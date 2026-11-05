@@ -1,0 +1,5 @@
+.venv/
+models/
+reports/*.json
+__pycache__/
+*.pyc
