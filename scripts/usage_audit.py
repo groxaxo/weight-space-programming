@@ -65,27 +65,28 @@ def rollout_usage(path: Path) -> dict:
     Mixed-model and forked/inherited sessions fail closed rather than overstate scope.
     """
     receipts, last, session, contexts, first, end = {}, None, None, set(), None, None
-    for line in path.open():
-        event = json.loads(line)
-        payload = event.get('payload') or {}
-        typ = event.get('type')
-        if typ == 'session_meta':
-            session = payload.get('id')
-            first = payload.get('timestamp')
-        elif typ == 'turn_context':
-            contexts.add((payload.get('model'), payload.get('effort')))
-        elif typ == 'token_usage_record':
-            rid = payload.get('response_id')
-            if not rid:
-                raise ValueError('Usage receipt lacks response identity')
-            usage = normalize(payload['usage'])
-            if rid in receipts and receipts[rid] != usage:
-                raise ValueError('Conflicting duplicate response usage')
-            receipts[rid] = usage
-        elif typ == 'event_msg' and payload.get('type') == 'token_count':
-            info = payload.get('info') or {}
-            if info.get('total_token_usage') is not None:
-                last = normalize(info['total_token_usage']); end = event.get('timestamp')
+    with path.open() as source:
+        for line in source:
+            event = json.loads(line)
+            payload = event.get('payload') or {}
+            typ = event.get('type')
+            if typ == 'session_meta':
+                session = payload.get('id')
+                first = payload.get('timestamp')
+            elif typ == 'turn_context':
+                contexts.add((payload.get('model'), payload.get('effort')))
+            elif typ == 'token_usage_record':
+                rid = payload.get('response_id')
+                if not rid:
+                    raise ValueError('Usage receipt lacks response identity')
+                usage = normalize(payload['usage'])
+                if rid in receipts and receipts[rid] != usage:
+                    raise ValueError('Conflicting duplicate response usage')
+                receipts[rid] = usage
+            elif typ == 'event_msg' and payload.get('type') == 'token_count':
+                info = payload.get('info') or {}
+                if info.get('total_token_usage') is not None:
+                    last = normalize(info['total_token_usage']); end = event.get('timestamp')
     if not session or len(contexts) != 1 or not receipts or last is None:
         raise ValueError('Incomplete or mixed-model session accounting')
     summed = add_usage(list(receipts.values()))
@@ -101,10 +102,11 @@ def rollout_usage(path: Path) -> dict:
 def plan_usage(events: Path, provenance: Path) -> dict:
     """Import the single completed turn of the existing ephemeral planner."""
     turns, thread = [], None
-    for line in events.open():
-        e = json.loads(line)
-        if e.get('type') == 'thread.started': thread = e['thread_id']
-        if e.get('type') == 'turn.completed': turns.append(normalize(e['usage']))
+    with events.open() as source:
+        for line in source:
+            e = json.loads(line)
+            if e.get('type') == 'thread.started': thread = e['thread_id']
+            if e.get('type') == 'turn.completed': turns.append(normalize(e['usage']))
     p = json.loads(provenance.read_text())
     if len(turns) != 1 or not thread:
         raise ValueError('Expected one completed ephemeral planner turn')
