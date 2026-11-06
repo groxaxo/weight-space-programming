@@ -4,7 +4,9 @@ A verified, CPU-only reproduction of the published **Qwen3.5-0.8B p50c weight re
 
 **Implemented and tested:** pinned downloads, full input authentication, sparse BF16 reconstruction, non-overwriting publication, output verification, and 40 CPU regression tests. A real 1.75 GB checkpoint has been reconstructed and checked on the Ubuntu 12700.
 
-**Not implemented:** autonomous Sol/Astra orchestration, token or spending budgets, activation extraction, an evaluation runner, GPU serving, or an isolated execution environment for agent-written code. This repository is a verified reproduction foundation, not the complete research-agent system discussed earlier.
+**Queued GPU comparison (7 November 2026):** a targeted, single-GPU-per-arm MATH-500 runner now compares original-thinking, repaired-thinking, and original-nonthinking through the existing GPUQ queue. The combined CPU suite passes 62 tests. GPU execution and accuracy results are pending. See [protocol, job IDs, and operations](docs/THREE_GPU_COMPARISON.md).
+
+**Research-agent components still not implemented:** autonomous Sol/Astra orchestration, frontier token or spending budgets, activation extraction, a general evaluation/serving service, and an isolated execution environment for agent-written code. The targeted comparison is not that complete system. [Sol 6.1 Max produced the implementation plan](docs/plans/sol-6.1-max-20261107.md), with [invocation provenance](docs/plans/sol-plan-provenance-20261107.json).
 
 ## Quick start — Linux, Python 3.12
 
