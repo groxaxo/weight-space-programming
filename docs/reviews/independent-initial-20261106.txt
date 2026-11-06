@@ -1,0 +1,10 @@
+Independent code review recorded before reading Sol's final review.
+Target: 5367eaa, scripts/pipeline.py (57 lines), README.md, .gitignore.
+P1: Default base filename cannot resolve actual downloaded checkpoint's shard/index (line 49).
+P1: Clean clone cannot run documented commands: upstream entirely ignored, no bootstrap/pins; reports directory untracked and never created (lines 24,25,43).
+P1: Assertions are used for runtime integrity/non-overwrite guards and can be disabled by optimization. Child process inherits PYTHONOPTIMIZE, which also disables upstream tensor checks (24-27,36-41).
+P1: Check-then-write output path is raceable, upstream writes directly to final path, failures leave partial files. Missing report directory fails after large output creation, and retry is rejected (39-43).
+P2: Rebuilt directory contains only weights, no config/tokenizer/index. It is not a directly usable pretrained checkpoint directory.
+P2: Upstream clones and manifest/code contents are not pinned or validated; edit hash is logged rather than enforced. README's pinned/fail-closed claim is too broad.
+P2: No tests, no CLI evaluation or autonomous experiment implementation despite earlier conversation aspirations. Missing functionality must be explicit, not claimed implemented.
+P2: Base hash is recorded but not independently pinned; only edited tensor identity is checked. Avoid claiming full model equivalence without checking unedited data and metadata.

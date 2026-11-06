@@ -1,0 +1,45 @@
+test_archive_integrity_enforced (test_pipeline.PipelineTests.test_archive_integrity_enforced) ... ok
+test_bad_download_never_publishes_partial_file (test_pipeline.PipelineTests.test_bad_download_never_publishes_partial_file) ... ok
+test_cli_returns_valid_json_and_verifies_output (test_pipeline.PipelineTests.test_cli_returns_valid_json_and_verifies_output) ... ok
+test_concurrent_rebuilds_publish_exactly_once (test_pipeline.PipelineTests.test_concurrent_rebuilds_publish_exactly_once) ... ok
+test_copy_failure_cleans_own_staging_only (test_pipeline.PipelineTests.test_copy_failure_cleans_own_staging_only) ... ok
+test_corruption_in_unedited_base_is_rejected (test_pipeline.PipelineTests.test_corruption_in_unedited_base_is_rejected) ... ok
+test_dangling_output_symlink_is_not_overwritten (test_pipeline.PipelineTests.test_dangling_output_symlink_is_not_overwritten) ... ok
+test_duplicate_json_lock_key_rejected (test_pipeline.PipelineTests.test_duplicate_json_lock_key_rejected) ... ok
+test_existing_invalid_download_not_replaced (test_pipeline.PipelineTests.test_existing_invalid_download_not_replaced) ... ok
+test_existing_output_directory_is_not_overwritten (test_pipeline.PipelineTests.test_existing_output_directory_is_not_overwritten) ... ok
+test_existing_output_file_is_not_overwritten (test_pipeline.PipelineTests.test_existing_output_file_is_not_overwritten) ... ok
+test_explicit_shard_path_remains_supported (test_pipeline.PipelineTests.test_explicit_shard_path_remains_supported) ... ok
+test_extra_archive_array_rejected (test_pipeline.PipelineTests.test_extra_archive_array_rejected) ... ok
+test_fresh_bootstrap_is_pinned_and_idempotent (test_pipeline.PipelineTests.test_fresh_bootstrap_is_pinned_and_idempotent) ... ok
+test_header_rejects_truncation_duplicates_and_out_of_bounds (test_pipeline.PipelineTests.test_header_rejects_truncation_duplicates_and_out_of_bounds) ... ok
+test_index_path_traversal_rejected (test_pipeline.PipelineTests.test_index_path_traversal_rejected) ... ok
+test_index_resolves_actual_hf_shard_filename (test_pipeline.PipelineTests.test_index_resolves_actual_hf_shard_filename) ... ok
+test_invalid_sparse_indices_rejected (test_pipeline.PipelineTests.test_invalid_sparse_indices_rejected) ... ok
+test_legacy_file_output_has_actionable_error (test_pipeline.PipelineTests.test_legacy_file_output_has_actionable_error) ... ok
+test_low_disk_fails_without_partial_output (test_pipeline.PipelineTests.test_low_disk_fails_without_partial_output) ... ok
+test_lowrank_edit_refused_explicitly (test_pipeline.PipelineTests.test_lowrank_edit_refused_explicitly) ... ok
+test_manifest_cannot_omit_expected_tensor (test_pipeline.PipelineTests.test_manifest_cannot_omit_expected_tensor) ... ok
+test_manifest_cannot_reorder_tensors (test_pipeline.PipelineTests.test_manifest_cannot_reorder_tensors) ... ok
+test_missing_assets_does_not_gate_download (test_pipeline.PipelineTests.test_missing_assets_does_not_gate_download) ... ok
+test_modified_config_is_rejected (test_pipeline.PipelineTests.test_modified_config_is_rejected) ... ok
+test_modified_manifest_is_rejected_without_relocking (test_pipeline.PipelineTests.test_modified_manifest_is_rejected_without_relocking) ... ok
+test_nested_output_cannot_modify_base (test_pipeline.PipelineTests.test_nested_output_cannot_modify_base) ... ok
+test_optimized_mode_enforces_tensor_hash (test_pipeline.PipelineTests.test_optimized_mode_enforces_tensor_hash) ... ok
+test_optimized_modes_enforce_overwrite_protection (test_pipeline.PipelineTests.test_optimized_modes_enforce_overwrite_protection) ... ok
+test_output_corruption_is_detected_inside_and_outside_edits (test_pipeline.PipelineTests.test_output_corruption_is_detected_inside_and_outside_edits) ... ok
+test_pickle_objects_are_not_loaded (test_pipeline.PipelineTests.test_pickle_objects_are_not_loaded) ... ok
+test_production_guards_are_not_assertions (test_pipeline.PipelineTests.test_production_guards_are_not_assertions) ... ok
+test_publication_race_never_replaces_empty_directory (test_pipeline.PipelineTests.test_publication_race_never_replaces_empty_directory) ... ok
+test_rebuild_copies_metadata_and_preserves_base (test_pipeline.PipelineTests.test_rebuild_copies_metadata_and_preserves_base) ... ok
+test_report_failure_does_not_publish (test_pipeline.PipelineTests.test_report_failure_does_not_publish) ... ok
+test_stage_is_rechecked_after_source_copy (test_pipeline.PipelineTests.test_stage_is_rechecked_after_source_copy) ... ok
+test_tensor_hash_checked_even_when_whole_base_lock_updated (test_pipeline.PipelineTests.test_tensor_hash_checked_even_when_whole_base_lock_updated) ... ok
+test_truncated_base_is_rejected (test_pipeline.PipelineTests.test_truncated_base_is_rejected) ... ok
+test_wrong_edited_hash_rejected (test_pipeline.PipelineTests.test_wrong_edited_hash_rejected) ... ok
+test_wrong_tensor_shape_rejected (test_pipeline.PipelineTests.test_wrong_tensor_shape_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 40 tests in 2.275s
+
+OK
