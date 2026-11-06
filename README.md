@@ -74,3 +74,9 @@ See [review comparison](docs/reviews/20261106-comparison.md), [Sol's original st
 - Format: [Safetensors specification](https://github.com/safetensors/safetensors#format).
 
 This project does not redistribute checkpoint or edit binaries in Git. Their upstream terms apply. Local testing is independent of GitHub Actions. Successful weight reconstruction establishes artifact integrity, not a new discovery result or reproduction of benchmark scores. Keep practice data separate from held-out evaluation when adding the research-agent stages.
+
+## Actual token accounting and benchmark observations
+
+[Actual measured token usage](docs/TOKEN_USAGE.md) separates recovered Sol session input, cached input, output, and reasoning subsets from local Qwen sample tokens. A read-only observer can refresh counts without another model call. It does not claim complete accounting for the main ChatGPT conversation or monetary billing.
+
+The three RTX 3090 benchmark attempts loaded and entered generation on 7 November 2026, then received SIGINT before saving any samples. They are cancelled, with no accuracy result. [Interruption evidence and limitations](docs/usage/benchmark-interruption-20261107.md) records the unknown cancellation initiator and discarded-token accounting gap.

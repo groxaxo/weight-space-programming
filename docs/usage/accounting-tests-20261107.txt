@@ -1,0 +1,94 @@
+test_admission_acquire_contract_and_cleanup (test_compare_gpu.EvaluationTests.test_admission_acquire_contract_and_cleanup) ... ok
+test_admission_low_disk_is_wait_not_kill (test_compare_gpu.EvaluationTests.test_admission_low_disk_is_wait_not_kill) ... ok
+test_admission_low_ram_is_wait (test_compare_gpu.EvaluationTests.test_admission_low_ram_is_wait) ... ok
+test_admission_resource_unique_per_job (test_compare_gpu.EvaluationTests.test_admission_resource_unique_per_job) ... ok
+test_atomic_json_deterministic_hash (test_compare_gpu.EvaluationTests.test_atomic_json_deterministic_hash) ... ok
+test_completed_records_require_full_identity (test_compare_gpu.EvaluationTests.test_completed_records_require_full_identity) ... ok
+test_fbox_and_bare_box (test_compare_gpu.EvaluationTests.test_fbox_and_bare_box) ... ok
+test_gpu_not_initialized_on_module_import (test_compare_gpu.EvaluationTests.test_gpu_not_initialized_on_module_import) ... ok
+test_last_reasoning_block_removed (test_compare_gpu.EvaluationTests.test_last_reasoning_block_removed) ... ok
+test_multi_gpu_rejected (test_compare_gpu.EvaluationTests.test_multi_gpu_rejected) ... ok
+test_nested_boxes (test_compare_gpu.EvaluationTests.test_nested_boxes) ... ok
+test_one_gpu_accepted_without_remapping (test_compare_gpu.EvaluationTests.test_one_gpu_accepted_without_remapping) ... ok
+test_proc_identity_reads_current_process (test_compare_gpu.EvaluationTests.test_proc_identity_reads_current_process) ... ok
+test_published_box_precedence (test_compare_gpu.EvaluationTests.test_published_box_precedence) ... ok
+test_question_bootstrap_constant (test_compare_gpu.EvaluationTests.test_question_bootstrap_constant) ... ok
+test_queue_required (test_compare_gpu.EvaluationTests.test_queue_required) ... ok
+test_record_atomic_no_clobber (test_compare_gpu.EvaluationTests.test_record_atomic_no_clobber) ... ok
+test_seed_is_matched_across_arms_and_distinct_across_samples (test_compare_gpu.EvaluationTests.test_seed_is_matched_across_arms_and_distinct_across_samples) ... ok
+test_unfinished_last_box_not_prior_answer (test_compare_gpu.EvaluationTests.test_unfinished_last_box_not_prior_answer) ... ok
+test_archive_integrity_enforced (test_pipeline.PipelineTests.test_archive_integrity_enforced) ... ok
+test_bad_download_never_publishes_partial_file (test_pipeline.PipelineTests.test_bad_download_never_publishes_partial_file) ... ok
+test_cli_returns_valid_json_and_verifies_output (test_pipeline.PipelineTests.test_cli_returns_valid_json_and_verifies_output) ... ok
+test_concurrent_rebuilds_publish_exactly_once (test_pipeline.PipelineTests.test_concurrent_rebuilds_publish_exactly_once) ... ok
+test_copy_failure_cleans_own_staging_only (test_pipeline.PipelineTests.test_copy_failure_cleans_own_staging_only) ... ok
+test_corruption_in_unedited_base_is_rejected (test_pipeline.PipelineTests.test_corruption_in_unedited_base_is_rejected) ... ok
+test_dangling_output_symlink_is_not_overwritten (test_pipeline.PipelineTests.test_dangling_output_symlink_is_not_overwritten) ... ok
+test_duplicate_json_lock_key_rejected (test_pipeline.PipelineTests.test_duplicate_json_lock_key_rejected) ... ok
+test_existing_invalid_download_not_replaced (test_pipeline.PipelineTests.test_existing_invalid_download_not_replaced) ... ok
+test_existing_output_directory_is_not_overwritten (test_pipeline.PipelineTests.test_existing_output_directory_is_not_overwritten) ... ok
+test_existing_output_file_is_not_overwritten (test_pipeline.PipelineTests.test_existing_output_file_is_not_overwritten) ... ok
+test_explicit_shard_path_remains_supported (test_pipeline.PipelineTests.test_explicit_shard_path_remains_supported) ... ok
+test_extra_archive_array_rejected (test_pipeline.PipelineTests.test_extra_archive_array_rejected) ... ok
+test_fresh_bootstrap_is_pinned_and_idempotent (test_pipeline.PipelineTests.test_fresh_bootstrap_is_pinned_and_idempotent) ... ok
+test_header_rejects_truncation_duplicates_and_out_of_bounds (test_pipeline.PipelineTests.test_header_rejects_truncation_duplicates_and_out_of_bounds) ... ok
+test_index_path_traversal_rejected (test_pipeline.PipelineTests.test_index_path_traversal_rejected) ... ok
+test_index_resolves_actual_hf_shard_filename (test_pipeline.PipelineTests.test_index_resolves_actual_hf_shard_filename) ... ok
+test_invalid_sparse_indices_rejected (test_pipeline.PipelineTests.test_invalid_sparse_indices_rejected) ... ok
+test_legacy_file_output_has_actionable_error (test_pipeline.PipelineTests.test_legacy_file_output_has_actionable_error) ... ok
+test_low_disk_fails_without_partial_output (test_pipeline.PipelineTests.test_low_disk_fails_without_partial_output) ... ok
+test_lowrank_edit_refused_explicitly (test_pipeline.PipelineTests.test_lowrank_edit_refused_explicitly) ... ok
+test_manifest_cannot_omit_expected_tensor (test_pipeline.PipelineTests.test_manifest_cannot_omit_expected_tensor) ... ok
+test_manifest_cannot_reorder_tensors (test_pipeline.PipelineTests.test_manifest_cannot_reorder_tensors) ... ok
+test_missing_assets_does_not_gate_download (test_pipeline.PipelineTests.test_missing_assets_does_not_gate_download) ... ok
+test_modified_config_is_rejected (test_pipeline.PipelineTests.test_modified_config_is_rejected) ... ok
+test_modified_manifest_is_rejected_without_relocking (test_pipeline.PipelineTests.test_modified_manifest_is_rejected_without_relocking) ... ok
+test_nested_output_cannot_modify_base (test_pipeline.PipelineTests.test_nested_output_cannot_modify_base) ... ok
+test_optimized_mode_enforces_tensor_hash (test_pipeline.PipelineTests.test_optimized_mode_enforces_tensor_hash) ... ok
+test_optimized_modes_enforce_overwrite_protection (test_pipeline.PipelineTests.test_optimized_modes_enforce_overwrite_protection) ... ok
+test_output_corruption_is_detected_inside_and_outside_edits (test_pipeline.PipelineTests.test_output_corruption_is_detected_inside_and_outside_edits) ... ok
+test_pickle_objects_are_not_loaded (test_pipeline.PipelineTests.test_pickle_objects_are_not_loaded) ... ok
+test_production_guards_are_not_assertions (test_pipeline.PipelineTests.test_production_guards_are_not_assertions) ... ok
+test_publication_race_never_replaces_empty_directory (test_pipeline.PipelineTests.test_publication_race_never_replaces_empty_directory) ... ok
+test_rebuild_copies_metadata_and_preserves_base (test_pipeline.PipelineTests.test_rebuild_copies_metadata_and_preserves_base) ... ok
+test_report_failure_does_not_publish (test_pipeline.PipelineTests.test_report_failure_does_not_publish) ... ok
+test_stage_is_rechecked_after_source_copy (test_pipeline.PipelineTests.test_stage_is_rechecked_after_source_copy) ... ok
+test_tensor_hash_checked_even_when_whole_base_lock_updated (test_pipeline.PipelineTests.test_tensor_hash_checked_even_when_whole_base_lock_updated) ... ok
+test_truncated_base_is_rejected (test_pipeline.PipelineTests.test_truncated_base_is_rejected) ... ok
+test_wrong_edited_hash_rejected (test_pipeline.PipelineTests.test_wrong_edited_hash_rejected) ... ok
+test_wrong_tensor_shape_rejected (test_pipeline.PipelineTests.test_wrong_tensor_shape_rejected) ... ok
+test_explicit_render_then_encode_avoids_batchencoding (test_tokenizer_preflight.TokenizerPreflightTests.test_explicit_render_then_encode_avoids_batchencoding) ... ok
+test_non_integer_token_output_is_rejected (test_tokenizer_preflight.TokenizerPreflightTests.test_non_integer_token_output_is_rejected) ... ok
+test_nonthinking_switch_is_preserved (test_tokenizer_preflight.TokenizerPreflightTests.test_nonthinking_switch_is_preserved) ... ok
+test_conflicting_duplicate_rejected (test_usage_audit.UsageAuditTests.test_conflicting_duplicate_rejected) ... /home/op/work/weight-space-programming-gpu-eval-20261107/scripts/usage_audit.py:83: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmprfzpjgzv/r' mode='r' encoding='UTF-8'>
+  raise ValueError('Conflicting duplicate response usage')
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_duplicate_receipts_and_cumulative_snapshots_not_double_counted (test_usage_audit.UsageAuditTests.test_duplicate_receipts_and_cumulative_snapshots_not_double_counted) ... /home/op/work/weight-space-programming-gpu-eval-20261107/scripts/usage_audit.py:68: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpyknfse_1/rollout.jsonl' mode='r' encoding='UTF-8'>
+  for line in path.open():
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_final_counter_must_match_receipts (test_usage_audit.UsageAuditTests.test_final_counter_must_match_receipts) ... /home/op/work/weight-space-programming-gpu-eval-20261107/scripts/usage_audit.py:68: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpre6vmikx/r' mode='r' encoding='UTF-8'>
+  for line in path.open():
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_inconsistent_total_rejected (test_usage_audit.UsageAuditTests.test_inconsistent_total_rejected) ... ok
+test_known_project_totals (test_usage_audit.UsageAuditTests.test_known_project_totals) ... ok
+test_negative_or_boolean_counts_rejected (test_usage_audit.UsageAuditTests.test_negative_or_boolean_counts_rejected) ... ok
+test_no_usage_is_not_zero (test_usage_audit.UsageAuditTests.test_no_usage_is_not_zero) ... ok
+test_planner_event_reconciles_with_provenance (test_usage_audit.UsageAuditTests.test_planner_event_reconciles_with_provenance) ... /home/op/work/weight-space-programming-gpu-eval-20261107/scripts/usage_audit.py:104: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmp3t5_9n2f/events' mode='r' encoding='UTF-8'>
+  for line in events.open():
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_same_session_not_counted_twice (test_usage_audit.UsageAuditTests.test_same_session_not_counted_twice) ... ok
+test_saved_samples_are_lower_bound_and_no_partial_accuracy (test_usage_audit.UsageAuditTests.test_saved_samples_are_lower_bound_and_no_partial_accuracy) ... ok
+test_subsets_are_not_added_to_total (test_usage_audit.UsageAuditTests.test_subsets_are_not_added_to_total) ... ok
+test_subsets_cannot_exceed_parent (test_usage_audit.UsageAuditTests.test_subsets_cannot_exceed_parent) ... ok
+test_unavailable_queue_not_misreported_as_queued (test_usage_audit.UsageAuditTests.test_unavailable_queue_not_misreported_as_queued) ... ok
+test_unknown_breakdown_stays_unknown (test_usage_audit.UsageAuditTests.test_unknown_breakdown_stays_unknown) ... ok
+test_wrong_sample_manifest_rejected (test_usage_audit.UsageAuditTests.test_wrong_sample_manifest_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 77 tests in 1.719s
+
+OK

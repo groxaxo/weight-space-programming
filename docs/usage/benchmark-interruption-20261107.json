@@ -1,0 +1,153 @@
+{
+  "captured_utc": "2026-11-06T19:54:28.745437+00:00",
+  "jobs": {
+    "original-thinking": {
+      "job_id": "ab865a58c626",
+      "physical_gpu": [
+        0
+      ],
+      "queue_status": "cancelled",
+      "cancel_flag": 1,
+      "exit_code": 1,
+      "stop_reason": null,
+      "updated_epoch": 1793994550.0178802,
+      "log_sha256": "6e66a3256b71318fcac660e768cfdeabd8d07b0d1168192e1a6123b62ffb02b7",
+      "generation_call_entered": true,
+      "sigint_observed": true,
+      "selected_log_lines": [
+        "(EngineCore pid=2257358) INFO 11-07 08:45:32 [gpu_model_runner.py:5255] Model loading took 1.53 GiB memory and 0.678409 seconds",
+        "(EngineCore pid=2257358) INFO 11-07 08:47:03 [core.py:344] init engine (profile, create kv cache, warmup model) took 91.23 s",
+        "(EngineCore pid=2257358) INFO 11-07 08:49:07 [core.py:1214] [shutdown] EngineCore: trigger received signal=SIGINT",
+        "INFO 11-07 08:49:07 [core.py:1214] [shutdown] EngineCore: trigger received signal=SIGINT",
+        "(EngineCore pid=2257358) INFO 11-07 08:49:07 [core.py:1342] [shutdown] EngineCore: aborting in-flight requests count=15"
+      ],
+      "saved_sample_records": 0
+    },
+    "repaired-thinking": {
+      "job_id": "ff5e96939107",
+      "physical_gpu": [
+        1
+      ],
+      "queue_status": "cancelled",
+      "cancel_flag": 1,
+      "exit_code": 1,
+      "stop_reason": null,
+      "updated_epoch": 1793994554.9080846,
+      "log_sha256": "670bb3fd85db754dc5b05e7390e342259aa240bb8047a3743b03fc8cd434c4c3",
+      "generation_call_entered": true,
+      "sigint_observed": true,
+      "selected_log_lines": [
+        "(EngineCore pid=2257371) INFO 11-07 08:45:32 [gpu_model_runner.py:5255] Model loading took 1.53 GiB memory and 0.775123 seconds",
+        "(EngineCore pid=2257371) INFO 11-07 08:47:03 [core.py:344] init engine (profile, create kv cache, warmup model) took 91.19 s",
+        "(EngineCore pid=2257371) INFO 11-07 08:49:13 [core.py:1214] [shutdown] EngineCore: trigger received signal=SIGINT",
+        "(EngineCore pid=2257371) INFO 11-07 08:49:13 [core.py:1214] [shutdown] EngineCore: trigger received signal=SIGINT",
+        "(EngineCore pid=2257371) INFO 11-07 08:49:13 [core.py:1342] [shutdown] EngineCore: aborting in-flight requests count=9"
+      ],
+      "saved_sample_records": 0
+    },
+    "original-nonthinking": {
+      "job_id": "318fe60bcc3d",
+      "physical_gpu": [
+        2
+      ],
+      "queue_status": "cancelled",
+      "cancel_flag": 1,
+      "exit_code": 1,
+      "stop_reason": null,
+      "updated_epoch": 1793994559.7903042,
+      "log_sha256": "8df921a64bff3f21417eeecd9838823cc28aba68adf0d0b65d05f5ce8279d61f",
+      "generation_call_entered": false,
+      "sigint_observed": true,
+      "selected_log_lines": [
+        "(EngineCore pid=2257357) INFO 11-07 08:45:32 [gpu_model_runner.py:5255] Model loading took 1.53 GiB memory and 0.797817 seconds",
+        "(EngineCore pid=2257357) INFO 11-07 08:47:03 [core.py:344] init engine (profile, create kv cache, warmup model) took 91.17 s",
+        "(EngineCore pid=2257357) INFO 11-07 08:49:18 [core.py:1214] [shutdown] EngineCore: trigger received signal=SIGINT",
+        "(EngineCore pid=2257357) INFO 11-07 08:49:18 [core.py:1214] [shutdown] EngineCore: trigger received signal=SIGINT",
+        "(EngineCore pid=2257357) INFO 11-07 08:49:18 [core.py:1342] [shutdown] EngineCore: aborting in-flight requests count=3"
+      ],
+      "saved_sample_records": 0
+    }
+  },
+  "watchdog_observations_0840_to_0850": [
+    {
+      "timestamp_us": "1793994351744210",
+      "job_id": "ab865a58c626",
+      "state": "protected",
+      "reason": "GPU activity observed",
+      "idle_seconds": null,
+      "idle_timeout_seconds": 300
+    },
+    {
+      "timestamp_us": "1793994351744210",
+      "job_id": "ff5e96939107",
+      "state": "protected",
+      "reason": "GPU activity observed",
+      "idle_seconds": null,
+      "idle_timeout_seconds": 300
+    },
+    {
+      "timestamp_us": "1793994351744210",
+      "job_id": "318fe60bcc3d",
+      "state": "protected",
+      "reason": "GPU activity observed",
+      "idle_seconds": null,
+      "idle_timeout_seconds": 300
+    },
+    {
+      "timestamp_us": "1793994411807525",
+      "job_id": "ab865a58c626",
+      "state": "idle",
+      "reason": null,
+      "idle_seconds": 0,
+      "idle_timeout_seconds": 300
+    },
+    {
+      "timestamp_us": "1793994411807525",
+      "job_id": "ff5e96939107",
+      "state": "idle",
+      "reason": null,
+      "idle_seconds": 0,
+      "idle_timeout_seconds": 300
+    },
+    {
+      "timestamp_us": "1793994411807525",
+      "job_id": "318fe60bcc3d",
+      "state": "idle",
+      "reason": null,
+      "idle_seconds": 0,
+      "idle_timeout_seconds": 300
+    },
+    {
+      "timestamp_us": "1793994471736545",
+      "job_id": "ab865a58c626",
+      "state": "protected",
+      "reason": "GPU activity observed",
+      "idle_seconds": null,
+      "idle_timeout_seconds": 300
+    },
+    {
+      "timestamp_us": "1793994471736545",
+      "job_id": "ff5e96939107",
+      "state": "protected",
+      "reason": "GPU activity observed",
+      "idle_seconds": null,
+      "idle_timeout_seconds": 300
+    },
+    {
+      "timestamp_us": "1793994471736950",
+      "job_id": "318fe60bcc3d",
+      "state": "protected",
+      "reason": "GPU activity observed",
+      "idle_seconds": null,
+      "idle_timeout_seconds": 300
+    }
+  ],
+  "conclusions": [
+    "All three jobs were admitted to different RTX 3090s, loaded the model, and entered llm.generate.",
+    "Each then received SIGINT while the first batched generation call was active; queue status is cancelled with cancel=1.",
+    "No sample records or final summaries were saved. Persisted generation totals are zero, but actual generated/discarded token counts are unknown.",
+    "The cancellation initiator is not identified by these queue records and logs. The sampled watchdog log shows protected activity observations, not a stop event for these jobs.",
+    "No cancellation, retry, queue mutation, or unrelated workload change was made by this audit."
+  ],
+  "accounting_gap": "Current evaluator persists only after a full synchronous batch returns. Per-sample completions or partial token counters can be lost on interruption. Capture incremental durable token counters in a separately versioned future runner; do not silently alter a frozen experiment."
+}

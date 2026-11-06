@@ -10,7 +10,7 @@ Three real GPUQ jobs were submitted. They each request one exclusive physical GP
 | Published repaired Qwen3.5-0.8B, thinking enabled | `ff5e96939107` | 1 |
 | Original Qwen3.5-0.8B, thinking disabled | `318fe60bcc3d` | 1 |
 
-**GPU execution and benchmark results are pending.** CPU preflight and tests do not establish that vLLM has successfully loaded this model on a GPU. Inspect GPUQ and the result files before making that claim.
+**Latest check, 7 November 2026:** all three jobs were admitted, loaded their model on separate RTX 3090s, and entered generation. They were then cancelled via SIGINT at approximately 08:49 NZDT, before the first batch was saved. No accuracy or speed result exists. The cancellation initiator is not identified. See [interruption evidence](usage/benchmark-interruption-20261107.md) and [actual token accounting](TOKEN_USAGE.md). The submission-time resource observations above are historical, not the current queue state.
 
 ## Frozen protocol
 
