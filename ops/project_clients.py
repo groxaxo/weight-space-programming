@@ -321,6 +321,7 @@ def main():
     sys.path.insert(0, str(ROOT))
     from coder_common import check, digest, write_json
     from evaluate_coder import Client
+    from ops.client_proxy import IdentityProxy
     from ops.smoke_clients import execute
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--base-url', default='http://127.0.0.1:18084/v1')
@@ -357,6 +358,7 @@ def main():
         container_name = 'wsp54-project-' + name + '-' + str(os.getpid())
         trial_label = 'wsp54.project_trial=' + str(os.getpid()) + '-' + str(time.time_ns())
         bridge = None
+        proxy = None
         observations = []
         allowed_extra = [Path(__file__).resolve(), Path(executable).resolve()] if name == 'opencode' else []
         observation_stop = threading.Event()
@@ -364,6 +366,9 @@ def main():
             args=(trial_label, area, allowed_extra, observation_stop, observations), daemon=True)
         observer.start()
         try:
+            proxy = IdentityProxy(args.base_url, client.identity, client.instance_id)
+            cli_base_url = proxy.base_url
+            proxy_address = urlparse(cli_base_url)
             version = subprocess.run([executable, '--version'], capture_output=True, text=True, timeout=30, check=True)
             row['version'] = version.stdout.splitlines()[0]
             if name == 'opencode':
@@ -386,7 +391,7 @@ def main():
                     '--mount', f'type=bind,src={Path(__file__).resolve()},dst=/harness/project_clients.py,readonly',
                     '--workdir', '/workspace', args.image, 'python3', '/harness/project_clients.py', '--container-client', args.model]
                 row['command_argv'] = command
-                with api_bridge(str(bridge/'model.sock'), (parsed.hostname, parsed.port or 80)):
+                with api_bridge(str(bridge/'model.sock'), (proxy_address.hostname, proxy_address.port or 80)):
                     row.update(execute(command, work, env, area/'client.log', timeout=1000))
             else:
                 profile = configure_hermes(state, work, args.image, trial_label)
@@ -401,11 +406,12 @@ def main():
                     TERMINAL_DOCKER_EXTRA_ARGS=json.dumps(['--label='+trial_label, '--pids-limit=64']),
                     TERMINAL_CONTAINER_MEMORY='768', TERMINAL_CONTAINER_CPU='1', TERMINAL_TIMEOUT='60',
                     TERMINAL_LIFETIME_SECONDS='120')
-                command = [executable, 'chat', '--ignore-rules', '--provider', 'custom', '--base-url', args.base_url,
+                command = [executable, 'chat', '--ignore-rules', '--provider', 'custom', '--base-url', cli_base_url,
                     '--api-key', 'local-only', '--model', args.model, '--oneshot', '--format', 'stream-json',
                     '--toolsets', 'file,terminal', '--max-turns', '16', '--query-file', str(work/'prompt.txt')]
                 row['command_argv'] = command
                 row.update(execute(command, work, env, area/'client.log', timeout=1000))
+            row['model_attestation'] = proxy.verify()
             for path, expected in protected.items():
                 check((work/path).is_file() and not (work/path).is_symlink() and digest(work/path) == expected, 'Client changed protected fixture: '+path)
             for path in ['scheduler/validation.py', 'scheduler/planning.py']:
@@ -419,6 +425,8 @@ def main():
         except Exception as error:
             row['error'] = f'{type(error).__name__}: {error}'
         finally:
+            if proxy is not None:
+                proxy.close()
             observation_stop.set()
             observer.join(timeout=12)
             row['container_isolation'] = observations

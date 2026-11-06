@@ -14,7 +14,7 @@ from urllib.request import urlopen
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path[:0]=[str(ROOT),str(ROOT/'scripts')]
-from coder_common import allocate_device,check,digest,load_config,loads,write_json
+from coder_common import adapter_identity,allocate_device,check,digest,fingerprint,load_config,loads,write_json
 from ops.run54_gpu_phase import gpu_window,restore,stop_child
 
 CPP=Path('/home/op/src/llama.cpp-prismml-mtp/src/build/bin')
@@ -72,7 +72,8 @@ def selected_identity(args,cfg):
         'launch_options':{'context':16384,'slots':1,'gpu_layers':'all','flash_attention':'on',
                           'threads':4,'threads_batch':4,'context_shift':False,'cache_prompt':False,
                           'warmup':False,'seed':20261106}}
-    identity={'base_model':cfg['model_id'],'revision':cfg['revision'],'adapter':None,
+    identity={'identity_schema':2,'model_proof_sha256':fingerprint(loads(args.model_proof.read_text())),
+        'limits':{'context':16384,'output':2048},'base_model':cfg['model_id'],'revision':cfg['revision'],'adapter':None,
         'quantization':'Q8_0','runtime':runtime,'artifact_path':str(artifact.resolve()),
         'artifact_sha256':model_entry['sha256'],'conversion_manifest_sha256':digest(args.conversion),
         'conversion_profile':args.profile}
@@ -105,6 +106,7 @@ def selected_identity(args,cfg):
                   and digest(adapter/name)==expected,'Source adapter artifact changed')
         identity.update(adapter=str(adapter),adapter_sha256=result['adapter_files']['adapter_model.safetensors'],
             adapter_config_sha256=result['adapter_files']['adapter_config.json'],adapter_provenance_sha256=digest(provenance))
+        identity.update(adapter_identity(result))
         if lora is not None:
             targets=loads((adapter.parent/'adapter-targets.json').read_text())
             check(exported['tensor_count']==2*len(targets),'Incomplete FP32 native adapter')

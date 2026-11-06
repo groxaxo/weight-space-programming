@@ -25,7 +25,13 @@ restoration. [Machine-readable findings](docs/experiments/qwen35-4b-20261107.jso
 preserve identities and per-case changes. Successful training or a small edit
 fixture does not establish broad coding reliability or frontier-model parity.
 
-The source regression suite contains 102 tests. Use the independent CPU setup
+The [pipeline review and fixes](docs/reviews/20261107-pipeline-fixes.md) close all nine
+reviewed discrepancies, including GPU ownership, mandatory artifact binding, atomic
+checkpoint export, literal tool markup and attribution of actual client requests.
+Serving identity schema 2 requires fresh paired evidence; the historical quality
+measurements above remain attached to their original source.
+
+The source regression suite contains 136 tests. Use the independent CPU setup
 below; optional training-library checks skip in that environment. Full sandbox
 checks additionally require Docker and `WSP_TEST_DOCKER_IMAGE`, as configured
 in the included GitHub Actions workflow.

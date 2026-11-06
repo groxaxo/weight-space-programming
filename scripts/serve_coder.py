@@ -16,7 +16,7 @@ from pathlib import Path
 import time
 import uuid
 
-from coder_common import allocate_device, check, digest, fingerprint, load_coder_model, load_config, loads, parse_completion, runtime_identity, tool_map, verify_model_proof
+from coder_common import adapter_identity, allocate_device, check, digest, fingerprint, load_coder_model, load_config, loads, parse_completion, runtime_identity, tool_map, verify_model_proof
 
 
 def chat_stop_tokens(tokenizer, generation_config):
@@ -66,7 +66,7 @@ def validate_request(request, model_name, max_context, max_output):
 
 
 class Backend:
-    def __init__(self, cfg, adapter, max_context, max_output, model_path=None, four_bit=False):
+    def __init__(self, cfg, adapter, max_context, max_output, model_path=None, four_bit=False, model_proof=None):
         import torch
         from transformers import AutoTokenizer
         check(torch.cuda.device_count() == 1, "Exactly one allocated CUDA GPU is required")
@@ -75,7 +75,9 @@ class Backend:
         self.tokenizer = AutoTokenizer.from_pretrained(str(model_path or cfg["model_id"]), revision=cfg["revision"],
             trust_remote_code=False, local_files_only=bool(model_path))
         self.model = load_coder_model(cfg, model_path, four_bit)
-        self.identity = {"base_model": cfg["model_id"], "revision": cfg["revision"], "adapter": None,
+        self.identity = {"identity_schema": 2, "base_model": cfg["model_id"], "revision": cfg["revision"], "adapter": None,
+                         "model_proof_sha256": fingerprint(model_proof) if model_proof else None,
+                         "limits": {"context": max_context, "output": max_output},
                          "quantization": "nf4-double" if four_bit else "bf16", "runtime": runtime_identity(),
                          "protocol_sha256": fingerprint({p.name: digest(p) for p in
                              (Path(__file__), Path(__file__).with_name("coder_common.py"))})}
@@ -95,7 +97,7 @@ class Backend:
                 check(Path(name).name == name and digest(adapter / name) == expected, "Adapter checksum mismatch")
             self.model = PeftModel.from_pretrained(self.model, str(adapter), is_trainable=False)
             self.identity["adapter"] = str(adapter)
-            self.identity["adapter_sha256"] = result["adapter_files"]["adapter_model.safetensors"]
+            self.identity.update(adapter_identity(result))
         self.model.eval()
         self.identity["chat_stop_token_ids"] = chat_stop_tokens(self.tokenizer, self.model.generation_config)
 
@@ -125,6 +127,7 @@ class Backend:
 
 
 def handler_for(backend):
+    instance = uuid.uuid4().hex
     class Handler(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.1"
         def log_message(self, *_args):
@@ -141,7 +144,7 @@ def handler_for(backend):
         def do_GET(self):
             if self.path in ("/health", "/v1/models"):
                 self.send_json(200, {"object": "list", "data": [{"id": backend.cfg["served_model_name"],
-                    "object": "model", "owned_by": "local"}], "wsp": backend.identity})
+                    "object": "model", "owned_by": "local"}], "wsp": backend.identity, "wsp_instance": instance})
             else:
                 self.send_json(404, {"error": {"message": "Unknown route"}})
 
@@ -157,6 +160,7 @@ def handler_for(backend):
                 check(len(raw) == size, "Incomplete request body")
                 request = loads(raw)
                 result = backend.complete(request)
+                result['wsp'] = {**result.get('wsp', {}), 'identity': backend.identity, 'instance_id': instance}
             except (ValueError, KeyError, TypeError) as error:
                 self.close_connection = True
                 self.send_json(400, {"error": {"message": str(error), "type": "invalid_request_error"}})
@@ -180,10 +184,10 @@ def handler_for(backend):
                 delta["tool_calls"] = [{"index": i, **call} for i, call in enumerate(message["tool_calls"])]
             common = {k: result[k] for k in ("id", "created", "model")}
             for change, finish in ((delta, None), ({}, result["choices"][0]["finish_reason"])):
-                chunk = {**common, "object": "chat.completion.chunk", "choices": [{"index": 0, "delta": change, "finish_reason": finish}]}
+                chunk = {**common, "wsp": result['wsp'], "object": "chat.completion.chunk", "choices": [{"index": 0, "delta": change, "finish_reason": finish}]}
                 self.wfile.write(("data: " + json.dumps(chunk) + "\n\n").encode())
             if (request.get("stream_options") or {}).get("include_usage"):
-                chunk = {**common, "object": "chat.completion.chunk", "choices": [], "usage": result["usage"]}
+                chunk = {**common, "wsp": result['wsp'], "object": "chat.completion.chunk", "choices": [], "usage": result["usage"]}
                 self.wfile.write(("data: " + json.dumps(chunk) + "\n\n").encode())
             self.wfile.write(b"data: [DONE]\n\n")
             self.wfile.flush()
@@ -205,9 +209,9 @@ def main():
     args = parser.parse_args()
     check(1 <= args.port <= 65535 and 512 <= args.max_context <= 32768 and 1 <= args.max_output < args.max_context, "Invalid server limits")
     cfg = load_config(args.config)
-    verify_model_proof(cfg, args.model_path, args.model_proof)
+    proof = verify_model_proof(cfg, args.model_path, args.model_proof)
     allocate_device(args.direct_idle_gpu)
-    backend = Backend(cfg, args.adapter, args.max_context, args.max_output, args.model_path, args.four_bit)
+    backend = Backend(cfg, args.adapter, args.max_context, args.max_output, args.model_path, args.four_bit, proof)
     server = HTTPServer(("127.0.0.1", args.port), handler_for(backend))
     print(json.dumps({"status": "ready", "url": f"http://127.0.0.1:{args.port}/v1", "identity": backend.identity,
                       "created_at": datetime.now(timezone.utc).isoformat()}), flush=True)

@@ -6,6 +6,7 @@ to the OpenAI message schema; Qwen's pinned native template renders the wire for
 from __future__ import annotations
 
 import hashlib
+import ast
 import json
 import math
 import os
@@ -200,12 +201,48 @@ def verify_model_proof(cfg, model_path, proof_path):
     files = proof["files"]
     check({"config.json", "tokenizer.json", "tokenizer_config.json", "chat_template.jinja",
            "model.safetensors.index.json"}.issubset(files), "Incomplete model proof")
+    index_path = Path(model_path) / 'model.safetensors.index.json'
+    check(digest(index_path) == files['model.safetensors.index.json']['sha256'], 'Authenticated model index changed')
+    index = loads(index_path.read_text()).get('weight_map')
+    check(isinstance(index, dict) and index, 'Missing model weight index')
+    shards = set(index.values())
+    check(all(isinstance(n, str) and Path(n).name == n and n.endswith('.safetensors') for n in shards), 'Unsafe model shard')
+    check(shards == {n for n in files if n.endswith('.safetensors')}, 'Incomplete model proof: shard/index mismatch')
+    consumed = {p.name for p in Path(model_path).iterdir() if p.is_file() and
+                (p.suffix in ('.json', '.safetensors', '.jinja', '.txt') or p.name == 'LICENSE')}
+    check(consumed == set(files), 'Incomplete model proof: unverified loader inputs')
     for name, spec in files.items():
         check(Path(name).name == name and name not in ("", ".", ".."), "Unsafe model filename")
         path = Path(model_path) / name
         check(path.is_file() and path.stat().st_size == spec["size"] and digest(path) == spec["sha256"],
               f"Authenticated model file changed: {name}")
     return proof
+
+
+def check_template_strings(value):
+    """Guard every training string that can be interpolated into the chat template."""
+    if isinstance(value, str):
+        check(not re.search(r'<\|(?:im_start|im_end|endoftext|vision_start|vision_end)\|>', value),
+              'Embedded chat control tokens are forbidden')
+        check(not re.search(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|\b(?:sk-proj-|ghp_)[A-Za-z0-9_-]{20,}', value),
+              'Possible secret in dataset')
+    elif isinstance(value, dict):
+        for key, child in value.items():
+            check_template_strings(key)
+            check_template_strings(child)
+    elif isinstance(value, list):
+        for child in value:
+            check_template_strings(child)
+
+
+def adapter_identity(training):
+    files = training.get('adapter_files', {})
+    result = {}
+    for key, name in [('adapter_sha256', 'adapter_model.safetensors'), ('adapter_config_sha256', 'adapter_config.json')]:
+        value = files.get(name)
+        check(isinstance(value, str) and re.fullmatch('[a-f0-9]{64}', value), 'Missing authenticated adapter artifact: ' + name)
+        result[key] = value
+    return {**result, 'training_result_sha256': fingerprint(training)}
 
 
 def load_coder_model(cfg, model_path, four_bit=False):
@@ -239,6 +276,7 @@ def normalize_record(record):
     tools = record.get("tools", [])
     if isinstance(tools, str):
         tools = loads(tools)
+    check_template_strings(tools)
     schemas = tool_map(tools)
     output, pending, seen_calls = [], {}, set()
     first_user = None
@@ -275,6 +313,7 @@ def normalize_record(record):
                     name, arguments = function.get("name"), function.get("arguments", {})
                     if isinstance(arguments, str):
                         arguments = loads(arguments)
+                    check_template_strings(arguments)
                     validate_call(name, arguments, schemas)
                     call_id = call.get("id") or f"call_{len(seen_calls)}"
                     check(isinstance(call_id, str) and call_id and call_id not in seen_calls, "Duplicate call id")
@@ -340,8 +379,34 @@ def parse_completion(text, tools):
     elif text.startswith("</think>"):
         text = text.removeprefix("</think>").strip()
     text = re.sub(r"(?:\s*<\|(?:im_end|endoftext)\|>)+\s*$", "", text).rstrip()
-    calls, position, contents = [], 0, []
+    # Valid Python is literal coding output, including triple-quoted XML examples.
+    try:
+        ast.parse(text)
+        return {'role': 'assistant', 'content': text or None}
+    except (SyntaxError, ValueError):
+        pass
+    protected, fence_start, fence_char, fence_size = [], None, None, 0
+    for line in re.finditer(r'.*(?:\n|$)', text):
+        marker = re.match(r'^\s{0,3}(`{3,}|~{3,})', line.group())
+        if not marker:
+            continue
+        chars = marker.group(1)
+        if fence_start is None:
+            fence_start, fence_char, fence_size = line.start(), chars[0], len(chars)
+        elif chars[0] == fence_char and len(chars) >= fence_size:
+            protected.append((fence_start, line.end()))
+            fence_start = None
+    if fence_start is not None:
+        protected.append((fence_start, len(text)))
+    def literal(position):
+        return any(a <= position < b for a, b in protected)
+    calls, position, contents, call_spans = [], 0, [], []
     for match in re.finditer(r"<tool_call>(.*?)</tool_call>", text, flags=re.S):
+        if literal(match.start()):
+            continue
+        prefix = text[text.rfind('\n', 0, match.start()) + 1:match.start()]
+        if prefix.strip() and match.start() != position:
+            continue  # Quoted/inline examples are content, not native call blocks.
         contents.append(text[position:match.start()])
         body = match.group(1).strip()
         if body.startswith("{"):
@@ -366,10 +431,13 @@ def parse_completion(text, tools):
         validate_call(name, arguments, schemas)
         calls.append({"id": f"call_{uuid.uuid4().hex[:16]}", "type": "function",
                       "function": {"name": name, "arguments": canonical(arguments)}})
+        call_spans.append((match.start(), match.end()))
         position = match.end()
     contents.append(text[position:])
     content = "".join(contents).strip()
-    check(not re.search(r"</?(?:tool_call|function|parameter)(?:>|=)", content), "Truncated or malformed tool call")
+    for marker in re.finditer(r'(?m)^\s*</?(?:tool_call|function|parameter)(?:>|=)', text):
+        if not literal(marker.start() + len(marker.group()) - 1):
+            check(any(a <= marker.end() - 1 < b for a, b in call_spans), 'Truncated or malformed tool call')
     message = {"role": "assistant", "content": content or None}
     if calls:
         message["tool_calls"] = calls

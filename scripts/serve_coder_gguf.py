@@ -16,7 +16,7 @@ from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 import uuid
 
-from coder_common import check, digest, fingerprint, load_config, loads, parse_completion
+from coder_common import check, digest, fingerprint, load_config, loads, parse_completion, verify_model_proof
 from serve_coder import handler_for, validate_request
 
 
@@ -90,13 +90,7 @@ def main():
               'Native LoRA artifact changed')
     snapshot=Path(proof['snapshot'])
     check(snapshot.name==cfg['revision'],'Tokenizer snapshot is not pinned')
-    # Base weight shards are not loaded here. Authenticate every non-weight tokenizer/config input.
-    for name,spec in proof['files'].items():
-        check(Path(name).name==name,'Unsafe tokenizer filename')
-        if not name.endswith('.safetensors'):
-            path=snapshot/name
-            check(path.is_file() and path.stat().st_size==spec['size'] and digest(path)==spec['sha256'],
-                  'Tokenizer/config input changed: '+name)
+    verify_model_proof(cfg, snapshot, args.model_proof)
     protocol_files=[Path(__file__),Path(__file__).with_name('serve_coder.py'),Path(__file__).with_name('coder_common.py'),
                     Path(__file__).resolve().parents[1]/'ops/run54_gguf_phase.py']
     identity['protocol_sha256']=fingerprint({'files':{p.name:digest(p) for p in protocol_files},

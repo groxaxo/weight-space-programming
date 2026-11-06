@@ -3,12 +3,28 @@
 import argparse
 import json
 import math
+import re
 from pathlib import Path
-from coder_common import check, digest, fingerprint, loads, write_json
+from coder_common import adapter_identity, check, digest, fingerprint, loads, write_json
 from evaluate_coder import CODE_CASES, TOOL_CASES
 
 
 def compare(baseline, candidate):
+    for report in (baseline, candidate):
+        identity = report['identity']
+        check(identity.get('identity_schema') == 2, 'Missing complete serving identity; legacy reports require their frozen gate')
+        check(isinstance(identity.get('model_proof_sha256'), str) and re.fullmatch('[a-f0-9]{64}', identity['model_proof_sha256']),
+              'Missing authenticated model proof identity')
+        check(isinstance(identity.get('limits'), dict) and set(identity['limits']) == {'context', 'output'}, 'Missing serving limits')
+        limits = identity['limits']
+        check(all(type(v) is int for v in limits.values()) and 0 < limits['output'] < limits['context'] <= 32768,
+              'Invalid serving limits')
+        if identity.get('adapter'):
+            for key in ('adapter_sha256', 'adapter_config_sha256', 'training_result_sha256'):
+                check(isinstance(identity.get(key), str) and re.fullmatch('[a-f0-9]{64}', identity[key]),
+                      'Missing authenticated adapter identity: ' + key)
+    for key in ('model_proof_sha256', 'limits'):
+        check(baseline['identity'][key] == candidate['identity'][key], 'Different inference profile: ' + key)
     check(baseline["schema_version"] == candidate["schema_version"] == 1, "Unsupported evaluation schema")
     check(baseline["suite_sha256"] == candidate["suite_sha256"], "Different evaluation suites")
     check(baseline["suite_sha256"] == fingerprint([CODE_CASES, TOOL_CASES]), "Unknown development suite identity")
@@ -83,9 +99,15 @@ def acceptance(baseline, candidate, baseline_human, candidate_human, clients, tr
     before, after = training["before"]["eval_loss"], training["after"]["eval_loss"]
     check(all(isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v) and v >= 0
               for v in (before, after)), "Invalid validation loss")
-    if "adapter_sha256" in candidate["identity"]:
-        check(training["adapter_files"]["adapter_model.safetensors"] == candidate["identity"]["adapter_sha256"],
-              "Training result belongs to a different adapter")
+    for key, value in adapter_identity(training).items():
+        check(candidate['identity'].get(key) == value, 'Training result belongs to a different adapter: ' + key)
+    proxy_hash = digest(Path(__file__).resolve().parents[1] / 'ops/client_proxy.py')
+    for row in rows:
+        proof = row.get('model_attestation', {})
+        check(proof.get('verified') is True and proof.get('requests', 0) > 0 and
+              proof.get('identity_sha256') == fingerprint(candidate['identity']) and
+              proof.get('proxy_sha256') == proxy_hash and bool(proof.get('instance_id')),
+              'Missing actual client request attribution')
     broad_pass = candidate_human["passed"] >= baseline_human["passed"]
     accepted = development["status"] == "development_gate_passed" and broad_pass and client_pass and after < before
     return {"status": "accepted_for_local_use" if accepted else "not_promoted", "development": development,

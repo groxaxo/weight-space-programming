@@ -18,6 +18,7 @@ import signal
 import subprocess
 import sys
 import time
+import uuid
 from urllib.request import urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,19 +28,67 @@ from coder_common import check, load_config, loads, write_json
 SERVICE = "browserfusion-bonsai.service"
 
 
+# One lease for this host/user, shared by every checkout and both backends.
+GPU_STATE = Path(os.environ.get('XDG_RUNTIME_DIR', f'/run/user/{os.getuid()}')) / 'wsp54-gpu'
+
+
+@contextmanager
+def host_lock():
+    GPU_STATE.mkdir(parents=True, exist_ok=True, mode=0o700)
+    with (GPU_STATE / 'lock').open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        yield
+
+
+def owner_record():
+    path = GPU_STATE / 'owner.json'
+    return loads(path.read_text()) if path.exists() else None
+
+
+def restore_owned(owner):
+    """Called only while holding the host lock; leave the owner on failure."""
+    output = Path(owner['output'])
+    done = output / 'bonsai-restored.json'
+    if not done.exists():
+        if owner['was_active']:
+            subprocess.run(['systemctl', '--user', 'start', SERVICE], check=True, timeout=120)
+            subprocess.run(['systemctl', '--user', 'is-active', '--quiet', SERVICE], check=True, timeout=15)
+        write_json(done, {'status': 'active' if owner['was_active'] else 'left_inactive',
+                         'lease_id': owner.get('lease_id'),
+                         'restored_at_utc': datetime.now(timezone.utc).isoformat()})
+    (output / 'restore-bonsai-required').unlink(missing_ok=True)
+    current = owner_record()
+    if current and current.get('lease_id') == owner.get('lease_id'):
+        (GPU_STATE / 'owner.json').unlink()
+        # Recovery must also work with /usr/bin/python3 and no training packages.
+        descriptor = os.open(GPU_STATE, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(descriptor)
+        finally:
+            os.close(descriptor)
+
+
 def restore(output):
-    marker = output / "restore-bonsai-required"
-    before_path = output / "service-before-phase.json"
-    before = loads(before_path.read_text()) if before_path.exists() else {}
-    if before:
-        check(before.get("service") == SERVICE, "Unexpected service restoration record")
-    if marker.exists() or before.get("was_active") is True:
-        subprocess.run(["systemctl", "--user", "start", SERVICE], check=True, timeout=120)
-        subprocess.run(["systemctl", "--user", "is-active", "--quiet", SERVICE], check=True, timeout=15)
-        marker.unlink(missing_ok=True)
-        path = output / "bonsai-restored.json"
-        if not path.exists():
-            write_json(path, {"status": "active", "restored_at_utc": datetime.now(timezone.utc).isoformat()})
+    output = Path(output).resolve()
+    if (output / 'bonsai-restored.json').exists():
+        return True
+    try:
+        with host_lock():
+            owner = owner_record()
+            if owner:
+                if Path(owner['output']).resolve() != output:
+                    return False  # A newer owner controls restoration.
+                restore_owned(owner)
+            else:
+                before_path = output / 'service-before-phase.json'
+                before = loads(before_path.read_text()) if before_path.exists() else None
+                if before:
+                    check(before.get('service') == SERVICE, 'Unexpected service restoration record')
+                    # Recovery of older, pre-lease runs is safe only under the host lock.
+                    restore_owned({**before, 'output': str(output)})
+            return True
+    except BlockingIOError:
+        return False  # The live owner will restore; never interfere with its GPU window.
 
 
 def stop_child(process):
@@ -52,24 +101,51 @@ def stop_child(process):
             process.wait(timeout=10)
 
 
+def wait_idle_gpu(seconds=60):
+    """Let CUDA teardown and NVML's sampled utilization settle after a stop.
+
+    This is read-only readiness; each model process still performs its strict
+    direct-idle admission. No unknown GPU process is stopped by this wait.
+    """
+    deadline = time.monotonic() + seconds
+    while True:
+        rows = subprocess.check_output(['nvidia-smi', '--query-gpu=index,memory.free,utilization.gpu',
+            '--format=csv,noheader,nounits'], text=True, timeout=10).strip().splitlines()
+        check(len(rows) == 1, 'Expected the sole .54 GPU while waiting for readiness')
+        index, free, utilization = (int(v.strip()) for v in rows[0].split(','))
+        check(index == 0, 'Unexpected GPU index while waiting for readiness')
+        if free >= 10500 and utilization == 0:
+            return
+        check(time.monotonic() < deadline,
+              f'GPU did not become idle within the bounded readiness wait (free={free} MiB, utilization={utilization}%)')
+        time.sleep(1)
+
+
 @contextmanager
 def gpu_window(output, allow_pause):
-    check(os.uname().nodename == "4790", "This supervisor is for .54 only")
-    with (ROOT / "runs/.gpu-phase.lock").open("a") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        observed = subprocess.run(["systemctl", "--user", "is-active", "--quiet", SERVICE])
+    check(os.uname().nodename == '4790', 'This supervisor is for .54 only')
+    output = Path(output).resolve()
+    with host_lock():
+        pending = owner_record()
+        if pending:
+            restore_owned(pending)  # Previous process died after releasing the lock.
+        observed = subprocess.run(['systemctl', '--user', 'is-active', '--quiet', SERVICE])
         check(observed.returncode in (0, 3), "Cannot determine Bonsai's initial service state")
         active = observed.returncode == 0
-        check(not active or allow_pause, "Pausing the existing Bonsai service needs explicit authorization")
-        write_json(output / "service-before-phase.json", {"service": SERVICE, "was_active": active,
-            "query_exit_code": observed.returncode, "observed_at_utc": datetime.now(timezone.utc).isoformat()})
+        check(not active or allow_pause, 'Pausing the existing Bonsai service needs explicit authorization')
+        owner = {'lease_id': uuid.uuid4().hex, 'output': str(output), 'service': SERVICE,
+                 'was_active': active, 'query_exit_code': observed.returncode,
+                 'observed_at_utc': datetime.now(timezone.utc).isoformat()}
+        write_json(output / 'service-before-phase.json', owner)
+        write_json(GPU_STATE / 'owner.json', owner)
         try:
             if active:
-                (output / "restore-bonsai-required").write_text(SERVICE + "\n")
-                subprocess.run(["systemctl", "--user", "stop", SERVICE], check=True, timeout=90)
+                (output / 'restore-bonsai-required').write_text(SERVICE + '\n')
+                subprocess.run(['systemctl', '--user', 'stop', SERVICE], check=True, timeout=90)
+            wait_idle_gpu()
             yield
         finally:
-            restore(output)
+            restore_owned(owner)
 
 
 def run_logged(command, output, name, timeout, accepted_codes=(0,)):

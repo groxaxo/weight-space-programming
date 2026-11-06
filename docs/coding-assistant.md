@@ -32,9 +32,9 @@ python3 -m venv .venv-train
 
 The full [verified .54 environment lock](../configs/qwen35-environment-54.lock.txt) also pins transitive dependencies for the recorded Linux/CUDA run. Use that file instead of `requirements-coder.txt` when reproducing that exact environment.
 
-The downloader checks every required file against the immutable Hub revision's LFS SHA-256 or Git blob identity and writes `reports/model-inputs.json`. Training and serving reauthenticate that snapshot and load it offline with `trust_remote_code=False`. Existing proof files, datasets, model reports, and training outputs are not overwritten; choose a new output path for another experiment.
+The downloader checks every required file against the immutable Hub revision's LFS SHA-256 or Git blob identity and writes `reports/model-inputs.json`. The verifier requires every weight shard referenced by the authenticated index and every loader sidecar present in the snapshot. Training and serving reauthenticate that snapshot and load it offline with `trust_remote_code=False`. Existing proof files, datasets, model reports, and training outputs are not overwritten; choose a new output path for another experiment.
 
-`configs/qwen35-4b.json` defines the seed, context length, adapter rank, learning rate, accumulation, and minimum usable split sizes. The recipe uses the model's native chat template. User, system, and tool-result tokens are masked out of the loss. Whole examples that exceed the context limit are recorded and dropped instead of being truncated through a tool call or answer.
+`configs/qwen35-4b.json` defines the seed, context length, adapter rank, learning rate, accumulation, and minimum usable split sizes. The recipe uses the model's native chat template. User, system, and tool-result tokens are masked out of the loss. Delimiter and credential-pattern checks cover nested tool arguments and tool schema/description strings as well as message content. Whole examples that exceed the context limit are recorded and dropped instead of being truncated through a tool call or answer.
 
 ## GPU phases on .54
 
@@ -42,7 +42,7 @@ The working checkout is `/home/op/work/weight-space-programming-20261106`. This 
 
 The phase supervisor supports an explicit `--allow-pause-bonsai` authorization. It records whether Bonsai was active, stops it for the requested phase, and restores it in a `finally` block. Run the supervisor in a transient systemd unit with its `--restore-only` command as `ExecStopPost`, so forced process termination also triggers restoration. Unit names and output directories must be unique.
 
-`service-before-phase.json` records the initial state independently of the transient pause marker. Restoration uses this record too, so losing the marker cannot silently leave a previously active Bonsai service stopped. An unknown service-state query fails before the phase starts.
+`service-before-phase.json` records the initial state independently of the transient pause marker. Restoration uses this record too, so losing the marker cannot silently leave a previously active Bonsai service stopped. An unknown service-state query fails before the phase starts. All checkouts share `$XDG_RUNTIME_DIR/wsp54-gpu` (normally `/run/user/1000/wsp54-gpu`). Its exclusive lock and owner journal bind cleanup to a single lease. Completed callbacks are idempotent; an older callback cannot start Bonsai inside a newer GPU window. An abandoned lease is recovered under the host lock before another phase is admitted. After stopping Bonsai, a bounded 60-second readiness wait lets CUDA teardown and NVIDIA’s sampled utilization settle; model admission still requires at least 10,500 MiB free and zero utilization, and unknown GPU processes are never stopped.
 
 ```bash
 ROOT=/home/op/work/weight-space-programming-20261106
@@ -59,7 +59,7 @@ Use `--phase smoke` for two optimizer steps, or `--phase evaluate` for the model
 
 Use `--phase benchmark` to run HumanEval alone against the same serving identity. Client failures are recorded in `acceptance.json`; they do not prevent gathering the remaining benchmark evidence.
 
-The supervisor limits host thread use and enables expandable CUDA allocation segments for varying sequence lengths. Training probes the longest training example using the actual backward/optimizer path at zero learning rate before the epoch. It periodically validates and retains checkpoints, selects the lowest validation loss, checks finite metrics, and records adapter checksums, source hashes, package versions, device allocation, and peak CUDA memory. A failed job is incomplete; inspect `phase-failed.json` and `training.log` before retrying.
+The supervisor limits host thread use and enables expandable CUDA allocation segments for varying sequence lengths. Training probes the longest training example using the actual backward/optimizer path at zero learning rate before the epoch. It periodically validates and retains checkpoints, selects the lowest validation loss, checks finite metrics, and records adapter checksums, source hashes, package versions, device allocation, and peak CUDA memory. Before model loading, training writes an authenticated `source/` archive of its scripts, operations code and recipe configuration. These hashes are recorded in `run-manifest.json`. A failed job is incomplete; inspect `phase-failed.json` and `training.log` before retrying.
 
 Lower validation loss does not guarantee better downstream behavior. To evaluate an earlier saved checkpoint from a completed run, export it without changing the original artifacts:
 
@@ -68,15 +68,15 @@ Lower validation loss does not guarantee better downstream behavior. To evaluate
   --training runs/train-02/training --step 18 --output runs/checkpoint-18/training
 ```
 
-The exporter checks all saved tensor names against the original language-module targets, verifies finite weights, preserves source provenance, and uses that step's actual validation loss. It writes a separate unpromoted candidate. Development results may guide checkpoint choice; HumanEval and client acceptance still require fresh measurements for the selected adapter.
+The exporter checks all saved tensor names against the original language-module targets, verifies finite weights, preserves source provenance, and uses that step's actual validation loss. It authenticates the frozen source archive and writes a separate unpromoted candidate through staging and atomic no-replace publication. A failed copy leaves no final destination, so the export can be retried. The selection script is preserved separately in `selection-source/`; it does not overwrite the parent recipe. Development results may guide checkpoint choice; HumanEval and client acceptance still require fresh measurements for the selected adapter.
 
 The existing GPUQ route remains the allocation path on .51. `--direct-idle-gpu` is a specific .54 exception and does not permit bypassing .51's queue.
 
 ## Evaluate the actual candidate
 
-The local endpoint is `http://127.0.0.1:18084/v1`. It advertises the exact model revision, adapter identity, runtime, quantization mode, and serving-protocol hash. Context and output limits are enforced. Calls are serialized and use greedy generation in the evaluations.
+The local endpoint is `http://127.0.0.1:18084/v1`. Its schema-2 identity advertises the authenticated model proof, adapter weights and configuration, training-result identity, runtime, quantization mode, effective context/output limits and serving-protocol hash. A separate per-process instance ID binds requests to a running server without making baseline/candidate profile identities process-specific. Context and output limits are enforced. Calls are serialized and use greedy generation in the evaluations.
 
-Qwen3.5's native XML function calls are parsed and validated against the provided JSON schemas, then returned as OpenAI `tool_calls`. Both ordinary JSON and SSE Chat Completions clients are supported. SSE currently emits one completed delta; it does not provide token-by-token latency. This is a measured local experiment server, not a multi-user production inference engine.
+Standalone top-level Qwen3.5 XML function calls are parsed and validated against the provided JSON schemas, then returned as OpenAI `tool_calls`. Fenced examples and valid Python containing tool markup remain literal coding output. Both ordinary JSON and SSE Chat Completions clients are supported. SSE currently emits one completed delta; it does not provide token-by-token latency. This is a measured local experiment server, not a multi-user production inference engine.
 
 Generation explicitly stops at both the native chat boundary (`<|im_end|>`, token 248046) and the checkpoint EOS (`<|endoftext|>`, token 248044). The pinned checkpoint's default EOS alone does not stop an assistant turn at its chat boundary. The serving identity records the effective stop IDs, and regression tests cover this distinction.
 
@@ -99,7 +99,7 @@ Generation explicitly stops at both the native chat boundary (`<|im_end|>`, toke
 
 The development suite has eight executable Python tasks and six multi-turn tool scenarios, including dependent calls, error recovery, typed arguments, and untrusted file text. The gate requires a complete matching pair, at least 80% coding success, all tool scenarios passing, no per-case regressions, and an actual improvement. Different base revisions, quantization, inference runtimes, serving protocols, or evaluator implementations cannot be silently compared. HumanEval adds all 164 official tasks, with the same output budget and sandbox for baseline and candidate. Its public status prevents a claim of uncontaminated generalization.
 
-For the complete local acceptance gate, also pass `--baseline-humaneval`, `--candidate-humaneval`, `--clients` (the candidate's `acceptance.json`), and `--training` (its `training-result.json`) to `compare_coder.py`. This requires all 164 paired tasks, no aggregate HumanEval regression, both installed clients making edits that pass independent tests, and a finite improvement in held-out validation loss. A missing or mismatched report fails closed.
+For the complete local acceptance gate, also pass `--baseline-humaneval`, `--candidate-humaneval`, `--clients` (the candidate's `acceptance.json`), and `--training` (its `training-result.json`) to `compare_coder.py`. This requires all 164 paired tasks, no aggregate HumanEval regression, both installed clients making edits that pass independent tests, and a finite improvement in held-out validation loss. A missing or mismatched report fails closed. Weight/configuration checksums and the training-result fingerprint are mandatory. Each successful client result must also carry a verified request attestation from the current proxy. Historical schema-1 reports are rejected by the current gate; use their frozen source to inspect historical decisions, and regenerate baseline/candidate evidence for a new qualification run. Do not add identity fields to old reports retroactively.
 
 Generated Python executes only in the pinned Docker image with networking disabled, a read-only root filesystem, an unprivileged user, bounded memory/CPU/processes, and a read-only fixture mount. Sandbox self-tests run before scoring. This isolates generated code for these evaluations; it is not a general policy for unrestricted agent shell commands.
 
@@ -109,7 +109,7 @@ If only sandbox scoring changes during a long HumanEval run, `rescore_humaneval.
 
 ## OpenCode and Hermes
 
-The [OpenCode example](../examples/opencode.json) uses `@ai-sdk/openai-compatible`. The [Hermes example](../examples/hermes-config.yaml) defines a separate custom-provider profile. Neither requires changing a user's existing default provider. The installed clients are tested against isolated fixture directories and empty client state, using file tools only. The harness independently tests the edited source in Docker and verifies that the client did not alter the fixture tests.
+The [OpenCode example](../examples/opencode.json) uses `@ai-sdk/openai-compatible`. The [Hermes example](../examples/hermes-config.yaml) defines a separate custom-provider profile. Neither requires changing a user's existing default provider. The installed clients are tested against isolated fixture directories and empty client state, using file tools only. Both client harnesses route actual model requests through `ops/client_proxy.py`. It validates the model profile and server instance on every JSON response or SSE chunk, requires real completion requests, rejects provider drift/fallback, and records only request hashes/counts. Unsupported SDK capability-discovery routes return 404 and never count as model requests; they do not invalidate an otherwise verified completion. The harness independently tests the edited source in Docker and verifies that the client did not alter the fixture tests.
 
 ```bash
 .venv-train/bin/python ops/smoke_clients.py \
@@ -193,7 +193,17 @@ uses the existing request validation, native tool-call parser and completed-delt
 SSE handler. The supervisor `ops/run54_gguf_phase.py` authenticates the converted
 artifacts and runtime, applies the same GPU admission and Bonsai restoration
 policy, and supports development, benchmark and serving phases. Its `--help`
-describes the required conversion manifest and profile selection.
+describes the required conversion manifest and profile selection. Create that manifest with the committed converter after CPU compilation:
+
+```bash
+CUDA_VISIBLE_DEVICES='' .venv-train/bin/python scripts/convert_coder_gguf.py \
+  --llama-source /home/op/src/llama.cpp-prismml-mtp/src \
+  --model-proof reports/model-inputs.json \
+  --compiled runs/compiled-lowlr18-bf16 --profile candidate \
+  --output runs/native-compiled-example
+```
+
+The command authenticates the source snapshot and compiled files, produces the Q8 base and candidate, preserves converter hashes, and atomically publishes `conversion.json` plus `compile-record.json`. Pass `--conversion runs/native-compiled-example/conversion.json --profile candidate` to the native supervisor.
 
 For a separate Q8 base plus unmerged FP32 LoRA, export with:
 
@@ -205,6 +215,18 @@ CUDA_VISIBLE_DEVICES='' .venv-train/bin/python scripts/export_coder_lora_gguf.py
   --training runs/checkpoint-lowlr-18/training \
   --output runs/gguf-lora18-f32
 ```
+
+Build a manifest for the unmerged route with:
+
+```bash
+CUDA_VISIBLE_DEVICES='' .venv-train/bin/python scripts/convert_coder_gguf.py \
+  --llama-source /home/op/src/llama.cpp-prismml-mtp/src \
+  --model-proof reports/model-inputs.json \
+  --lora-export runs/gguf-lora18-f32 --profile candidate-lora \
+  --output runs/native-lora-example
+```
+
+Add `--reuse-base /absolute/path/to/prior/conversion.json` to authenticate and reuse an existing Q8 base. Otherwise the producer converts a fresh base. Use the resulting `conversion.json` with `--profile candidate-lora`; the manifest binds the export and its base without hand-authored fields.
 
 The exporter adjusts hybrid-head permutations on the LoRA factors in memory:
 row permutations affect B and column permutations affect A. It verifies finite
@@ -239,3 +261,21 @@ The [comprehensive report](experiments/qwen35-4b-20261107.md) and
 checkpoint decisions and later integration corrections. `--safe-mode` in the
 earlier file-only interactive example does not establish terminal isolation;
 use the explicit task-profile project harness for contained terminal trials.
+
+## Bounded end-to-end verification on .54
+
+`ops/verify_pipeline54.py` uses 16 training and four validation conversations from the authenticated public corpus for a complete two-step control epoch. It freezes the recipe, exports checkpoint 1, exercises the base and control adapter through the development evaluator and actual OpenCode/Hermes clients, compiles all 248 matrices on CPU, exports FP32 factors, produces the native manifest and exercises native inference/clients. It records actual outcomes without treating the tiny control adapter as a qualified coding model.
+
+```bash
+ROOT=/home/op/work/weight-space-programming-20261106
+OUT="$ROOT/reports/pipeline-verification-example"
+systemd-run --user --collect --unit=wsp54-pipeline-example \
+  --property=RuntimeMaxSec=5400 --property=TimeoutStopSec=240 \
+  --property=KillMode=control-group --property="WorkingDirectory=$ROOT" \
+  --property="ExecStopPost=$ROOT/.venv-train/bin/python $ROOT/ops/verify_pipeline54.py --output $OUT --restore-only" \
+  "$ROOT/.venv-train/bin/python" "$ROOT/ops/verify_pipeline54.py" \
+  --output "$OUT" --allow-pause-bonsai \
+  --base-conversion /absolute/path/to/existing/base/conversion.json
+```
+
+A pinned model/corpus, the full training environment, installed clients, Docker, and the protected native runtime must already exist. Use a unique unit and output directory. `--restore-only` covers both the HF and native lease outputs. `verification.json` distinguishes pipeline execution, client/code quality results, and whether HumanEval was regenerated. Add `--humaneval` only for a fresh all-164-task measurement of both HF profiles; it substantially extends runtime, so raise the transient unit’s `RuntimeMaxSec` to `21600` for that mode. The ordinary bounded control does not update the original HumanEval scores or promote its adapter. The [nine-finding resolution record](reviews/20261107-pipeline-fixes.md) maps each fix to its regression evidence.

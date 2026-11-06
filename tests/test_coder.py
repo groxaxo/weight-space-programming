@@ -123,10 +123,11 @@ class ProtocolTests(unittest.TestCase):
     def test_snapshot_proof_rejects_changed_inputs_and_wrong_identity(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory) / ("a" * 40); root.mkdir()
-            names = ["config.json", "tokenizer.json", "tokenizer_config.json", "chat_template.jinja", "model.safetensors.index.json"]
+            names = ["config.json", "tokenizer.json", "tokenizer_config.json", "chat_template.jinja", "model.safetensors.index.json", "model.safetensors"]
             for name in names: (root / name).write_text("fixture")
+            (root / "model.safetensors.index.json").write_text(json.dumps({"weight_map": {"x": "model.safetensors"}}))
             proof = {"schema_version": 1, "model_id": "test", "revision": "a" * 40,
-                     "files": {name: {"size": 7, "sha256": digest(root / name)} for name in names}}
+                     "files": {name: {"size": (root / name).stat().st_size, "sha256": digest(root / name)} for name in names}}
             path = Path(directory) / "proof.json"; path.write_text(json.dumps(proof))
             cfg = {"model_id": "test", "revision": "a" * 40}
             verify_model_proof(cfg, root, path)
@@ -326,10 +327,12 @@ class PromotionTests(unittest.TestCase):
         baseline = {"schema_version": 1, "suite_sha256": fingerprint([CODE_CASES, TOOL_CASES]),
             "evaluator_sha256": digest(Path(__file__).resolve().parents[1] / "scripts/evaluate_coder.py"),
             "sandbox_image": "pinned-fixture", "identity": {"base_model": "test", "revision": "a"*40,
+            "identity_schema": 2, "model_proof_sha256": "f"*64, "limits": {"context": 16384, "output": 2048},
             "adapter": None, "quantization": "nf4-double", "runtime": {"torch": "test"}, "protocol_sha256": "pinned"},
             "results": rows}
         candidate = copy.deepcopy(baseline)
-        candidate["identity"]["adapter"] = "candidate"
+        candidate["identity"].update(adapter="candidate", adapter_sha256="a"*64, adapter_config_sha256="b"*64,
+                                     training_result_sha256="c"*64)
         baseline["results"][0]["passed"] = False
         return baseline, candidate
 
@@ -369,7 +372,13 @@ class PromotionTests(unittest.TestCase):
                    "results": [{"client": n, "passed": True, "exit_code": 0, "timed_out": False,
                                 "independent_tests": {"passed": True, "tests_completed": True}} for n in ("opencode", "hermes")]}
         training = {"smoke_only": False, "status": "trained_unpromoted",
-                    "before": {"eval_loss": 0.3}, "after": {"eval_loss": 0.2}}
+                    "before": {"eval_loss": 0.3}, "after": {"eval_loss": 0.2},
+                    "adapter_files": {"adapter_model.safetensors": "a"*64, "adapter_config.json": "b"*64}}
+        b["identity"]["training_result_sha256"] = fingerprint(training)
+        for row in clients["results"]:
+            row["model_attestation"] = {"verified": True, "requests": 2, "instance_id": "synthetic-instance",
+                "identity_sha256": fingerprint(b["identity"]),
+                "proxy_sha256": digest(Path(__file__).resolve().parents[1] / "ops/client_proxy.py")}
         return a, b, human, candidate, clients, training
 
     def test_complete_evidence_required_before_acceptance(self):

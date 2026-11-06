@@ -14,6 +14,7 @@ import sys
 
 from coder_common import allocate_device, check, digest, encode_record, load_coder_model, load_config, runtime_identity, verify_model_proof, write_json
 from prepare_coder_data import read_dataset
+from coder_artifacts import capture_recipe
 
 
 def main():
@@ -60,8 +61,7 @@ def main():
     source = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=Path(__file__).resolve().parents[1], text=True).strip()
     patch = subprocess.check_output(["git", "diff", "HEAD"], cwd=Path(__file__).resolve().parents[1])
     # Hash every executed recipe file too: git diff does not include new untracked files.
-    recipe = {str(p.relative_to(Path(__file__).resolve().parents[1])): digest(p)
-              for p in sorted(Path(__file__).parent.glob("*.py"))}
+    recipe = capture_recipe(Path(__file__).resolve().parents[1], args.output, args.config)
     run = {"schema_version": 1, "started_at_utc": datetime.now(timezone.utc).isoformat(),
            "host": os.uname().nodename, "source_revision": source,
            "dirty_patch_sha256": __import__("hashlib").sha256(patch).hexdigest(), "recipe_sha256": recipe,

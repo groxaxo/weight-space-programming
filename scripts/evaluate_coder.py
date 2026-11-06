@@ -118,8 +118,11 @@ class Client:
               "Evaluation endpoints must be local; use an SSH tunnel for a remote server")
         self.base_url, self.model = base_url.rstrip("/"), model
         with urlopen(self.base_url + "/models", timeout=15) as response:
-            self.identity = loads(response.read()).get("wsp")
+            info = loads(response.read())
+            self.identity = info.get('wsp')
+            self.instance_id = info.get('wsp_instance')
         check(self.identity, "Endpoint must report model/revision/adapter identity")
+        check(isinstance(self.instance_id, str) and self.instance_id, 'Endpoint must identify its server instance')
 
     def complete(self, messages, tools=None):
         payload = {"model": self.model, "messages": messages, "temperature": 0, "max_tokens": 1024,
@@ -131,6 +134,7 @@ class Client:
         with urlopen(request, timeout=300) as response:
             result = loads(response.read())
         check(result.get("wsp", {}).get("identity") == self.identity, "Model identity changed during evaluation")
+        check(result.get('wsp', {}).get('instance_id') == self.instance_id, 'Serving instance changed during evaluation')
         check(result["choices"][0]["finish_reason"] != "length", "Generation hit its token limit")
         return result["choices"][0]["message"], result.get("usage", {})
 

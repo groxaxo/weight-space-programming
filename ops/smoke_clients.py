@@ -18,9 +18,10 @@ import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "scripts"))
+sys.path[:0] = [str(ROOT), str(ROOT / "scripts")]
 from coder_common import check, digest, write_json
 from evaluate_coder import Client, run_python
+from ops.client_proxy import IdentityProxy
 
 INITIAL = '''def wsp_client_discount(price, percent):
     """Apply a percentage discount. Negative prices and percentages outside 0..100 are invalid."""
@@ -100,14 +101,17 @@ def main():
                "XDG_STATE_HOME": str(state / "state"), "XDG_CACHE_HOME": str(state / "cache")}
         executable = shutil.which(name) or f"/home/op/.local/bin/{name}"
         row = {"client": name, "passed": False, "scope": "isolated file tools; independent sandbox tests"}
+        proxy = None
         try:
+            proxy = IdentityProxy(args.base_url, client.identity, client.instance_id)
+            cli_base_url = proxy.base_url
             check(Path(executable).exists(), f"{name} is not installed")
             version = subprocess.run([executable, "--version"], capture_output=True, text=True, timeout=30)
             row["version"] = version.stdout.splitlines()[0] if version.stdout else "unknown"
             if name == "opencode":
                 config = {"$schema": "https://opencode.ai/config.json", "model": f"wsp-local/{args.model}",
                     "provider": {"wsp-local": {"npm": "@ai-sdk/openai-compatible", "name": "WSP local trial",
-                    "options": {"baseURL": args.base_url, "apiKey": "local-only"},
+                    "options": {"baseURL": cli_base_url, "apiKey": "local-only"},
                     "models": {args.model: {"name": "Qwen 4B trial", "toolcall": True,
                         "limit": {"context": 16384, "output": 2048}}}}},
                     "tools": {"bash": False, "task": False, "webfetch": False, "websearch": False},
@@ -119,11 +123,12 @@ def main():
                 command = [executable, "run", "--pure", "--format", "json", "--model", f"wsp-local/{args.model}", PROMPT]
             else:
                 env["HERMES_HOME"] = str(state / "hermes")
-                command = [executable, "chat", "--safe-mode", "--provider", "custom", "--base-url", args.base_url,
+                command = [executable, "chat", "--safe-mode", "--provider", "custom", "--base-url", cli_base_url,
                     "--api-key", "local-only", "--model", args.model, "--oneshot", "--format", "stream-json",
                     "--toolsets", "file", "--max-turns", "8", "--query-file", str(work / "prompt.txt")]
             row["command_argv"] = command
             row.update(execute(command, work, env, work / "client.log"))
+            row["model_attestation"] = proxy.verify()
             check((work / "calc.py").is_file() and not (work / "calc.py").is_symlink(), "Client did not leave a regular source file")
             check(digest(work / "test_calc.py") == tests_hash, "Client modified the fixture tests")
             check(digest(work / "calc.py") != initial_hash, "Client made no source edit")
@@ -133,6 +138,9 @@ def main():
             row["passed"] = row["exit_code"] == 0 and row["independent_tests"]["passed"]
         except Exception as error:
             row["error"] = f"{type(error).__name__}: {error}"
+        finally:
+            if proxy is not None:
+                proxy.close()
         results.append(row)
         print(json.dumps(row), flush=True)
     report = {"schema_version": 1, "identity": client.identity, "results": results,
