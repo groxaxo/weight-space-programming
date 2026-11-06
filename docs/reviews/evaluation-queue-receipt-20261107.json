@@ -1,0 +1,19 @@
+{
+  "manifest_sha256": "043e88e2cb427970e47c8bc50ea2e4099097dec5b964d8c29969501d60c2960b",
+  "jobs": {
+    "original-thinking": {
+      "job_id": "ab865a58c626",
+      "gpu_count": 1
+    },
+    "repaired-thinking": {
+      "job_id": "ff5e96939107",
+      "gpu_count": 1
+    },
+    "original-nonthinking": {
+      "job_id": "318fe60bcc3d",
+      "gpu_count": 1
+    }
+  },
+  "status_at_submission": "queued; GPU inference not yet tested",
+  "run_dir": "/home/op/work/weight-space-programming-gpu-eval-20261107/runs/math500-three-arm-20261107"
+}

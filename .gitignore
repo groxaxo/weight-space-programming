@@ -13,3 +13,9 @@ __pycache__/
 .env.*
 !.env.example
 *.log
+
+.eval-venv/
+.gpu-admission/
+.sol-plan-session-path
+data/
+runs/

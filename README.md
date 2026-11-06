@@ -36,6 +36,10 @@ below; optional training-library checks skip in that environment. Full sandbox
 checks additionally require Docker and `WSP_TEST_DOCKER_IMAGE`, as configured
 in the included GitHub Actions workflow.
 
+**GPU comparison and accounting (7 November 2026):** a targeted, single-GPU-per-arm MATH-500 runner compares original-thinking, repaired-thinking, and original-nonthinking through the existing GPUQ queue. The three jobs were subsequently cancelled after entering generation, with zero saved samples and no accuracy result. The token-accounting audit and interruption evidence are retained. See [protocol, job IDs, and operations](docs/THREE_GPU_COMPARISON.md).
+
+**Research-agent components still not implemented:** autonomous Sol/Astra orchestration, frontier token or spending budgets, activation extraction, a general evaluation/serving service, and an isolated execution environment for agent-written code. The targeted comparison is not that complete system. [Sol 6.1 Max produced the implementation plan](docs/plans/sol-6.1-max-20261107.md), with [invocation provenance](docs/plans/sol-plan-provenance-20261107.json).
+
 ## Quick start — Linux, Python 3.12
 
 ```bash
@@ -102,3 +106,9 @@ See [review comparison](docs/reviews/20261106-comparison.md), [Sol's original st
 - Format: [Safetensors specification](https://github.com/safetensors/safetensors#format).
 
 This project does not redistribute checkpoint or edit binaries in Git. Their upstream terms apply. Local testing is independent of GitHub Actions. Successful weight reconstruction establishes artifact integrity, not a new discovery result or reproduction of benchmark scores. Keep practice data separate from held-out evaluation when adding the research-agent stages.
+
+## Actual token accounting and benchmark observations
+
+[Actual measured token usage](docs/TOKEN_USAGE.md) separates recovered Sol session input, cached input, output, and reasoning subsets from local Qwen sample tokens. A read-only observer can refresh counts without another model call. It does not claim complete accounting for the main ChatGPT conversation or monetary billing.
+
+The three RTX 3090 benchmark attempts loaded and entered generation on 7 November 2026, then received SIGINT before saving any samples. They are cancelled, with no accuracy result. [Interruption evidence and limitations](docs/usage/benchmark-interruption-20261107.md) records the unknown cancellation initiator and discarded-token accounting gap.
