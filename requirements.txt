@@ -1,0 +1,2 @@
+# Sole runtime dependency. CPU-only; no torch, CUDA, agent API or Hugging Face credentials.
+numpy==2.5.4

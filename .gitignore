@@ -1,7 +1,12 @@
 .venv/
 models/
-reports/*.json
+assets/
+upstream/
+reports/
 __pycache__/
 *.pyc
-
-upstream/
+.pytest_cache/
+.env
+.env.*
+!.env.example
+*.log

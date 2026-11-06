@@ -1,28 +1,74 @@
 # Weight-Space Programming Lab
 
-Reproducible, non-destructive reproduction of the published Qwen3.5-0.8B 50-pass edit, with upstream OpenWSP checked out for future independent editing experiments.
+A verified, CPU-only reproduction of the published **Qwen3.5-0.8B p50c weight repair**. The base checkpoint stays unchanged. The output includes the full checkpoint, tokenizer, configuration, index, and a reconstruction record.
 
-## Status
-- Upstream research and OpenWSP cloned.
-- Published edit and its manifest available locally.
-- Pipeline preflight and CPU-only reconstruction wrapper included.
-- **Full checkpoint rebuild and GPU benchmarks are not yet verified.**
-- Do not use the benchmark datasets to select edits; keep training/practice and held-out evaluation separate.
+**Implemented and tested:** pinned downloads, full input authentication, sparse BF16 reconstruction, non-overwriting publication, output verification, and 40 CPU regression tests. A real 1.75 GB checkpoint has been reconstructed and checked on the Ubuntu 12700.
 
-## Commands
+**Not implemented:** autonomous Sol/Astra orchestration, token or spending budgets, activation extraction, an evaluation runner, GPU serving, or an isolated execution environment for agent-written code. This repository is a verified reproduction foundation, not the complete research-agent system discussed earlier.
+
+## Quick start — Linux, Python 3.12
+
 ```bash
-cd /home/op/experiments/weight-space-programming
-python3 scripts/pipeline.py preflight
 python3 -m venv .venv
-.venv/bin/pip install numpy huggingface_hub
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python scripts/pipeline.py bootstrap
 .venv/bin/python scripts/pipeline.py download
+.venv/bin/python scripts/pipeline.py verify
 .venv/bin/python scripts/pipeline.py rebuild
+.venv/bin/python scripts/pipeline.py verify-output
 ```
 
-The upstream reconstruction checks SHA-256 of every modified tensor against the authors' evaluated checkpoint and refuses incompatible base weights. This wrapper pins the original revision, prevents overwriting the base and writes a provenance record to reports/rebuild.json.
+`bootstrap` fetches only the two pinned edit artifacts, not an executable upstream checkout. `download` independently fetches the locked base snapshot. Existing files are reused only after size and SHA-256 verification. Incorrect files are **not silently replaced**. Downloads are streamed to temporary files and published without clobbering existing paths; interrupted downloads restart that file rather than resuming it.
 
-**Evaluation:** See upstream/lm_understand-logs/exp8_math/code/evaluate.py and profiles.py for the exact authors' vLLM protocol. Run original-thinking, edited-thinking, and original-non-thinking under matching decoding budgets. Do not interpret a short smoke test as reproduction of published MATH-500 scores.
+The default paths are `assets/p50c`, `models/base`, and `models/rebuilt`. `preflight` is an alias for the full input/tensor verification performed by `verify`, not merely a presence check. Rebuild and verification are offline after the inputs exist. They require no GPU, frontier-model calls, API keys, or authenticated services.
 
-**Future discovery:** upstream/openwsp is a separate research implementation, not automatically integrated into the reconstruction wrapper. Review its environment and isolation requirements before executing agent-generated edits. Preserve immutable baselines and compare against held-out benchmarks.
+### Reuse the existing model on the 12700
 
-GPU usage is intentionally opt-in; no existing services are stopped.
+The review branch is checked out at `/home/op/work/weight-space-programming-review-20261106`. The original checkout remains unchanged on `master`.
+
+```bash
+cd /home/op/work/weight-space-programming-review-20261106
+PY=/home/op/experiments/weight-space-programming/.venv/bin/python
+BASE=/home/op/experiments/weight-space-programming/models/base
+OUT=/home/op/experiments/weight-space-programming/models/rebuilt
+
+"$PY" scripts/pipeline.py verify --base "$BASE"
+"$PY" scripts/pipeline.py verify-output --base "$BASE" --output "$OUT"
+```
+
+The verified output already exists at `$OUT`. A second rebuild to that directory deliberately fails; use a new output directory for another run. `--base` accepts either the model directory or an exact locked shard path. **`--output` is now a checkpoint directory**, not the old single `.safetensors` filename. The checkpoint index resolves the real shard name automatically.
+
+## Integrity and publication guarantees
+
+`reproduction.lock.json` pins the model revision, research revision, every required model file's size/SHA-256, the edit archive and manifest, and the ordered set of edited tensors. Base model hashes were cross-checked with Hugging Face's immutable-revision LFS SHA-256 values or Git blob IDs. This lock and the code in this repository are trusted inputs: changing both is outside the integrity threat model.
+
+The implementation verifies the entire base, including untouched weights and sidecar files; applies only the published sparse BF16 edit; verifies the published pre-edit/post-edit tensor hashes; and checks every byte outside the edited tensor spans. It copies the full checkpoint into a private staging directory, rechecks those copies, records provenance inside that directory, and publishes using Linux `renameat2(RENAME_NOREPLACE)`. Existing files, directories, empty directories, and dangling symlinks cannot be replaced by the publication operation. Normal failures remove only the current invocation's staging directory.
+
+Guards use explicit exceptions, not `assert`, and remain active under `-O`, `-OO`, and `PYTHONOPTIMIZE`. Upstream Python is never executed, and NumPy archives are loaded with `allow_pickle=False`. Unsupported edit forms are rejected rather than silently generalized.
+
+A killed process or machine crash may leave a hidden `.NAME.building-*` directory, but not a partial checkpoint at the final destination. Inspect stale staging directories before removing them; another run may still own one. Download/rebuild operations should use private directories controlled by the operator. This is **not** a defense against an attacker who can rewrite the process's files, trusted lock, code, or directory tree while it runs. Linux no-replace publication is mandatory; there is no unsafe portable fallback.
+
+## Measured reconstruction
+
+| Check | Observed result |
+|---|---|
+| Full base checkpoint and 12 sidecar files | All locked hashes matched |
+| Layer 15 MLP tensor | Published edited SHA-256 matched; 65,260 BF16 entries differ |
+| Layer 19 MLP tensor | Published edited SHA-256 matched; 64,928 BF16 entries differ |
+| Total changed BF16 entries | 130,188 |
+| All remaining weight/header bytes and sidecars | Preserved |
+| CPU regression suite on the 12700 | 40 passed |
+| GPU inference / MATH-500 performance | Not run |
+
+The often-quoted 131,072 figure counts selected weight positions. The published manifest counts 130,188 positions whose BF16 bits actually change; some touched entries round back to their original value. Both edited tensor hashes match the published artifact. The whole output file's hash is **not** claimed to equal a separately repackaged Hugging Face release, since serialization/header layout may differ.
+
+See [review comparison](docs/reviews/20261106-comparison.md), [Sol's original static findings](docs/reviews/sol-6.1-static-review-20261106.md), and [measured validation evidence](docs/reviews/validation-20261106.json).
+
+## Research provenance
+
+- Research: [RikiyaT/lm_understand-logs](https://github.com/RikiyaT/lm_understand-logs), commit `4d09ba6d6a7e891dd8063974dfe81b3d78e3494f`, `exp8_math/runs/p50c/edit`.
+- Base: [Qwen/Qwen3.5-0.8B](https://huggingface.co/Qwen/Qwen3.5-0.8B), revision `2fc06364715b967f1860aea9cf38778875588b17`.
+- Format: [Safetensors specification](https://github.com/safetensors/safetensors#format).
+
+This project does not redistribute checkpoint or edit binaries in Git. Their upstream terms apply. Local testing is independent of GitHub Actions. Successful weight reconstruction establishes artifact integrity, not a new discovery result or reproduction of benchmark scores. Keep practice data separate from held-out evaluation when adding the research-agent stages.
