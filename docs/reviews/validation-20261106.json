@@ -67,5 +67,45 @@
   "benchmarks_run": false,
   "autonomous_agent_implemented": false,
   "review_source_log_sha256": "77503beb80004b839c90bcdc5e3166f3740742402ecb80465b9903133b290927",
-  "note": "Model binaries and upstream artifact caches remain local; no benchmark score is inferred."
+  "note": "Model binaries and upstream artifact caches remain local; no benchmark score is inferred.",
+  "clean_clone": {
+    "tested_commit": "54d17c694c59ffa27dafdaef5e047af8a342c23f",
+    "fresh_virtual_environment": true,
+    "installed_requirements": [
+      "numpy==2.5.4"
+    ],
+    "unit_tests_passed": 40,
+    "bootstrap": {
+      "status": "edit_assets_verified",
+      "assets": "/tmp/wsp-clean-clone-20261106-x3kEEH/repo/assets/p50c"
+    },
+    "real_input_verification": {
+      "status": "verified",
+      "base_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+      "source_revision": "4d09ba6d6a7e891dd8063974dfe81b3d78e3494f",
+      "tensors": [
+        {
+          "name": "model.language_model.layers.15.mlp.down_proj.weight",
+          "base_sha256": "ef60d2c687bab19464dca9c8bfd7777e46ad226df0c9e25643b0bab04b5a1cca",
+          "edited_sha256": "82e2d733ea64feaeb4af93a1e065641d3df98b494a8b7576ef2f52e90fe2ee53",
+          "changed_entries": 65260
+        },
+        {
+          "name": "model.language_model.layers.19.mlp.down_proj.weight",
+          "base_sha256": "638eedeb701b94aa861f4438e615c07ec6c60ee703db1bfee2de577bb6498c3e",
+          "edited_sha256": "8ef3c61bc36af113ad58e89dbb0a4a14dcba5a45cb750c15ab515c82ddd12eb2",
+          "changed_entries": 64928
+        }
+      ],
+      "changed_entries_total": 130188
+    },
+    "network_model_download_repeated": false,
+    "note": "Reused existing authenticated 1.75 GB base instead of redownloading it; edit artifacts were fetched anew from the pinned commit."
+  },
+  "tested_code_sha256": {
+    "scripts/pipeline.py": "8e0b37291632c7d3ac52a712e98dffc3acccf88b255a0248260a7521d087d1c3",
+    "tests/test_pipeline.py": "2c98c570db472fa403b9aadc3c37a959743ee8de6b7869f08b185343dce3b061",
+    "requirements.txt": "9baeb54683653046a27fd7c75db1d04dac8dd9c1fe11b663d2898c0e8d75e90c",
+    "reproduction.lock.json": "c507040ba623ee3202f354606742df648f65b1f0b047cbabab0ea6dfdd464f84"
+  }
 }
