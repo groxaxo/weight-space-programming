@@ -1,0 +1,8 @@
+# Example for a separate Hermes profile. Do not overwrite an existing profile.
+model:
+  provider: custom
+  default: wsp-qwen35-4b-coder
+  base_url: http://127.0.0.1:18084/v1
+  api_mode: chat_completions
+agent:
+  max_turns: 8

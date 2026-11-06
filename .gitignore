@@ -1,4 +1,7 @@
 .venv/
+.venv-*/
+model-store/
+runs/
 models/
 assets/
 upstream/

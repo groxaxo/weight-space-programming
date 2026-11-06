@@ -1,10 +1,34 @@
 # Weight-Space Programming Lab
 
-A verified, CPU-only reproduction of the published **Qwen3.5-0.8B p50c weight repair**. The base checkpoint stays unchanged. The output includes the full checkpoint, tokenizer, configuration, index, and a reconstruction record.
+A verified reproduction of the published **Qwen3.5-0.8B p50c weight repair**, plus a pinned **Qwen3.5-4B coding-assistant adaptation and evaluation track**. Both keep the original base checkpoint unchanged.
 
-**Implemented and tested:** pinned downloads, full input authentication, sparse BF16 reconstruction, non-overwriting publication, output verification, and 40 CPU regression tests. A real 1.75 GB checkpoint has been reconstructed and checked on the Ubuntu 12700.
+**Reconstruction:** pinned downloads, full input authentication, sparse BF16 reconstruction, non-overwriting publication, output and provenance verification, and CPU regression tests. A real 1.75 GB checkpoint has been reconstructed and checked on the Ubuntu 12700. `verify-output` now also authenticates the reconstruction record against the actual files and trusted lock.
 
-**Not implemented:** autonomous Sol/Astra orchestration, token or spending budgets, activation extraction, an evaluation runner, GPU serving, or an isolated execution environment for agent-written code. This repository is a verified reproduction foundation, not the complete research-agent system discussed earlier.
+**Coding track:** authenticated official model snapshots, licensed public corpus imports, complete task-disjoint conversations, assistant-only loss masks, BF16 LoRA / NF4 QLoRA, separate validation and checkpoint selection, bounded OpenAI-compatible serving, executable coding and multi-turn tool checks, all 164 HumanEval tasks, and isolated OpenCode/Hermes file-edit acceptance checks. Generated Python is graded in a digest-pinned Docker sandbox with no network and a read-only root filesystem. See [the coding-assistant workflow](docs/coding-assistant.md).
+
+**Scope:** this does not implement autonomous Sol/Astra orchestration, activation extraction, or a general sandbox for unrestricted agents. Model quality is established by the actual paired reports and client results, not by successful training or reconstruction alone. The compact development suite is not evidence of frontier-model equivalence.
+
+The current coding experiment runs on **`100.85.200.54`**, an RTX 3060 with 12 GB VRAM. Its supervisor temporarily pauses the existing Bonsai service only when explicitly authorized and restores it at the end of each GPU phase, including failures. Moss and Bonsai models/runtimes are preserved.
+
+## Current measured findings
+
+**No fine-tuned adapter passed the complete acceptance gate.** The official base
+remains the default: 6/8 authored coding tasks, 6/6 tool scenarios and 128/164
+HumanEval tasks (78.05%). Both real OpenCode/Hermes clients passed the initial
+single-module file-edit fixture. Lower-rate adapters improved the small coding
+suite to 7/8 but scored 127/164 and 126/164 HumanEval, so neither was promoted.
+
+The [comprehensive experiment report](docs/experiments/qwen35-4b-20261107.md) records
+the training recipe, all rejected profiles, harder project trials, the corrected
+Hermes Docker configuration, grader controls, storage cleanup and service
+restoration. [Machine-readable findings](docs/experiments/qwen35-4b-20261107.json)
+preserve identities and per-case changes. Successful training or a small edit
+fixture does not establish broad coding reliability or frontier-model parity.
+
+The source regression suite contains 102 tests. Use the independent CPU setup
+below; optional training-library checks skip in that environment. Full sandbox
+checks additionally require Docker and `WSP_TEST_DOCKER_IMAGE`, as configured
+in the included GitHub Actions workflow.
 
 ## Quick start — Linux, Python 3.12
 

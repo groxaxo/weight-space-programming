@@ -1,0 +1,998 @@
+{
+  "selection": {
+    "created_at_utc": "2026-11-06T19:23:41.664938+00:00",
+    "status": "no_adapter_promoted",
+    "selected_profile": "official-base-nf4-double",
+    "identity": {
+      "base_model": "Qwen/Qwen3.5-4B",
+      "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+      "adapter": null,
+      "quantization": "nf4-double",
+      "runtime": {
+        "torch": "2.11.0",
+        "transformers": "5.22.1",
+        "peft": "0.21.2",
+        "bitsandbytes": "0.49.2",
+        "flash-linear-attention": "0.6.0",
+        "fla-core": "0.6.0",
+        "causal-conv1d": null
+      },
+      "protocol_sha256": "95ccac67c7d4d58eaf644439cf4076e50bca2f580b9e3b89eed6ba5d9aaad82d",
+      "chat_stop_token_ids": [
+        248044,
+        248046
+      ]
+    },
+    "reason": "Both complete lower-rate candidates regressed HumanEval; higher-rate and native profiles failed development requirements.",
+    "candidate_decisions": [
+      {
+        "label": "lower-rate-step18",
+        "optimizer_step": 18,
+        "humaneval_passed": 127,
+        "gate": {
+          "status": "not_promoted",
+          "development": {
+            "status": "development_gate_passed",
+            "regressions": [],
+            "improvements": [
+              "version_tuple"
+            ],
+            "requires_real_client_acceptance": true,
+            "scope": "Passing this gate alone does not authorize deployment or establish broad coding reliability."
+          },
+          "humaneval": {
+            "baseline": 128,
+            "candidate": 127,
+            "total": 164,
+            "aggregate_nonregression": false
+          },
+          "real_clients_passed": true,
+          "validation_loss_improved": true,
+          "scope": "Measured Python and isolated file-tool tasks only; broader coding reliability remains unproven."
+        }
+      },
+      {
+        "label": "lower-rate-step72",
+        "optimizer_step": 72,
+        "humaneval_passed": 126,
+        "gate": {
+          "status": "not_promoted",
+          "development": {
+            "status": "development_gate_passed",
+            "regressions": [],
+            "improvements": [
+              "version_tuple"
+            ],
+            "requires_real_client_acceptance": true,
+            "scope": "Passing this gate alone does not authorize deployment or establish broad coding reliability."
+          },
+          "humaneval": {
+            "baseline": 128,
+            "candidate": 126,
+            "total": 164,
+            "aggregate_nonregression": false
+          },
+          "real_clients_passed": true,
+          "validation_loss_improved": true,
+          "scope": "Measured Python and isolated file-tool tasks only; broader coding reliability remains unproven."
+        }
+      }
+    ],
+    "scope": "Default selection is the measured base profile, not a claim that the requested perfect coding assistant was achieved."
+  },
+  "base_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "training_candidates": [
+    {
+      "label": "lower-rate-step18",
+      "training_path": "/home/op/work/weight-space-programming-20261106/runs/checkpoint-lowlr-18/training",
+      "adapter_path": "/home/op/work/weight-space-programming-20261106/runs/checkpoint-lowlr-18/training/adapter",
+      "adapter_sha256": "c0248b8cd94fa387c2c215dcf382f5ea816a94cf50428b62af17cddcc1f67f8e",
+      "optimizer_step": 18,
+      "epoch": 0.25,
+      "validation_before": 0.2984120547771454,
+      "validation_after": 0.23123371601104736,
+      "development": {
+        "code": {
+          "passed": 7,
+          "total": 8
+        },
+        "tools": {
+          "passed": 6,
+          "total": 6
+        }
+      },
+      "humaneval_passed": 127,
+      "humaneval_total": 164,
+      "humaneval_improvements": [
+        "HumanEval/76",
+        "HumanEval/89",
+        "HumanEval/130"
+      ],
+      "humaneval_regressions": [
+        "HumanEval/26",
+        "HumanEval/81",
+        "HumanEval/86",
+        "HumanEval/129"
+      ],
+      "gate": {
+        "status": "not_promoted",
+        "development": {
+          "status": "development_gate_passed",
+          "regressions": [],
+          "improvements": [
+            "version_tuple"
+          ],
+          "requires_real_client_acceptance": true,
+          "scope": "Passing this gate alone does not authorize deployment or establish broad coding reliability."
+        },
+        "humaneval": {
+          "baseline": 128,
+          "candidate": 127,
+          "total": 164,
+          "aggregate_nonregression": false
+        },
+        "real_clients_passed": true,
+        "validation_loss_improved": true,
+        "scope": "Measured Python and isolated file-tool tasks only; broader coding reliability remains unproven."
+      },
+      "report_sha256": "6c36c4543c6b6b196b5e8d9a1a4e09de8f904518aff57f9b6dec0d6fdbb21e8e"
+    },
+    {
+      "label": "lower-rate-step72",
+      "training_path": "/home/op/work/weight-space-programming-20261106/runs/train-lowlr-01/training",
+      "adapter_path": "/home/op/work/weight-space-programming-20261106/runs/train-lowlr-01/training/adapter",
+      "adapter_sha256": "c3ce0cce8ee22923684259b30114235542c5e776d7b7c85190b42a06e66e7832",
+      "optimizer_step": 72,
+      "epoch": 1.0,
+      "validation_before": 0.2984120547771454,
+      "validation_after": 0.21469902992248535,
+      "development": {
+        "code": {
+          "passed": 7,
+          "total": 8
+        },
+        "tools": {
+          "passed": 6,
+          "total": 6
+        }
+      },
+      "humaneval_passed": 126,
+      "humaneval_total": 164,
+      "humaneval_improvements": [
+        "HumanEval/46",
+        "HumanEval/65",
+        "HumanEval/89",
+        "HumanEval/140"
+      ],
+      "humaneval_regressions": [
+        "HumanEval/1",
+        "HumanEval/26",
+        "HumanEval/38",
+        "HumanEval/86",
+        "HumanEval/129",
+        "HumanEval/141"
+      ],
+      "gate": {
+        "status": "not_promoted",
+        "development": {
+          "status": "development_gate_passed",
+          "regressions": [],
+          "improvements": [
+            "version_tuple"
+          ],
+          "requires_real_client_acceptance": true,
+          "scope": "Passing this gate alone does not authorize deployment or establish broad coding reliability."
+        },
+        "humaneval": {
+          "baseline": 128,
+          "candidate": 126,
+          "total": 164,
+          "aggregate_nonregression": false
+        },
+        "real_clients_passed": true,
+        "validation_loss_improved": true,
+        "scope": "Measured Python and isolated file-tool tasks only; broader coding reliability remains unproven."
+      },
+      "report_sha256": "400645e3c416f3729d679b7b988eca59d8962c8abe32dd339f94e986f3bbddbd"
+    }
+  ],
+  "higher_rate_note": "Full high-rate checkpoint and steps18/36/54 failed coding regression screens; partial screens are not complete benchmarks.",
+  "limitations": [
+    "Small public Python evaluations; pretraining contamination cannot be excluded.",
+    "HumanEval was used for acceptance and selection, not an untouched final test.",
+    "No native profile reached the floor required for full HumanEval evaluation.",
+    "No frontier parity, perfect behavior, unrestricted host-shell/MCP, other-language, or long-context qualification."
+  ],
+  "baseline": {
+    "development": {
+      "code": {
+        "passed": 6,
+        "total": 8
+      },
+      "tools": {
+        "passed": 6,
+        "total": 6
+      }
+    },
+    "humaneval_passed": 128,
+    "humaneval_total": 164,
+    "clients": [
+      {
+        "client": "opencode",
+        "passed": true,
+        "version": "1.18.32",
+        "seconds": 47.81066717184149
+      },
+      {
+        "client": "hermes",
+        "passed": true,
+        "version": "Hermes Agent v0.22.2+2320.g27a92f6 (2026.9.24) \u00b7 stable \u00b7 local 27a92f6df064",
+        "seconds": 97.94577826093882
+      }
+    ],
+    "project_clients": {
+      "identity": {
+        "base_model": "Qwen/Qwen3.5-4B",
+        "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+        "adapter": null,
+        "quantization": "nf4-double",
+        "runtime": {
+          "torch": "2.11.0",
+          "transformers": "5.22.1",
+          "peft": "0.21.2",
+          "bitsandbytes": "0.49.2",
+          "flash-linear-attention": "0.6.0",
+          "fla-core": "0.6.0",
+          "causal-conv1d": null
+        },
+        "protocol_sha256": "95ccac67c7d4d58eaf644439cf4076e50bca2f580b9e3b89eed6ba5d9aaad82d",
+        "chat_stop_token_ids": [
+          248044,
+          248046
+        ]
+      },
+      "sandbox_image": "python:3.12-slim@sha256:4840d514c583a4d3d8cad3940e68dee6f0f6f3635c12fcd0a3d74c21a5b93a54",
+      "scope": "Latest scored supplementary trial per client; original Hermes attempt was aborted as infrastructure evidence.",
+      "results": [
+        {
+          "client": "opencode",
+          "passed": false,
+          "scope": "two-module project, file and terminal tools, network-disabled execution",
+          "version": "1.18.32",
+          "command_argv": [
+            "docker",
+            "run",
+            "--rm",
+            "--name",
+            "wsp54-project-opencode-1447714",
+            "--label",
+            "wsp54.project_trial=1447714-1793990773275175715",
+            "--network=none",
+            "--read-only",
+            "--cap-drop=ALL",
+            "--security-opt=no-new-privileges",
+            "--pids-limit=64",
+            "--memory=768m",
+            "--cpus=1",
+            "--user",
+            "1000:1000",
+            "--tmpfs",
+            "/tmp:rw,nosuid,nodev,size=268435456,mode=1777",
+            "--mount",
+            "type=bind,src=/home/op/work/weight-space-programming-20261106/runs/base-project-01/opencode/workspace,dst=/workspace",
+            "--mount",
+            "type=bind,src=/tmp/wsp-api-ayd2rtct,dst=/model-api,readonly",
+            "--mount",
+            "type=bind,src=/home/op/.opencode/bin/opencode,dst=/usr/local/bin/opencode,readonly",
+            "--mount",
+            "type=bind,src=/home/op/work/weight-space-programming-20261106/ops/project_clients.py,dst=/harness/project_clients.py,readonly",
+            "--workdir",
+            "/workspace",
+            "python:3.12-slim@sha256:4840d514c583a4d3d8cad3940e68dee6f0f6f3635c12fcd0a3d74c21a5b93a54",
+            "python3",
+            "/harness/project_clients.py",
+            "--container-client",
+            "wsp-qwen35-4b-coder"
+          ],
+          "exit_code": null,
+          "timed_out": true,
+          "seconds": 1000.0008912070189,
+          "independent_tests": {
+            "passed": false,
+            "exit_code": 1,
+            "container_exit_code": 1,
+            "tests_completed": false,
+            "timed_out": false
+          },
+          "tests_sha256": "cdb58a352119a2b7a230d93f8488f1289363cf3256318d9f64dadc74a9317c25",
+          "source_sha256": {
+            "scheduler/validation.py": "30a002cdcb422d99b654e8e54aa507f691e6630d01eb30c15ea14eb886fa44d9",
+            "scheduler/planning.py": "f69e902fb20caffe087c373ebaec2d53925029c9dee2a94d086e72ae1927888d"
+          },
+          "test_command_observed": true,
+          "container_isolation": [
+            {
+              "id": "1934edb32fd9",
+              "network": "none",
+              "privileged": false,
+              "cap_drop": [
+                "ALL"
+              ],
+              "pids_limit": 64,
+              "memory_bytes": 805306368,
+              "user": "1000:1000",
+              "mounts": [
+                {
+                  "type": "bind",
+                  "source": "/home/op/work/weight-space-programming-20261106/runs/base-project-01/opencode/workspace",
+                  "destination": "/workspace"
+                },
+                {
+                  "type": "bind",
+                  "source": "/tmp/wsp-api-ayd2rtct",
+                  "destination": "/model-api"
+                },
+                {
+                  "type": "bind",
+                  "source": "/home/op/.opencode/bin/opencode",
+                  "destination": "/usr/local/bin/opencode"
+                },
+                {
+                  "type": "bind",
+                  "source": "/home/op/work/weight-space-programming-20261106/ops/project_clients.py",
+                  "destination": "/harness/project_clients.py"
+                }
+              ],
+              "verified": true
+            }
+          ],
+          "remaining_test_containers": [],
+          "source_report": "runs/base-project-01/acceptance.json",
+          "original_test_command_observed": false,
+          "original_passed": false
+        },
+        {
+          "client": "hermes",
+          "passed": false,
+          "scope": "two-module project, file and terminal tools, network-disabled execution",
+          "version": "Hermes Agent v0.22.2+2320.g27a92f6 (2026.9.24) \u00b7 stable \u00b7 local 27a92f6df064",
+          "hermes_profile_sha256": "08e4deb36a1bf5ca61fe2573b322488ce714adfa3b2487750c8d1bf82e990f6e",
+          "command_argv": [
+            "/home/op/.local/bin/hermes",
+            "chat",
+            "--ignore-rules",
+            "--provider",
+            "custom",
+            "--base-url",
+            "http://127.0.0.1:18084/v1",
+            "--api-key",
+            "local-only",
+            "--model",
+            "wsp-qwen35-4b-coder",
+            "--oneshot",
+            "--format",
+            "stream-json",
+            "--toolsets",
+            "file,terminal",
+            "--max-turns",
+            "16",
+            "--query-file",
+            "/home/op/work/weight-space-programming-20261106/runs/base-project-hermes-docker-02/hermes/workspace/prompt.txt"
+          ],
+          "exit_code": 1,
+          "timed_out": false,
+          "seconds": 414.94615189987235,
+          "independent_tests": {
+            "passed": false,
+            "exit_code": 1,
+            "container_exit_code": 1,
+            "tests_completed": false,
+            "timed_out": false
+          },
+          "tests_sha256": "cdb58a352119a2b7a230d93f8488f1289363cf3256318d9f64dadc74a9317c25",
+          "source_sha256": {
+            "scheduler/validation.py": "3f9894d993fd90df0a361521da3bd9f7311ea134834a62f287dbf632f3eb0bf7",
+            "scheduler/planning.py": "a7bef52e40978dc7b36b7a7735a88930797880629a60d28d6ca5389466625474"
+          },
+          "test_command_observed": true,
+          "container_isolation": [
+            {
+              "id": "b94f712b24e7",
+              "network": "none",
+              "privileged": false,
+              "cap_drop": [
+                "ALL"
+              ],
+              "pids_limit": 64,
+              "memory_bytes": 805306368,
+              "user": "1000:1000",
+              "mounts": [
+                {
+                  "type": "bind",
+                  "source": "/home/op/work/weight-space-programming-20261106/runs/base-project-hermes-docker-02/hermes/.client-state/hermes/composer-pastes",
+                  "destination": "/root/.hermes/composer-pastes"
+                },
+                {
+                  "type": "bind",
+                  "source": "/home/op/work/weight-space-programming-20261106/runs/base-project-hermes-docker-02/hermes/workspace",
+                  "destination": "/workspace"
+                },
+                {
+                  "type": "bind",
+                  "source": "/home/op/work/weight-space-programming-20261106/runs/base-project-hermes-docker-02/hermes/.client-state/hermes/cache/documents",
+                  "destination": "/root/.hermes/cache/documents"
+                },
+                {
+                  "type": "bind",
+                  "source": "/home/op/work/weight-space-programming-20261106/runs/base-project-hermes-docker-02/hermes/.client-state/hermes/cache/screenshots",
+                  "destination": "/root/.hermes/cache/screenshots"
+                },
+                {
+                  "type": "bind",
+                  "source": "/home/op/work/weight-space-programming-20261106/runs/base-project-hermes-docker-02/hermes/.client-state/hermes/cache/web",
+                  "destination": "/root/.hermes/cache/web"
+                },
+                {
+                  "type": "bind",
+                  "source": "/home/op/work/weight-space-programming-20261106/runs/base-project-hermes-docker-02/hermes/.client-state/hermes/cache/spillover",
+                  "destination": "/root/.hermes/cache/spillover"
+                },
+                {
+                  "type": "bind",
+                  "source": "/home/op/work/weight-space-programming-20261106/runs/base-project-hermes-docker-02/hermes/.client-state/hermes/cache/images",
+                  "destination": "/root/.hermes/cache/images"
+                },
+                {
+                  "type": "bind",
+                  "source": "/home/op/work/weight-space-programming-20261106/runs/base-project-hermes-docker-02/hermes/.client-state/hermes/cache/audio",
+                  "destination": "/root/.hermes/cache/audio"
+                },
+                {
+                  "type": "bind",
+                  "source": "/home/op/work/weight-space-programming-20261106/runs/base-project-hermes-docker-02/hermes/.client-state/hermes/cache/generated",
+                  "destination": "/root/.hermes/cache/generated"
+                },
+                {
+                  "type": "bind",
+                  "source": "/home/op/work/weight-space-programming-20261106/runs/base-project-hermes-docker-02/hermes/.client-state/hermes/cache/videos",
+                  "destination": "/root/.hermes/cache/videos"
+                },
+                {
+                  "type": "bind",
+                  "source": "/home/op/work/weight-space-programming-20261106/runs/base-project-hermes-docker-02/hermes/.client-state/hermes/attachments",
+                  "destination": "/root/.hermes/attachments"
+                },
+                {
+                  "type": "bind",
+                  "source": "/home/op/work/weight-space-programming-20261106/runs/base-project-hermes-docker-02/hermes/.client-state/hermes/skills",
+                  "destination": "/root/.hermes/skills"
+                },
+                {
+                  "type": "bind",
+                  "source": "/home/op/work/weight-space-programming-20261106/runs/base-project-hermes-docker-02/hermes/.client-state/hermes/cache/delegation",
+                  "destination": "/root/.hermes/cache/delegation"
+                },
+                {
+                  "type": "bind",
+                  "source": "/home/op/work/weight-space-programming-20261106/runs/base-project-hermes-docker-02/hermes/.client-state/hermes/images",
+                  "destination": "/root/.hermes/images"
+                }
+              ],
+              "verified": true
+            }
+          ],
+          "remaining_test_containers": [],
+          "source_report": "runs/base-project-hermes-docker-02/acceptance.json",
+          "original_test_command_observed": false,
+          "original_passed": false
+        }
+      ],
+      "passed": false
+    }
+  },
+  "native_profiles": [
+    {
+      "label": "Q8 base",
+      "report": "runs/gguf-base-01/evaluation.json",
+      "protocol_version": "merged-v1",
+      "scores": {
+        "code": {
+          "passed": 6,
+          "total": 8
+        },
+        "tools": {
+          "passed": 5,
+          "total": 6
+        }
+      },
+      "identity": {
+        "base_model": "Qwen/Qwen3.5-4B",
+        "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+        "adapter": null,
+        "quantization": "Q8_0",
+        "runtime": {
+          "backend": "llama.cpp",
+          "server_sha256": "943d35a2b9798d7f223d511a72fc64c4f5c22174dc0c9240afa58eda93cf5a13",
+          "shared_libraries": {
+            "libggml-base.so.0.21.0": "cf0f94d23ab8f36b1bc895de65f427cace06bea61e722cbdadc5bf0c3848782d",
+            "libggml-cpu.so.0.21.0": "0acd235f5093f0383825500612f90a5e12e02b57a01c5e1763ea46ba83dbd34c",
+            "libggml-cuda.so.0.21.0": "7252e37d06acc595fb273ac40c6a18f5e5afa8337a8e0c0a3b1c56480d4818e5",
+            "libggml.so.0.21.0": "3972d167587bab25d3911fa4c1b828732362199b807396a37d9b3af4ad4d55dc",
+            "libllama-cli-impl.so": "dab82a7958f46c3738b108279fb49185d2c3a95578077985f1906784843c9f36",
+            "libllama-common.so.0.2.0": "25d1706aed337e481ca3fda2659789c5f25a334d758146a972e6706ac73da725",
+            "libllama-server-impl.so": "18dbce7f6056a77622432ec4f67176b2ef12bd9d6d79f01d6484d4146a60030b",
+            "libllama.so.0.2.0": "9d1879c845d52c7aa8e0353139d53e72a67f4d383b5d6a24c6a491154631055e",
+            "libmtmd.so.0.2.0": "ecdf47dd5c58e9818851cb3fbeb844bab89d834654626d49b554fa6d2403cbad"
+          },
+          "launch_options": {
+            "context": 16384,
+            "slots": 1,
+            "gpu_layers": "all",
+            "flash_attention": "on",
+            "threads": 4,
+            "threads_batch": 4,
+            "context_shift": false,
+            "cache_prompt": false,
+            "warmup": false,
+            "seed": 20261106
+          },
+          "tokenizer": {
+            "transformers": "5.22.1",
+            "tokenizers": "0.23.3"
+          }
+        },
+        "artifact_path": "/home/op/work/weight-space-programming-20261106/runs/gguf-profile-q8-01/base-Q8_0.gguf",
+        "artifact_sha256": "2164b7e8728dc954702d86fe423da3a240964877d3d31b8f6530d38702c38547",
+        "conversion_manifest_sha256": "2e0e2550593039da0f4cd6da294a4854317399d6ff4fe0b2d4bd40cd886a775c",
+        "protocol_sha256": "b3afc8c3d43219c4c1552022d4911604c2c61c7bdd420db3e5a07e2aa243cc98",
+        "chat_stop_token_ids": [
+          248044,
+          248046
+        ]
+      },
+      "status": "not_qualified",
+      "humaneval": "not_run_after_development_failure"
+    },
+    {
+      "label": "Q8 merged lower-rate step18",
+      "report": "runs/gguf-candidate18-01/evaluation.json",
+      "protocol_version": "merged-v1",
+      "scores": {
+        "code": {
+          "passed": 6,
+          "total": 8
+        },
+        "tools": {
+          "passed": 5,
+          "total": 6
+        }
+      },
+      "identity": {
+        "base_model": "Qwen/Qwen3.5-4B",
+        "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+        "adapter": "/home/op/work/weight-space-programming-20261106/runs/checkpoint-lowlr-18/training/adapter",
+        "quantization": "Q8_0",
+        "runtime": {
+          "backend": "llama.cpp",
+          "server_sha256": "943d35a2b9798d7f223d511a72fc64c4f5c22174dc0c9240afa58eda93cf5a13",
+          "shared_libraries": {
+            "libggml-base.so.0.21.0": "cf0f94d23ab8f36b1bc895de65f427cace06bea61e722cbdadc5bf0c3848782d",
+            "libggml-cpu.so.0.21.0": "0acd235f5093f0383825500612f90a5e12e02b57a01c5e1763ea46ba83dbd34c",
+            "libggml-cuda.so.0.21.0": "7252e37d06acc595fb273ac40c6a18f5e5afa8337a8e0c0a3b1c56480d4818e5",
+            "libggml.so.0.21.0": "3972d167587bab25d3911fa4c1b828732362199b807396a37d9b3af4ad4d55dc",
+            "libllama-cli-impl.so": "dab82a7958f46c3738b108279fb49185d2c3a95578077985f1906784843c9f36",
+            "libllama-common.so.0.2.0": "25d1706aed337e481ca3fda2659789c5f25a334d758146a972e6706ac73da725",
+            "libllama-server-impl.so": "18dbce7f6056a77622432ec4f67176b2ef12bd9d6d79f01d6484d4146a60030b",
+            "libllama.so.0.2.0": "9d1879c845d52c7aa8e0353139d53e72a67f4d383b5d6a24c6a491154631055e",
+            "libmtmd.so.0.2.0": "ecdf47dd5c58e9818851cb3fbeb844bab89d834654626d49b554fa6d2403cbad"
+          },
+          "launch_options": {
+            "context": 16384,
+            "slots": 1,
+            "gpu_layers": "all",
+            "flash_attention": "on",
+            "threads": 4,
+            "threads_batch": 4,
+            "context_shift": false,
+            "cache_prompt": false,
+            "warmup": false,
+            "seed": 20261106
+          },
+          "tokenizer": {
+            "transformers": "5.22.1",
+            "tokenizers": "0.23.3"
+          }
+        },
+        "artifact_path": "/home/op/work/weight-space-programming-20261106/runs/gguf-profile-q8-01/candidate-step18-Q8_0.gguf",
+        "artifact_sha256": "5e110c3185d756ec95d81d97805c624de11d1514dbb5824ef32a1e6fdeca30d4",
+        "conversion_manifest_sha256": "2e0e2550593039da0f4cd6da294a4854317399d6ff4fe0b2d4bd40cd886a775c",
+        "adapter_sha256": "c0248b8cd94fa387c2c215dcf382f5ea816a94cf50428b62af17cddcc1f67f8e",
+        "adapter_config_sha256": "2e269430cc936297d443840a75c1030f6f35d248c7cbd6245c96660fb08f9184",
+        "compilation_sha256": "f86c226cbaaf18b3092c3b5a8d66b01fb66989802645b21979a14d2a91a0959b",
+        "adapter_application": "compiled-bf16-then-q8_0",
+        "protocol_sha256": "b3afc8c3d43219c4c1552022d4911604c2c61c7bdd420db3e5a07e2aa243cc98",
+        "chat_stop_token_ids": [
+          248044,
+          248046
+        ]
+      },
+      "status": "not_qualified",
+      "humaneval": "not_run_after_development_failure"
+    },
+    {
+      "label": "Q8 plus FP32 lower-rate step18",
+      "report": "runs/gguf-lora-candidate18-01/evaluation.json",
+      "protocol_version": "unmerged-v2",
+      "scores": {
+        "code": {
+          "passed": 6,
+          "total": 8
+        },
+        "tools": {
+          "passed": 5,
+          "total": 6
+        }
+      },
+      "identity": {
+        "base_model": "Qwen/Qwen3.5-4B",
+        "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+        "adapter": "/home/op/work/weight-space-programming-20261106/runs/checkpoint-lowlr-18/training/adapter",
+        "quantization": "Q8_0",
+        "runtime": {
+          "backend": "llama.cpp",
+          "server_sha256": "943d35a2b9798d7f223d511a72fc64c4f5c22174dc0c9240afa58eda93cf5a13",
+          "shared_libraries": {
+            "libggml-base.so.0.21.0": "cf0f94d23ab8f36b1bc895de65f427cace06bea61e722cbdadc5bf0c3848782d",
+            "libggml-cpu.so.0.21.0": "0acd235f5093f0383825500612f90a5e12e02b57a01c5e1763ea46ba83dbd34c",
+            "libggml-cuda.so.0.21.0": "7252e37d06acc595fb273ac40c6a18f5e5afa8337a8e0c0a3b1c56480d4818e5",
+            "libggml.so.0.21.0": "3972d167587bab25d3911fa4c1b828732362199b807396a37d9b3af4ad4d55dc",
+            "libllama-cli-impl.so": "dab82a7958f46c3738b108279fb49185d2c3a95578077985f1906784843c9f36",
+            "libllama-common.so.0.2.0": "25d1706aed337e481ca3fda2659789c5f25a334d758146a972e6706ac73da725",
+            "libllama-server-impl.so": "18dbce7f6056a77622432ec4f67176b2ef12bd9d6d79f01d6484d4146a60030b",
+            "libllama.so.0.2.0": "9d1879c845d52c7aa8e0353139d53e72a67f4d383b5d6a24c6a491154631055e",
+            "libmtmd.so.0.2.0": "ecdf47dd5c58e9818851cb3fbeb844bab89d834654626d49b554fa6d2403cbad"
+          },
+          "launch_options": {
+            "context": 16384,
+            "slots": 1,
+            "gpu_layers": "all",
+            "flash_attention": "on",
+            "threads": 4,
+            "threads_batch": 4,
+            "context_shift": false,
+            "cache_prompt": false,
+            "warmup": false,
+            "seed": 20261106
+          },
+          "tokenizer": {
+            "transformers": "5.22.1",
+            "tokenizers": "0.23.3"
+          }
+        },
+        "artifact_path": "/home/op/work/weight-space-programming-20261106/runs/gguf-profile-q8-01/base-Q8_0.gguf",
+        "artifact_sha256": "2164b7e8728dc954702d86fe423da3a240964877d3d31b8f6530d38702c38547",
+        "conversion_manifest_sha256": "2bb6181a85376f4c5e7822a17e17ca04df204f43c50ca601fc3e64500c26722c",
+        "conversion_profile": "candidate-step18-lora",
+        "adapter_sha256": "c0248b8cd94fa387c2c215dcf382f5ea816a94cf50428b62af17cddcc1f67f8e",
+        "adapter_config_sha256": "2e269430cc936297d443840a75c1030f6f35d248c7cbd6245c96660fb08f9184",
+        "adapter_provenance_sha256": "de45ab8a297051c2c4b9c7ab9c0c55e26b4932a7639f4342e0bf3d96baf13b05",
+        "adapter_application": "native-f32-lora-on-q8_0",
+        "lora_artifact_path": "/home/op/work/weight-space-programming-20261106/runs/gguf-lora18-f32/adapter-F32.gguf",
+        "lora_artifact_sha256": "7ff8b8b07e1adf690d794ecf10722ae0ca9b59373046bf6a64810b3a73485148",
+        "lora_id": 0,
+        "lora_scale": 1.0,
+        "protocol_sha256": "dd2431eb8065e83c584b2ee6c97fb9188fa561a18352089e6c98c47b4f83cfe4",
+        "chat_stop_token_ids": [
+          248044,
+          248046
+        ]
+      },
+      "status": "not_qualified",
+      "humaneval": "not_run_after_development_failure"
+    },
+    {
+      "label": "Q8 plus FP32 higher-rate step72",
+      "report": "runs/gguf-lora-high72-01/evaluation.json",
+      "protocol_version": "unmerged-v2",
+      "scores": {
+        "code": {
+          "passed": 5,
+          "total": 8
+        },
+        "tools": {
+          "passed": 6,
+          "total": 6
+        }
+      },
+      "identity": {
+        "base_model": "Qwen/Qwen3.5-4B",
+        "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+        "adapter": "/home/op/work/weight-space-programming-20261106/runs/train-02/training/adapter",
+        "quantization": "Q8_0",
+        "runtime": {
+          "backend": "llama.cpp",
+          "server_sha256": "943d35a2b9798d7f223d511a72fc64c4f5c22174dc0c9240afa58eda93cf5a13",
+          "shared_libraries": {
+            "libggml-base.so.0.21.0": "cf0f94d23ab8f36b1bc895de65f427cace06bea61e722cbdadc5bf0c3848782d",
+            "libggml-cpu.so.0.21.0": "0acd235f5093f0383825500612f90a5e12e02b57a01c5e1763ea46ba83dbd34c",
+            "libggml-cuda.so.0.21.0": "7252e37d06acc595fb273ac40c6a18f5e5afa8337a8e0c0a3b1c56480d4818e5",
+            "libggml.so.0.21.0": "3972d167587bab25d3911fa4c1b828732362199b807396a37d9b3af4ad4d55dc",
+            "libllama-cli-impl.so": "dab82a7958f46c3738b108279fb49185d2c3a95578077985f1906784843c9f36",
+            "libllama-common.so.0.2.0": "25d1706aed337e481ca3fda2659789c5f25a334d758146a972e6706ac73da725",
+            "libllama-server-impl.so": "18dbce7f6056a77622432ec4f67176b2ef12bd9d6d79f01d6484d4146a60030b",
+            "libllama.so.0.2.0": "9d1879c845d52c7aa8e0353139d53e72a67f4d383b5d6a24c6a491154631055e",
+            "libmtmd.so.0.2.0": "ecdf47dd5c58e9818851cb3fbeb844bab89d834654626d49b554fa6d2403cbad"
+          },
+          "launch_options": {
+            "context": 16384,
+            "slots": 1,
+            "gpu_layers": "all",
+            "flash_attention": "on",
+            "threads": 4,
+            "threads_batch": 4,
+            "context_shift": false,
+            "cache_prompt": false,
+            "warmup": false,
+            "seed": 20261106
+          },
+          "tokenizer": {
+            "transformers": "5.22.1",
+            "tokenizers": "0.23.3"
+          }
+        },
+        "artifact_path": "/home/op/work/weight-space-programming-20261106/runs/gguf-profile-q8-01/base-Q8_0.gguf",
+        "artifact_sha256": "2164b7e8728dc954702d86fe423da3a240964877d3d31b8f6530d38702c38547",
+        "conversion_manifest_sha256": "2b814396235152b1e5855959c606c0ea4a43916fbc8b1f728e27b1d3b42bfd15",
+        "conversion_profile": "candidate-high72-lora",
+        "adapter_sha256": "f2c4dc8645b15fefadd06b55d5aedad9358915f396a224258689f4df0bd6c18f",
+        "adapter_config_sha256": "400831b92dbd921e48bd09ebba26bc886733f1bc5181f422255e46affa638a3a",
+        "adapter_provenance_sha256": "7e92488dfa479c9ed80892e91ce5a78970c2b0acc9ce7c7c19b405323460351e",
+        "adapter_application": "native-f32-lora-on-q8_0",
+        "lora_artifact_path": "/home/op/work/weight-space-programming-20261106/runs/gguf-lora-high72-f32/adapter-F32.gguf",
+        "lora_artifact_sha256": "a509e0807392d9eaac6b5d8f824500c3a314c7e783d9d6ca412f4bcbd905ccde",
+        "lora_id": 0,
+        "lora_scale": 1.0,
+        "protocol_sha256": "dd2431eb8065e83c584b2ee6c97fb9188fa561a18352089e6c98c47b4f83cfe4",
+        "chat_stop_token_ids": [
+          248044,
+          248046
+        ]
+      },
+      "status": "not_qualified",
+      "humaneval": "not_run_after_development_failure"
+    }
+  ],
+  "project_history": {
+    "original_report_sha256": "b251ad051c58d5c4b6723a3e9a271190c02c29e165b06016604fa2385447659a",
+    "corrected_report_sha256": "08d24c31773e4019c80bccb3b04650c2c1d81bbf638d4b21fbf72fc5c20a1ad3",
+    "original_harness_sha256": "759bbed1cff948c1e2420244625a38513512c4cc4781abf80f2959b1c40a374f",
+    "corrected_harness_sha256": "4f0f9a851e04e182868fde11a28b790ddc6f13f20cfe4a61398d18042b67e61a",
+    "command_audit": {
+      "status": "audited",
+      "inputs": {
+        "runs/base-project-01/acceptance.json": {
+          "sha256": "b251ad051c58d5c4b6723a3e9a271190c02c29e165b06016604fa2385447659a",
+          "harness_sha256": "759bbed1cff948c1e2420244625a38513512c4cc4781abf80f2959b1c40a374f"
+        },
+        "runs/base-project-hermes-docker-02/acceptance.json": {
+          "sha256": "08d24c31773e4019c80bccb3b04650c2c1d81bbf638d4b21fbf72fc5c20a1ad3",
+          "harness_sha256": "4f0f9a851e04e182868fde11a28b790ddc6f13f20cfe4a61398d18042b67e61a"
+        }
+      },
+      "corrected_harness_sha256": "0fbc705e764dddad0a9e2ced42cd91121901e1ec6ce1b73dbecf903161b3af2a",
+      "audit_script_sha256": "6a02ebb07490476e282305fd2f4f047ecdff322d8e529f8ca0b3985a70c65d0d",
+      "regenerated_model_answers": false,
+      "independent_code_outcomes_changed": false,
+      "workflow_classifications_changed": false,
+      "results": [
+        {
+          "source_report": "runs/base-project-01/acceptance.json",
+          "client": "opencode",
+          "original_command_observed": false,
+          "corrected_command_observed": true,
+          "original_passed": false,
+          "corrected_passed": false,
+          "independent_code_passed": false,
+          "client_log_sha256": "f9cbafcb19f29128033765fe2d6bf57051bed11f21ba94828805420d2ab8a670"
+        },
+        {
+          "source_report": "runs/base-project-01/acceptance.json",
+          "client": "hermes",
+          "original_command_observed": false,
+          "corrected_command_observed": false,
+          "original_passed": false,
+          "corrected_passed": false,
+          "independent_code_passed": false,
+          "client_log_sha256": "25c8af3790ef4504667e628139f5be5342e324265d8988530bc42d341c481721"
+        },
+        {
+          "source_report": "runs/base-project-hermes-docker-02/acceptance.json",
+          "client": "hermes",
+          "original_command_observed": false,
+          "corrected_command_observed": true,
+          "original_passed": false,
+          "corrected_passed": false,
+          "independent_code_passed": false,
+          "client_log_sha256": "3683a8ea85f4eb08292c543817e5f85a41b939241a895b2b1dc663ab5016cc22"
+        }
+      ],
+      "scope": "Recognize equivalent unittest module/redirection forms and completed nonzero subprocess exits; exclude policy-blocked launches. Original reports, code and independent grader results are immutable."
+    },
+    "infrastructure_abort": {
+      "at_utc": "2026-11-06T19:06:25.634210+00:00",
+      "status": "aborted_unqualified",
+      "reason": "Actual Hermes terminal events returned host repository paths; requested Docker backend was not active. No labeled sandbox containers were observed. Trial stopped before any model write event was observed.",
+      "unit": "wsp54-base-project-20261107-01.service",
+      "terminated_owned_pids": [
+        1512732,
+        1514701,
+        1515535,
+        1515573,
+        1515574,
+        1515575,
+        1515576
+      ],
+      "model_quality_score": null
+    }
+  },
+  "command_detection_audit": {
+    "status": "audited",
+    "inputs": {
+      "runs/base-project-01/acceptance.json": {
+        "sha256": "b251ad051c58d5c4b6723a3e9a271190c02c29e165b06016604fa2385447659a",
+        "harness_sha256": "759bbed1cff948c1e2420244625a38513512c4cc4781abf80f2959b1c40a374f"
+      },
+      "runs/base-project-hermes-docker-02/acceptance.json": {
+        "sha256": "08d24c31773e4019c80bccb3b04650c2c1d81bbf638d4b21fbf72fc5c20a1ad3",
+        "harness_sha256": "4f0f9a851e04e182868fde11a28b790ddc6f13f20cfe4a61398d18042b67e61a"
+      }
+    },
+    "corrected_harness_sha256": "0fbc705e764dddad0a9e2ced42cd91121901e1ec6ce1b73dbecf903161b3af2a",
+    "audit_script_sha256": "6a02ebb07490476e282305fd2f4f047ecdff322d8e529f8ca0b3985a70c65d0d",
+    "regenerated_model_answers": false,
+    "independent_code_outcomes_changed": false,
+    "workflow_classifications_changed": false,
+    "results": [
+      {
+        "source_report": "runs/base-project-01/acceptance.json",
+        "client": "opencode",
+        "original_command_observed": false,
+        "corrected_command_observed": true,
+        "original_passed": false,
+        "corrected_passed": false,
+        "independent_code_passed": false,
+        "client_log_sha256": "f9cbafcb19f29128033765fe2d6bf57051bed11f21ba94828805420d2ab8a670"
+      },
+      {
+        "source_report": "runs/base-project-01/acceptance.json",
+        "client": "hermes",
+        "original_command_observed": false,
+        "corrected_command_observed": false,
+        "original_passed": false,
+        "corrected_passed": false,
+        "independent_code_passed": false,
+        "client_log_sha256": "25c8af3790ef4504667e628139f5be5342e324265d8988530bc42d341c481721"
+      },
+      {
+        "source_report": "runs/base-project-hermes-docker-02/acceptance.json",
+        "client": "hermes",
+        "original_command_observed": false,
+        "corrected_command_observed": true,
+        "original_passed": false,
+        "corrected_passed": false,
+        "independent_code_passed": false,
+        "client_log_sha256": "3683a8ea85f4eb08292c543817e5f85a41b939241a895b2b1dc663ab5016cc22"
+      }
+    ],
+    "scope": "Recognize equivalent unittest module/redirection forms and completed nonzero subprocess exits; exclude policy-blocked launches. Original reports, code and independent grader results are immutable."
+  },
+  "hermes_infrastructure_abort": {
+    "at_utc": "2026-11-06T19:06:25.634210+00:00",
+    "status": "aborted_unqualified",
+    "reason": "Actual Hermes terminal events returned host repository paths; requested Docker backend was not active. No labeled sandbox containers were observed. Trial stopped before any model write event was observed.",
+    "unit": "wsp54-base-project-20261107-01.service",
+    "terminated_owned_pids": [
+      1512732,
+      1514701,
+      1515535,
+      1515573,
+      1515574,
+      1515575,
+      1515576
+    ],
+    "model_quality_score": null
+  },
+  "hermes_managed_control": {
+    "mode": "synthetic_provider_actual_managed_cli_no_model_inference",
+    "passed": true,
+    "requests": [
+      {
+        "path": "/api/show",
+        "tools": [],
+        "tool_result_verified": false
+      },
+      {
+        "path": "/v1/chat/completions",
+        "tools": [
+          "terminal",
+          "tool_search",
+          "tool_describe",
+          "tool_call"
+        ],
+        "tool_result_verified": false
+      },
+      {
+        "path": "/v1/chat/completions",
+        "tools": [
+          "terminal",
+          "tool_search",
+          "tool_describe",
+          "tool_call"
+        ],
+        "tool_result_verified": true
+      },
+      {
+        "path": "/v1/chat/completions",
+        "tools": [],
+        "tool_result_verified": false
+      }
+    ],
+    "container_count": 1,
+    "all_containers_verified": true
+  },
+  "final_host": {
+    "checked_at_utc": "2026-11-06T19:23:12.294632+00:00",
+    "host": "100.85.200.54",
+    "hostname": "4790",
+    "filesystem_free_bytes": 56724639744,
+    "protected_directories": [
+      {
+        "path": "/home/op/models/browserfusion-bonsai-27b",
+        "exists": true
+      },
+      {
+        "path": "/home/op/models/moss-exl3-5",
+        "exists": true
+      },
+      {
+        "path": "/home/op/models/moss-exl3-4",
+        "exists": true
+      },
+      {
+        "path": "/home/op/src/llama.cpp-prismml-mtp",
+        "exists": true
+      },
+      {
+        "path": "/home/op/experiments/qwen-bonsai-tensor-rpc-20261030",
+        "exists": true
+      },
+      {
+        "path": "/home/op/work/moss-awq-marlin-3060",
+        "exists": true
+      },
+      {
+        "path": "/home/op/work/moss-gptq-fused-3060-fresh-20261027",
+        "exists": true
+      }
+    ],
+    "bonsai_health": {
+      "http_status": 200,
+      "body": {
+        "status": "ok"
+      }
+    },
+    "active_task_services": {
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  "validation": {
+    "full_tests": 102,
+    "minimal_cpu_tests": 102,
+    "minimal_optional_skips": 2,
+    "development_reference_controls": 8,
+    "humaneval_reference_controls": 164,
+    "note": "Exact final patch and source hashes are recorded in the external delivery manifest. They are not embedded recursively in this source-controlled report."
+  }
+}

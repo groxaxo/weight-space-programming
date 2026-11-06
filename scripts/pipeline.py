@@ -362,28 +362,47 @@ def rebuild(lock: dict, base: Path, assets: Path, output: Path) -> dict:
 def verify_output(lock: dict, base: Path, assets: Path, output: Path) -> dict:
     manifest, arrays = load_edit(lock, assets)
     base, index = verify_base(lock, base)
-    grouped = {}
+    record_path = output / "rebuild.json"
+    require(record_path.is_file() and not record_path.is_symlink(), "Missing regular reconstruction record")
+    record = read_json(record_path)
+    expected_identity = {"schema_version": 1, "status": "reconstructed",
+                         "base_repo": lock["model"]["repo"], "base_revision": lock["model"]["revision"],
+                         "source_revision": lock["source"]["revision"],
+                         "lock_sha256": hashlib.sha256(json.dumps(lock, sort_keys=True).encode()).hexdigest()}
+    for key, value in expected_identity.items():
+        require(record.get(key) == value, f"Reconstruction provenance mismatch: {key}")
+    grouped, tensor_checks, file_hashes, preservation = {}, [], {}, {}
     for i, tensor in enumerate(manifest["tensors"]):
         shard = index[tensor["name"]]
         offset, data, proof = replacement(base / shard, tensor, arrays, i)
         grouped.setdefault(shard, []).append((offset, data, proof))
+        tensor_checks.append(proof)
     for name, spec in lock["model"]["files"].items():
         path = output / name
         if name not in grouped:
             verify_file(path, spec)
+            file_hashes[name] = spec["sha256"]
             continue
         require(path.is_file() and not path.is_symlink() and path.stat().st_size == spec["size"],
                 f"Missing/invalid output shard: {name}")
         spans = [(o, o + len(d)) for o, d, _ in grouped[name]]
-        require(digest_regions(base / name, spans) == digest_regions(path, spans),
+        preservation[name] = digest_regions(base / name, spans)
+        require(preservation[name] == digest_regions(path, spans),
                 f"Unedited output bytes differ: {name}")
         with path.open("rb") as f:
             for offset, data, proof in grouped[name]:
                 f.seek(offset)
                 require(hashlib.sha256(f.read(len(data))).hexdigest() == proof["edited_sha256"],
                         f"Edited output tensor differs: {proof['name']}")
+        file_hashes[name] = sha256(path)
+    expected_checks = {"tensor_checks": tensor_checks,
+                       "changed_entries_total": sum(t["changed_entries"] for t in tensor_checks),
+                       "unedited_region_sha256": preservation, "output_file_sha256": file_hashes}
+    for key, value in expected_checks.items():
+        require(record.get(key) == value, f"Reconstruction provenance mismatch: {key}")
     return {"status": "output_verified", "output": str(output),
-            "edited_tensors": len(manifest["tensors"]), "all_other_bytes_preserved": True}
+            "edited_tensors": len(manifest["tensors"]), "all_other_bytes_preserved": True,
+            "provenance_verified": True}
 
 
 def main(argv: list[str] | None = None) -> int:

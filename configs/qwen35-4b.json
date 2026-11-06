@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "model_id": "Qwen/Qwen3.5-4B",
+  "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "license": "Apache-2.0",
+  "served_model_name": "wsp-qwen35-4b-coder",
+  "seed": 20261106,
+  "max_length": 1536,
+  "lora_rank": 16,
+  "lora_alpha": 32,
+  "learning_rate": 0.00005,
+  "epochs": 1,
+  "gradient_accumulation_steps": 8,
+  "minimum_train_examples": 256,
+  "minimum_validation_examples": 16,
+  "max_grad_norm": 1.0
+}
