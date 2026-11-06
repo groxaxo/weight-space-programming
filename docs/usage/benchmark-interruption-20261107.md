@@ -17,3 +17,5 @@ This audit did not cancel jobs, stop another workload, retry cancelled attempts,
 Numeric queue metadata, selected engine lifecycle lines, source-log hashes and watchdog observations are in `benchmark-interruption-20261107.json`. Raw generation text and raw agent transcripts remain local.
 
 The next approved run should preserve incremental per-sample completions and token counters so an interruption cannot erase the entire in-flight batch accounting. Such a change needs a new versioned experiment, not an edit to the current frozen manifest. No retry was submitted by this check.
+
+The non-thinking process lost its Python stderr traceback during interruption, but its engine explicitly reported aborting **3 in-flight requests**. Its generation activity is supported by that lifecycle record, not by an assumed missing traceback.

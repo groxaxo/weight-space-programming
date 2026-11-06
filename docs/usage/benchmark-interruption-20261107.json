@@ -12,7 +12,6 @@
       "stop_reason": null,
       "updated_epoch": 1793994550.0178802,
       "log_sha256": "6e66a3256b71318fcac660e768cfdeabd8d07b0d1168192e1a6123b62ffb02b7",
-      "generation_call_entered": true,
       "sigint_observed": true,
       "selected_log_lines": [
         "(EngineCore pid=2257358) INFO 11-07 08:45:32 [gpu_model_runner.py:5255] Model loading took 1.53 GiB memory and 0.678409 seconds",
@@ -21,7 +20,11 @@
         "INFO 11-07 08:49:07 [core.py:1214] [shutdown] EngineCore: trigger received signal=SIGINT",
         "(EngineCore pid=2257358) INFO 11-07 08:49:07 [core.py:1342] [shutdown] EngineCore: aborting in-flight requests count=15"
       ],
-      "saved_sample_records": 0
+      "saved_sample_records": 0,
+      "generation_traceback_marker_present": true,
+      "inflight_requests_aborted": 15,
+      "generation_activity_confirmed": true,
+      "evidence_note": "Generation activity confirmed by traceback and/or engine in-flight request shutdown; missing traceback text is not proof generation never began."
     },
     "repaired-thinking": {
       "job_id": "ff5e96939107",
@@ -34,7 +37,6 @@
       "stop_reason": null,
       "updated_epoch": 1793994554.9080846,
       "log_sha256": "670bb3fd85db754dc5b05e7390e342259aa240bb8047a3743b03fc8cd434c4c3",
-      "generation_call_entered": true,
       "sigint_observed": true,
       "selected_log_lines": [
         "(EngineCore pid=2257371) INFO 11-07 08:45:32 [gpu_model_runner.py:5255] Model loading took 1.53 GiB memory and 0.775123 seconds",
@@ -43,7 +45,11 @@
         "(EngineCore pid=2257371) INFO 11-07 08:49:13 [core.py:1214] [shutdown] EngineCore: trigger received signal=SIGINT",
         "(EngineCore pid=2257371) INFO 11-07 08:49:13 [core.py:1342] [shutdown] EngineCore: aborting in-flight requests count=9"
       ],
-      "saved_sample_records": 0
+      "saved_sample_records": 0,
+      "generation_traceback_marker_present": true,
+      "inflight_requests_aborted": 9,
+      "generation_activity_confirmed": true,
+      "evidence_note": "Generation activity confirmed by traceback and/or engine in-flight request shutdown; missing traceback text is not proof generation never began."
     },
     "original-nonthinking": {
       "job_id": "318fe60bcc3d",
@@ -56,7 +62,6 @@
       "stop_reason": null,
       "updated_epoch": 1793994559.7903042,
       "log_sha256": "8df921a64bff3f21417eeecd9838823cc28aba68adf0d0b65d05f5ce8279d61f",
-      "generation_call_entered": false,
       "sigint_observed": true,
       "selected_log_lines": [
         "(EngineCore pid=2257357) INFO 11-07 08:45:32 [gpu_model_runner.py:5255] Model loading took 1.53 GiB memory and 0.797817 seconds",
@@ -65,7 +70,11 @@
         "(EngineCore pid=2257357) INFO 11-07 08:49:18 [core.py:1214] [shutdown] EngineCore: trigger received signal=SIGINT",
         "(EngineCore pid=2257357) INFO 11-07 08:49:18 [core.py:1342] [shutdown] EngineCore: aborting in-flight requests count=3"
       ],
-      "saved_sample_records": 0
+      "saved_sample_records": 0,
+      "generation_traceback_marker_present": false,
+      "inflight_requests_aborted": 3,
+      "generation_activity_confirmed": true,
+      "evidence_note": "Generation activity confirmed by traceback and/or engine in-flight request shutdown; missing traceback text is not proof generation never began."
     }
   },
   "watchdog_observations_0840_to_0850": [
