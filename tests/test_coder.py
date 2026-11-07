@@ -35,6 +35,12 @@ def record(task="task"):
 
 
 class ProtocolTests(unittest.TestCase):
+    def test_short_tool_conversations_are_not_rejected_at_200_messages(self):
+        request={'model':'unit','messages':[{'role':'user','content':'x'} for _ in range(202)],'max_tokens':8}
+        messages,*_=validate_request(request,'unit',262144,8192)
+        self.assertEqual(len(messages),202)
+        with self.assertRaises(CoderError):validate_request(request,'unit',128,16)
+
     def test_all_terminal_chat_markers_are_removed_without_breaking_json(self):
         message = parse_completion('{"exit_code":1,"failed":2}<|im_end|>\n<|endoftext|>', [])
         self.assertEqual(json.loads(message["content"]), {"exit_code": 1, "failed": 2})

@@ -55,5 +55,16 @@ class SamplingTests(unittest.TestCase):
             request={**control.GgufBackendTests().request(),**QWEN35_INSTRUCT}
             with self.assertRaisesRegex(CoderError,'presence_penalty'):backend.complete(request)
 
+    def test_explicit_legacy_route_parameters_are_forwarded_without_changing_defaults(self):
+        settings={'temperature':0.6,'top_p':0.9,'top_k':40,'min_p':0.05,
+            'presence_penalty':1.2,'frequency_penalty':0.1,'repeat_penalty':1.1,'seed':42}
+        response=control.GgufBackendTests().result(generation_settings=settings)
+        with control.native_control(response) as (url,requests):
+            backend=control.GgufBackendTests().backend(url)
+            backend.complete({**control.GgufBackendTests().request(),**settings})
+        self.assertEqual({k:requests[0][k] for k in settings},settings)
+        for key,value in [('presence_penalty',float('nan')),('top_k',True),('seed',-1),('repeat_penalty',0)]:
+            with self.subTest(key=key),self.assertRaises(CoderError):effective_sampling({key:value})
+
 
 if __name__=='__main__':unittest.main()

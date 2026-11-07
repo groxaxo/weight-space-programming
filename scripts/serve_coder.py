@@ -32,7 +32,9 @@ def validate_request(request, model_name, max_context, max_output):
     check(isinstance(request, dict), "Expected a request object")
     check(request.get("model") == model_name, "Unknown model")
     messages = request.get("messages")
-    check(isinstance(messages, list) and 1 <= len(messages) <= 200, "Invalid message count")
+    # The HTTP body and exact rendered-token checks bound resource use. A fixed
+    # 200-message cap rejected short tool conversations far below a 262K window.
+    check(isinstance(messages, list) and 1 <= len(messages) <= max_context, "Invalid message count")
     for message in messages:
         check(isinstance(message, dict) and message.get("role") in ("system", "user", "assistant", "tool"), "Invalid message")
         content = message.get("content")

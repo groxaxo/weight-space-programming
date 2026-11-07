@@ -31,7 +31,7 @@ checkpoint export, literal tool markup and attribution of actual client requests
 Serving identity schema 2 requires fresh paired evidence; the historical quality
 measurements above remain attached to their original source.
 
-The source regression suite contains 204 tests. Use the independent CPU setup
+The source regression suite contains 206 tests. Use the independent CPU setup
 below; optional training-library checks skip in that environment. Full sandbox
 checks additionally require Docker and `WSP_TEST_DOCKER_IMAGE`, as configured
 in the included GitHub Actions workflow.

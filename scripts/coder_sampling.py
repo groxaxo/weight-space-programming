@@ -21,8 +21,21 @@ def effective_sampling(request, declared=None):
         temperature=request.get('temperature',0)
         check(type(temperature) in (float,int) and math.isfinite(temperature) and 0<=temperature<=2,
               'Invalid temperature')
-        return {'temperature':temperature,'top_k':0,'top_p':0.95 if temperature>0 else 1.0,
+        values={'temperature':temperature,'top_k':0,'top_p':0.95 if temperature>0 else 1.0,
             'min_p':0.0,'repeat_penalty':1.0,'presence_penalty':0.0,'frequency_penalty':0.0}
+        for key,lower,upper in [('top_p',0,1),('min_p',0,1),('presence_penalty',-2,2),
+                                ('frequency_penalty',-2,2),('repeat_penalty',0,10)]:
+            if key in request:
+                value=request[key]
+                check(type(value) in (int,float) and math.isfinite(value) and lower<=value<=upper
+                    and (key!='repeat_penalty' or value>0), 'Invalid native sampling value: '+key)
+                values[key]=value
+        for key,upper in [('top_k',262144),('seed',2**32-1)]:
+            if key in request:
+                value=request[key]
+                check(type(value) is int and 0<=value<=upper,'Invalid native sampling value: '+key)
+                values[key]=value
+        return values
     check(declared==QWEN35_INSTRUCT, 'Unknown declared native sampling parameters')
     for key,expected in declared.items():
         if key in request:

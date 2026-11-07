@@ -61,6 +61,8 @@ The model stays on host loopback. A loopback-only SSH reverse tunnel reaches the
 
 Controlled runs opt into private request/token traces before parsing. These preserve malformed model output for diagnosis without relaxing validation. The native-port readiness probe permits TCP `TIME_WAIT` reuse while still refusing a live listener. A regression exercises both real socket states.
 
+The first sampled run passed tasks 1 and 6, then a repeated-command conversation hit the API's old 200-message guard at roughly 12K tokens. That partial run is retained as invalid infrastructure evidence. Message count is now bounded by the configured context, while the 2 MiB HTTP-body and exact rendered-token guards still apply. The complete pair is rerun after this fix. Synthetic controls did not establish enforcement of the configured OpenCode step limit in this installed release, so no extra step budget is claimed or used: the original 1,200-second actor deadline remains authoritative. Model repetition and deadline-limited artifacts remain visible in the results.
+
 At the deadline, stop only the owned actor, preserve and grade its saved artifact, and report agent completion separately. Drain issued requests before attribution. A disconnect after a validated response is delivery failure, not model-identity drift. Stop that task's frontend/native processes and restore Bonsai before the next task. Each next task starts a new model instance. Infrastructure/API/grader errors remain unscored and invalidate qualification.
 
 ## Qualification

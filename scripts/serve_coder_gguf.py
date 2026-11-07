@@ -56,7 +56,8 @@ class NativeBackend:
             result=loads(response.read())
         check(Path(result['model']).resolve()==Path(self.identity['artifact_path']).resolve(),'Wrong native model on serving port')
         check(result.get('truncated') is False,'Native backend truncated the prompt')
-        if declared is not None:verify_native_sampling(result.get('generation_settings'),sampling)
+        if declared is not None or any(k in request for k in sampling if k!='temperature'):
+            verify_native_sampling(result.get('generation_settings'),sampling)
         if self.identity.get('lora_artifact_path'):
             active=result.get('generation_settings',{}).get('lora',[])
             check(any(a.get('id')==self.identity['lora_id'] and a.get('scale')==self.identity['lora_scale'] for a in active),
