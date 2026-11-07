@@ -13302,12 +13302,14 @@
     "weights_sha256": "0aa61a13cdb0f8f4c29c5367995944981021584965f4a9c4c2c1c82cdf6b2188",
     "no_further_tuning_after_closeout_request": true,
     "next_work": [
-      "Declare a larger explicit Hermes output budget and repeat the matched client pair; omission currently falls back to 1024 and truncates long tool patches.",
       "Family-disjoint executable coverage for chunk boundaries and half-open intervals.",
       "Truthful failure observations and permitted-command, cross-module Hermes planning.",
       "Repeated seeded paired trials and unseen repository tasks before promotion."
     ],
-    "scope": "Selected historical development-informed replay; not official EvalPlus parity, all-164 accuracy, full-window recall or frontier equivalence."
+    "scope": "Selected historical development-informed replay; not official EvalPlus parity, all-164 accuracy, full-window recall or frontier equivalence.",
+    "completed_followups": [
+      "Configured default output allowance corrected; fresh paired base/released-MLP client run at28192."
+    ]
   },
   "all_pr_heads_verified_ancestors": {
     "origin/pr/1": "4ed4266d5f37c8a2583b4c95278fbbfaab3aeab1",
@@ -13517,5 +13519,17 @@
     },
     "base_model": "Qwen/Qwen3.5-4B",
     "base_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  },
+  "output28192_followup": {
+    "source_commit": "4feadcc8216c7953e6a4e2c2643457be0029bfc6",
+    "report": "hermes-output28192-20261107.json",
+    "budget_fixed": true,
+    "client_passes": {
+      "base": 3,
+      "mlp": 3
+    },
+    "all_clients_attributed": true,
+    "he9_regenerated": false,
+    "adapter_promoted": false
   }
 }

@@ -12,11 +12,13 @@ The current coding experiment runs on **`100.85.200.54`**, an RTX 3060 with 12 G
 
 ## Current measured findings
 
+**28,192-token client follow-up:** The paired 28,192-token client rerun records base **3/4** and released MLP **3/4** passes. All actual clients have complete request attribution: **True**. The omitted-limit fallback is fixed, native output allowances are verified, and the original HE9 measurements retain their separate 8,192-token identity. No additional training or model promotion is performed. See [paired results and budget proof](docs/experiments/hermes-output28192-20261107.md).
+
 The latest selected **Experimentos HE9** replay uses actual OpenCode in a fresh
 VM on `.54`, full 262,144-token context and Q8 K/V cache. The matched base scores
 **6/9 Base and 3/9 Base+Plus**; the MLP adapter scores **7/9 and 5/9**, respectively,
-with 7/9 completed actors in each arm. Both newly solved tasks and the remaining
-partial-result regressions are retained. The complete qualification rejects the
+with 7/9 completed actors in each arm. These are the original 8,192-output-cap measurements. Both newly solved tasks and the remaining
+partial-result regressions are retained. The original complete qualification rejects the
 MLP adapter: development success falls from 12/14 to 11/14, and the Hermes project
 trial fails. A further all-language adapter scores 6/9 Base and 4/9 Base+Plus,
 solving task 132 while losing base-solved task 76. An authenticated MLP

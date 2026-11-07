@@ -1,6 +1,6 @@
 # HE9 integration review and findings
 
-The nine original pipeline discrepancies remain closed in their separate frozen finding-to-test record. This follow-up records seven additional integration failures found while replaying the exact historical HE9 set. Each has a regression control. The latest implementation at `c2b4ed05f1b7fd0ff959f85950d76f7310cdb322` passes all 240 tests on .54 with actual pinned Docker and zero skips (39.121 seconds); GitHub Actions run 42347035658 succeeds.
+The nine original pipeline discrepancies remain closed in their separate frozen finding-to-test record. This follow-up records seven additional integration failures found while replaying the exact historical HE9 set. Each has a regression control. The seven-fix implementation at `c2b4ed05f1b7fd0ff959f85950d76f7310cdb322` passes all 240 tests on .54 with actual pinned Docker and zero skips (39.121 seconds); GitHub Actions run 42347035658 succeeds.
 
 | Finding | Failure and enforced correction | Regression evidence |
 |---|---|---|
@@ -64,23 +64,14 @@ repository tasks before promotion. The later lower-loss runs are evidence that
 longer training or validation loss alone is insufficient. No further tuning was
 started after the user's closeout instruction.
 
-## Open follow-up: effective Hermes output budget
+## Resolved follow-up: effective Hermes output budget
 
-All 18 malformed final continuation tool calls stop at exactly 1,024 generated
-tokens with native `stop_type=limit`. Their saved requests omit both
-`max_tokens` and `max_completion_tokens`, so the frontend validator's 1,024-token
-default applies even though the server advertises an 8,192-token output cap.
-The patch calls end before their closing markup. The parser correctly rejects
-these incomplete calls; this is not proof of provider drift or a parser bug.
-Hermes reaches its 1,000-second deadline; its original row lacks complete
-attribution and independent grading, and the complete qualifier rejects it.
-The successful request-drain correction is confirmed by the fully attributed
-OpenCode timeout and does not make malformed responses valid.
+The historical continuation's 18 malformed calls still record omitted output
+fields and exact 1,024-token truncation. The frontend default is now corrected
+to the configured serving allowance. Explicit client limits retain precedence
+and caps. Three regression tests include a real frontend/native HTTP control
+above 1,024 tokens; all 243 .54 tests pass with zero skips.
 
-This is an **open budget/configuration follow-up**, not an eighth fixed
-integration discrepancy or a new measured model gain. Explicitly configure and
-record a larger output budget and repeat both compatibility arms before drawing
-a training-only explanation for this failure. No such new run is claimed here.
-A separate diagnostic of the stopped Hermes workspace also fails independent
-Docker assertions, without altering the original row or its missing proof.
-The saved-request and diagnostic evidence is retained in the report JSON.
+The paired 28,192-token client rerun records base **3/4** and released MLP **3/4** passes. All actual clients have complete request attribution: **True**. The omitted-limit fallback is fixed, native output allowances are verified, and the original HE9 measurements retain their separate 8,192-token identity. No additional training or model promotion is performed.
+
+Source: `4feadcc8216c7953e6a4e2c2643457be0029bfc6`. The [new paired report](../experiments/hermes-output28192-20261107.md) includes request/engine budget audits and every actual client outcome. This closes the budget defect without relabeling the old missing-attribution record or its failed model logic. Remaining correctness failures and development regressions stay visible.

@@ -152,10 +152,19 @@
     "error": "AssertionError: Invalid continuation qualification evidence"
   },
   "continuation_output_budget_finding": {
-    "status": "open_followup",
-    "code_changed": false,
+    "status": "fixed_and_paired_retested",
+    "code_changed": true,
     "observation": "Hermes omits max_tokens/max_completion_tokens. The serving validator falls back to1024; all18 malformed calls stop at1024 with stop_type=limit. The8192 value is the server cap, not this effective request budget.",
-    "next_step": "Set an explicit larger client budget, record it in comparison identity, and rerun both compatibility arms before attributing remaining failures to model quality."
+    "next_step": "Address remaining measured logic failures; repeat paired seeds and unseen repository tasks before promotion.",
+    "resolution_source_commit": "4feadcc8216c7953e6a4e2c2643457be0029bfc6",
+    "effective_output_cap_and_default": 28192,
+    "regression_tests": "tests/test_client_output_budget.py",
+    "full_regressions": {
+      "tests": 243,
+      "skips": 0,
+      "seconds": 46.833
+    },
+    "paired_report": "docs/experiments/hermes-output28192-20261107.json"
   },
   "portable_release_preflight": {
     "status": "passed",
@@ -172,5 +181,12 @@
     "published_config_sha256": "65c222eae6171037425b09503f8103c4bb81a147f062da597470ce393093d50a",
     "weights_sha256": "0aa61a13cdb0f8f4c29c5367995944981021584965f4a9c4c2c1c82cdf6b2188",
     "precision_note": "PEFT can round factors through BF16 when the base target weights are BF16; this exactness control deliberately uses FP32. Native measured inference retains the published F32 GGUF factors."
+  },
+  "latest_output_budget_validation": {
+    "source_commit": "4feadcc8216c7953e6a4e2c2643457be0029bfc6",
+    "tests": 243,
+    "skips": 0,
+    "seconds": 46.833,
+    "ci_run": 42361899546
   }
 }

@@ -360,13 +360,11 @@ executable coverage, truthful tool-failure handling, permitted-command planning
 and cross-module Hermes correctness, followed by repeated paired trials and
 unseen repository tasks. No gate is relaxed for this release.
 
-The final continuation Hermes project has an additional measured limitation:
-requests omit both output-limit fields and receive the frontend's 1,024-token
-default, despite the 8,192-token server cap. Eighteen patch/tool completions hit
-that limit and are correctly rejected as incomplete. Hermes times out and the
-complete qualifier refuses missing attribution. The original record is retained;
-a separate saved-artifact diagnostic is not a replacement for request proof.
-Declare a larger explicit client output budget and repeat both compatibility
-arms before attributing this failure solely to training. This remains an open
-follow-up; the seven fixed integration discrepancies and 240-test result refer
-to the unchanged executed C2b source.
+The historical 1,024-token omitted-limit defect is now resolved. The frontend
+defaults to the configured `--max-output` allowance, and the new paired native
+client profile uses `--max-context 262144 --max-output 28192 --cache-type-k q8_0
+--cache-type-v q8_0`. Explicit smaller request budgets remain honored.
+
+The paired 28,192-token client rerun records base **3/4** and released MLP **3/4** passes. All actual clients have complete request attribution: **True**. The omitted-limit fallback is fixed, native output allowances are verified, and the original HE9 measurements retain their separate 8,192-token identity. No additional training or model promotion is performed.
+
+See the [complete follow-up](experiments/hermes-output28192-20261107.md) and [declared protocol](experiments/hermes-output-28192-protocol-20261107.md). The historical malformed continuation calls remain in their original failed record. Current budget proof comes from actual native settings, with main Hermes tool calls and auxiliary requests both accounted for.
