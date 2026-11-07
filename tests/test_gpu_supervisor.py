@@ -14,6 +14,34 @@ PATH = Path(__file__).resolve().parents[1] / "ops/run54_gpu_phase.py"
 SPEC = importlib.util.spec_from_file_location("gpu_phase_test", PATH)
 PHASE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(PHASE)
+import coder_common as COMMON
+
+
+class AdmissionTests(unittest.TestCase):
+    def test_native_admission_waits_for_a_later_strictly_idle_sample(self):
+        with patch.dict(os.environ, {'CUDA_VISIBLE_DEVICES': ''}), \
+             patch.object(COMMON.os, 'uname', return_value=SimpleNamespace(nodename='4790')), \
+             patch('subprocess.check_output', side_effect=['0, 11890, 17\n', '0, 100, 0\n', '0, 11890, 0\n']) as query, \
+             patch('time.sleep'):
+            self.assertEqual(COMMON.allocate_device(True, wait_seconds=60), 'direct-idle-.54')
+            self.assertEqual(query.call_count, 3)
+            self.assertEqual(os.environ['CUDA_VISIBLE_DEVICES'], '0')
+
+    def test_persistent_occupancy_fails_without_changing_the_environment(self):
+        with patch.dict(os.environ, {'CUDA_VISIBLE_DEVICES': ''}), \
+             patch.object(COMMON.os, 'uname', return_value=SimpleNamespace(nodename='4790')), \
+             patch('subprocess.check_output', return_value='0, 11890, 17\n'), \
+             patch('time.monotonic', side_effect=[0, 61]), patch('time.sleep'):
+            with self.assertRaisesRegex(ValueError, 'GPU is occupied'):
+                COMMON.allocate_device(True, wait_seconds=60)
+            self.assertEqual(os.environ['CUDA_VISIBLE_DEVICES'], '')
+
+    def test_waiting_does_not_admit_an_unknown_gpu_layout(self):
+        with patch.object(COMMON.os, 'uname', return_value=SimpleNamespace(nodename='4790')), \
+             patch('subprocess.check_output', return_value='0, 11890, 0\n1, 11890, 0\n') as query:
+            with self.assertRaisesRegex(ValueError, 'sole .54 GPU'):
+                COMMON.allocate_device(True, wait_seconds=60)
+            self.assertEqual(query.call_count, 1)
 
 
 class RestorationTests(unittest.TestCase):

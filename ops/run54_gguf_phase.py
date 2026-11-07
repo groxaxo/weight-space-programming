@@ -194,7 +194,7 @@ def main():
     try:
         artifact,identity=selected_identity(args,cfg)
         with gpu_window(args.output,args.allow_pause_bonsai):
-            allocate_device(True)
+            allocate_device(True, wait_seconds=60)
             verify_native_port_free()
             command=native_command(artifact,identity)
             write_json(args.output/'native-command.json',{'argv':command,'identity_before_frontend':identity})

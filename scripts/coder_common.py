@@ -175,17 +175,29 @@ def tool_map(tools):
     return result
 
 
-def allocate_device(direct_idle=False):
+def allocate_device(direct_idle=False, wait_seconds=0):
     """Use GPUQ's allocation, or explicitly admit the sole idle GPU on host .54."""
     import subprocess
+    import time
     if direct_idle:
         check(os.uname().nodename == "4790", "Direct idle admission is restricted to the approved .54 host")
-        result = subprocess.check_output(["nvidia-smi", "--query-gpu=index,memory.free,utilization.gpu",
-                                          "--format=csv,noheader,nounits"], text=True)
-        rows = [line.split(",") for line in result.splitlines() if line.strip()]
-        check(len(rows) == 1 and rows[0][0].strip() == "0", "Expected the sole .54 GPU")
-        check(int(rows[0][1]) >= 10500 and int(rows[0][2]) == 0,
-              ".54 GPU is occupied: need at least 10500 MiB free and no active compute; do not stop services automatically")
+        check(type(wait_seconds) in (int, float) and 0 <= wait_seconds <= 120, "Invalid GPU admission wait")
+        deadline = time.monotonic() + wait_seconds
+        while True:
+            result = subprocess.check_output(["nvidia-smi", "--query-gpu=index,memory.free,utilization.gpu",
+                                              "--format=csv,noheader,nounits"], text=True, timeout=10)
+            rows = [line.split(",") for line in result.splitlines() if line.strip()]
+            check(len(rows) == 1 and rows[0][0].strip() == "0", "Expected the sole .54 GPU")
+            free, utilization = int(rows[0][1]), int(rows[0][2])
+            if free >= 10500 and utilization == 0:
+                break
+            check(time.monotonic() < deadline,
+                  ".54 GPU is occupied: need at least 10500 MiB free and no active compute; "
+                  f"observed free={free} MiB, utilization={utilization}%; do not stop services automatically")
+            # NVML utilization can change between the supervisor readiness
+            # probe and this final admission after CUDA teardown. Retrying a
+            # read-only probe keeps the same admission requirements.
+            time.sleep(1)
         os.environ["CUDA_VISIBLE_DEVICES"] = "0"
         return "direct-idle-.54"
     check(os.environ.get("CUDA_VISIBLE_DEVICES") not in (None, "", "-1"), "GPUQ allocation is missing")
