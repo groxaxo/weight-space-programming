@@ -133,7 +133,10 @@ def qualify(base_he9,candidate_he9,base_phase,candidate_phase,training,*,he9_sou
     for phase,identity in zip((base_phase,candidate_phase),identities):
         check(phase['completed'].get('status')=='complete','Compatibility phase is incomplete')
         ready=phase['ready']
-        check(ready.get('status')=='ok' and ready.get('wsp')==identity and
+        check(ready.get('object')=='list' and ready.get('data')==[
+            {'id':cfg['served_model_name'],'object':'model','owned_by':'local'}],
+            'Invalid compatibility model discovery')
+        check(ready.get('wsp')==identity and
               isinstance(ready.get('wsp_instance'),str) and ready['wsp_instance'],'Different compatibility serving instance')
         evaluated.append(development(phase['development'],identity,compatibility_sources))
         pairs={}

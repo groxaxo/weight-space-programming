@@ -1,12 +1,17 @@
 """Synthetic acceptance evidence: no model scores or live clients in these tests."""
 import copy
 import hashlib
+from http.server import HTTPServer
+import json
 from pathlib import Path
 import sys
 import subprocess
 import tempfile
+import threading
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
+from urllib.request import urlopen
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path[:0]=[str(ROOT),str(ROOT/'scripts')]
@@ -15,6 +20,7 @@ from evaluate_coder import CODE_CASES,TOOL_CASES
 import qualify_he9 as gate
 from qualify_he9 import qualify
 from ops.replay_he9 import LIMITS
+from serve_coder import handler_for
 import test_he9 as he9_fixtures
 
 
@@ -50,7 +56,9 @@ class QualificationTests(unittest.TestCase):
             development={'schema_version':1,'identity':identity,'suite_sha256':fingerprint([CODE_CASES,TOOL_CASES]),
                 'evaluator_sha256':digest(ROOT/'scripts/evaluate_coder.py'),'sandbox_image':image,'results':rows,
                 'scores':{'code':{'passed':8,'total':8},'tools':{'passed':6,'total':6}}}
-            phase={'completed':{'status':'complete'},'ready':{'status':'ok','wsp':identity,'wsp_instance':instance},
+            phase={'completed':{'status':'complete'},'ready':{'object':'list',
+                'data':[{'id':cfg['served_model_name'],'object':'model','owned_by':'local'}],
+                'wsp':identity,'wsp_instance':instance},
                 'development':development}
             for kind,harness in (('file','smoke_clients.py'),('project','project_clients.py')):
                 results=[]
@@ -75,6 +83,33 @@ class QualificationTests(unittest.TestCase):
         self.assertEqual(result['status'],'qualified_for_native_he9_use')
         self.assertEqual(result['identity']['limits']['context'],262144)
         self.assertFalse(result['adapter_promoted'])
+
+    def test_real_frontend_health_discovery_is_accepted_with_matching_client_instances(self):
+        data=self.fixture();cfg=load_config(ROOT/'configs/qwen35-4b.json')
+        for report,phase in ((data[0],data[2]),(data[1],data[3])):
+            backend=SimpleNamespace(cfg=cfg,identity=report['results'][0]['identity'])
+            server=HTTPServer(('127.0.0.1',0),handler_for(backend))
+            thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
+            try:
+                with urlopen(f'http://127.0.0.1:{server.server_port}/health',timeout=5) as response:
+                    phase['ready']=json.load(response)
+            finally:
+                server.shutdown();server.server_close();thread.join(timeout=5)
+            self.assertNotIn('status',phase['ready'])
+            for kind in ('file','project'):
+                for row in phase[kind]['results']:
+                    row['model_attestation']['instance_id']=phase['ready']['wsp_instance']
+        self.assertEqual(qualify(*data)['status'],'qualified_for_native_he9_use')
+
+    def test_discovery_cannot_omit_or_substitute_the_model_or_instance(self):
+        for mode in ('status-only','wrong-model','duplicate-model','empty-instance'):
+            data=self.fixture();ready=data[3]['ready']
+            if mode=='status-only':
+                ready.pop('object');ready.pop('data');ready['status']='ok'
+            elif mode=='wrong-model':ready['data'][0]['id']='unrelated-model'
+            elif mode=='duplicate-model':ready['data'].append(copy.deepcopy(ready['data'][0]))
+            else:ready['wsp_instance']=''
+            with self.subTest(mode=mode),self.assertRaises(CoderError):qualify(*data)
 
     def test_he9_gain_cannot_replace_a_failed_development_or_real_client_case(self):
         for mode in ('development','file','project'):
