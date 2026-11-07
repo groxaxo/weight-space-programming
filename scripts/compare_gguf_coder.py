@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Apply the predeclared Q8 contract; the original NF4 gate stays unchanged."""
+"""Apply the declared Q8 contract, including a strict paired HumanEval gain."""
 import argparse
 import json
 from pathlib import Path
@@ -35,7 +35,7 @@ def compare_native(base,candidate,base_human,candidate_human,clients,training,co
     tools=[r for r in candidate['results'] if r['category']=='tools']
     floor=(not dev['regressions'] and sum(r['passed'] for r in code)/len(code)>=0.8 and all(r['passed'] for r in tools))
     gain=bool(dev['improvements']) or candidate_human['passed']>base_human['passed']
-    accepted=(floor and gain and validated['humaneval']['aggregate_nonregression'] and
+    accepted=(floor and gain and candidate_human['passed']>base_human['passed'] and
               validated['real_clients_passed'] and validated['validation_loss_improved'])
     profile='native-Q8_0-unmerged-F32-v2' if candidate['identity'].get('lora_artifact_path') else 'native-Q8_0-compiled-v1'
     return {'status':'accepted_for_local_use' if accepted else 'not_promoted','format_profile':profile,

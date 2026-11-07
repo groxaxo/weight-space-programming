@@ -108,11 +108,12 @@ def acceptance(baseline, candidate, baseline_human, candidate_human, clients, tr
               proof.get('identity_sha256') == fingerprint(candidate['identity']) and
               proof.get('proxy_sha256') == proxy_hash and bool(proof.get('instance_id')),
               'Missing actual client request attribution')
-    broad_pass = candidate_human["passed"] >= baseline_human["passed"]
+    broad_pass = candidate_human["passed"] > baseline_human["passed"]
     accepted = development["status"] == "development_gate_passed" and broad_pass and client_pass and after < before
     return {"status": "accepted_for_local_use" if accepted else "not_promoted", "development": development,
         "humaneval": {"baseline": baseline_human["passed"], "candidate": candidate_human["passed"], "total": 164,
-                      "aggregate_nonregression": broad_pass}, "real_clients_passed": client_pass,
+                      "aggregate_nonregression": candidate_human["passed"] >= baseline_human["passed"],
+                      "strict_improvement": broad_pass}, "real_clients_passed": client_pass,
         "validation_loss_improved": after < before,
         "scope": "Measured Python and isolated file-tool tasks only; broader coding reliability remains unproven."}
 

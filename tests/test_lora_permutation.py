@@ -4,7 +4,7 @@ import sys
 import unittest
 import numpy as np
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from export_coder_lora_gguf import reorder_factors
+from export_coder_lora_gguf import reorder_factors, verify_permutations
 from coder_common import CoderError
 
 
@@ -30,6 +30,16 @@ class LoraPermutationTests(unittest.TestCase):
         a=np.ones((3,12),dtype=np.float32);b=np.ones((12,3),dtype=np.float32)
         with self.assertRaises(CoderError):reorder_factors(a,b,2,2,3,2,dense_reorder)
         with self.assertRaises(CoderError):reorder_factors(a[None],b[None],0,2,3,2,dense_reorder)
+
+    def test_mlp_only_export_needs_no_hybrid_attention_permutations(self):
+        targets = ['model.language_model.layers.0.mlp.'+n for n in ('gate_proj', 'up_proj', 'down_proj')]
+        verify_permutations(targets, {'rows': 0, 'columns': 0})
+        hybrid = ['model.language_model.layers.0.linear_attn.'+n for n in
+                  ('in_proj_qkv', 'in_proj_z', 'in_proj_b', 'in_proj_a', 'out_proj')]
+        verify_permutations(hybrid, {'rows': 4, 'columns': 1})
+        for counts in ({'rows': 0, 'columns': 0}, {'rows': 4, 'columns': 0}, {'rows': 3, 'columns': 1}):
+            with self.subTest(counts=counts), self.assertRaises(CoderError):
+                verify_permutations(hybrid, counts)
 
 
 if __name__=='__main__':unittest.main()

@@ -19,6 +19,7 @@ from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 from coder_common import check, digest, fingerprint, loads, tool_map, validate_call, write_json
+from coder_sampling import request_sampling
 
 CODE_CASES = [
     ("adjacent_runs", "Implement wsp_adjacent_runs(items): return a list of (value, count) tuples for consecutive equal values. Empty input returns []. Preserve order. Return only Python code.",
@@ -125,7 +126,7 @@ class Client:
         check(isinstance(self.instance_id, str) and self.instance_id, 'Endpoint must identify its server instance')
 
     def complete(self, messages, tools=None):
-        payload = {"model": self.model, "messages": messages, "temperature": 0, "max_tokens": 1024,
+        payload = {"model": self.model, "messages": messages, **request_sampling(self.identity), "max_tokens": 1024,
                    "stream": False}
         if tools:
             payload["tools"] = tools

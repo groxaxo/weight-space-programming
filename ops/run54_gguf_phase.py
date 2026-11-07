@@ -16,9 +16,55 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path[:0]=[str(ROOT),str(ROOT/'scripts')]
 from coder_common import adapter_identity,allocate_device,check,digest,fingerprint,load_config,loads,write_json
 from ops.run54_gpu_phase import gpu_window,restore,stop_child
+from coder_sampling import sampling_for_profile
 
 CPP=Path('/home/op/src/llama.cpp-prismml-mtp/src/build/bin')
 IMAGE='python:3.12-slim@sha256:4840d514c583a4d3d8cad3940e68dee6f0f6f3635c12fcd0a3d74c21a5b93a54'
+
+
+def inference_settings(args):
+    settings={'context':getattr(args,'max_context',16384),'output':getattr(args,'max_output',2048),
+        'cache_type_k':getattr(args,'cache_type_k','f16'),'cache_type_v':getattr(args,'cache_type_v','f16'),
+        'thinking':getattr(args,'thinking',False),'slots':1,'gpu_layers':'all','flash_attention':'on',
+        'threads':4,'threads_batch':4,'context_shift':False,'cache_prompt':False,'warmup':False,'seed':20261106,
+        'sampling_profile':getattr(args,'sampling_profile','greedy')}
+    check(type(settings['context']) is int and 512<=settings['context']<=262144,
+          'Context exceeds the pinned Qwen3.5-4B supported maximum')
+    check(type(settings['output']) is int and 1<=settings['output']<settings['context'],'Invalid output allowance')
+    check(settings['cache_type_k'] in ('f16','q8_0') and settings['cache_type_v'] in ('f16','q8_0'),'Unsupported KV cache type')
+    check(type(settings['thinking']) is bool,'Invalid thinking flag')
+    sampling_for_profile(settings['sampling_profile'])
+    check(settings['sampling_profile']!='qwen35-instruct' or not settings['thinking'],
+          'The instruct sampling profile requires non-thinking mode')
+    return settings
+
+
+def native_command(artifact,identity):
+    settings=identity['runtime']['launch_options']
+    command=[str(CPP/'llama-server'),'--model',str(artifact),'--host','127.0.0.1','--port','18085',
+        '--ctx-size',str(settings['context']),'--parallel','1','--n-gpu-layers','all',
+        '--threads','4','--threads-batch','4','--flash-attn','on','--no-context-shift','--no-warmup',
+        '--cache-type-k',settings['cache_type_k'],'--cache-type-v',settings['cache_type_v'],'--seed','20261106']
+    if identity.get('lora_artifact_path'):command.extend(['--lora',identity['lora_artifact_path']])
+    return command
+
+
+def verify_compiled_targets(compiled, targets):
+    names=[row['name'] for row in compiled['tensor_checks']]
+    expected={name+'.weight' for name in targets}
+    check(targets and len(expected)==len(targets) and len(names)==len(set(names))
+          and set(names)==expected and compiled['verification']['all_unedited_bytes_preserved'] is True
+          and compiled['verification']['edited_tensors']==len(targets),
+          'Incomplete language-layer compilation proof')
+
+
+def verify_native_port_free(address=('127.0.0.1',18085)):
+    # Match the native HTTP listener's reuse semantics. A recently closed
+    # connection in TIME_WAIT is not an active serving process. SO_REUSEADDR
+    # still refuses an address held by a live listener; never stop that owner.
+    with socket.socket() as probe:
+        probe.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
+        probe.bind(address)
 
 
 def wait_ready(url,process,seconds=300):
@@ -67,13 +113,14 @@ def selected_identity(args,cfg):
     artifact=verified_artifact(model_entry)
     binary=CPP/'llama-server'
     libraries=sorted({p.resolve() for p in CPP.glob('*.so*') if p.is_file()})
+    settings=inference_settings(args)
     runtime={'backend':'llama.cpp','server_sha256':digest(binary),
         'shared_libraries':{p.name:digest(p) for p in libraries},
-        'launch_options':{'context':16384,'slots':1,'gpu_layers':'all','flash_attention':'on',
-                          'threads':4,'threads_batch':4,'context_shift':False,'cache_prompt':False,
-                          'warmup':False,'seed':20261106}}
+        'launch_options':settings}
+    sampling=sampling_for_profile(settings['sampling_profile'])
+    if sampling is not None:runtime['sampling']=sampling
     identity={'identity_schema':2,'model_proof_sha256':fingerprint(loads(args.model_proof.read_text())),
-        'limits':{'context':16384,'output':2048},'base_model':cfg['model_id'],'revision':cfg['revision'],'adapter':None,
+        'limits':{'context':settings['context'],'output':settings['output']},'base_model':cfg['model_id'],'revision':cfg['revision'],'adapter':None,
         'quantization':'Q8_0','runtime':runtime,'artifact_path':str(artifact.resolve()),
         'artifact_sha256':model_entry['sha256'],'conversion_manifest_sha256':digest(args.conversion),
         'conversion_profile':args.profile}
@@ -90,8 +137,7 @@ def selected_identity(args,cfg):
             provenance=args.conversion.parent/'compile-record.json'
             check(provenance.is_file() and digest(provenance)==record['compile_record_sha256'],'Missing verified compile record')
             compiled=loads(provenance.read_text());adapter=Path(compiled['source_adapter'])
-            check(compiled['verification']['all_unedited_bytes_preserved'] is True and len(compiled['tensor_checks'])==248,
-                  'Incomplete language-layer compilation proof')
+            verify_compiled_targets(compiled,loads((adapter.parent/'adapter-targets.json').read_text()))
             training_hash=record['compiler_provenance']['training_result_sha256']
         result=loads((adapter.parent/'training-result.json').read_text())
         run=loads((adapter.parent/'run-manifest.json').read_text())
@@ -128,6 +174,13 @@ def main():
     parser.add_argument('--clients',action='store_true')
     parser.add_argument('--project',action='store_true')
     parser.add_argument('--image',default=IMAGE)
+    parser.add_argument('--max-context',type=int,default=16384)
+    parser.add_argument('--max-output',type=int,default=2048)
+    parser.add_argument('--cache-type-k',choices=['f16','q8_0'],default='f16')
+    parser.add_argument('--cache-type-v',choices=['f16','q8_0'],default='f16')
+    parser.add_argument('--thinking',action='store_true')
+    parser.add_argument('--sampling-profile',choices=['greedy','qwen35-instruct'],default='greedy')
+    parser.add_argument('--audit-generations',action='store_true',help='Write private request/token evidence for a controlled run')
     args=parser.parse_args();args.output=args.output.absolute();args.conversion=args.conversion.resolve()
     check(os.uname().nodename=='4790','This supervisor is for .54 only')
     check(not args.output.exists(),'Refusing existing native phase output')
@@ -142,15 +195,12 @@ def main():
         artifact,identity=selected_identity(args,cfg)
         with gpu_window(args.output,args.allow_pause_bonsai):
             allocate_device(True)
-            with socket.socket() as probe:probe.bind(('127.0.0.1',18085))
-            native_command=[str(CPP/'llama-server'),'--model',str(artifact),'--host','127.0.0.1','--port','18085',
-                '--ctx-size','16384','--parallel','1','--n-gpu-layers','all','--threads','4','--threads-batch','4',
-                '--flash-attn','on','--no-context-shift','--no-warmup','--seed','20261106']
-            if identity.get('lora_artifact_path'):native_command.extend(['--lora',identity['lora_artifact_path']])
-            write_json(args.output/'native-command.json',{'argv':native_command,'identity_before_frontend':identity})
+            verify_native_port_free()
+            command=native_command(artifact,identity)
+            write_json(args.output/'native-command.json',{'argv':command,'identity_before_frontend':identity})
             with (args.output/'native.log').open('x') as native_log,(args.output/'server.log').open('x') as front_log:
                 native_env={k:v for k,v in os.environ.items() if not k.startswith('LLAMA_ARG_')}
-                native=subprocess.Popen(native_command,cwd=ROOT,env=native_env,stdout=native_log,stderr=subprocess.STDOUT)
+                native=subprocess.Popen(command,cwd=ROOT,env=native_env,stdout=native_log,stderr=subprocess.STDOUT)
                 try:
                     info=wait_ready('http://127.0.0.1:18085/health',native)
                     check(info.get('status')=='ok','Native model is not healthy')
@@ -161,8 +211,12 @@ def main():
                     write_json(args.output/'identity.json',identity)
                     front_env=dict(os.environ,CUDA_VISIBLE_DEVICES='',HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',
                                    OMP_NUM_THREADS='2',MKL_NUM_THREADS='2',TOKENIZERS_PARALLELISM='false')
-                    front=subprocess.Popen([str(ROOT/'.venv-train/bin/python'),'-u','scripts/serve_coder_gguf.py',
-                        '--config',str(args.config),'--model-proof',str(args.model_proof),'--identity',str(args.output/'identity.json')],
+                    frontend_command=[str(ROOT/'.venv-train/bin/python'),'-u','scripts/serve_coder_gguf.py',
+                        '--config',str(args.config),'--model-proof',str(args.model_proof),'--identity',str(args.output/'identity.json'),
+                        '--max-context',str(identity['limits']['context']),'--max-output',str(identity['limits']['output'])]
+                    if args.thinking:frontend_command.append('--thinking')
+                    if args.audit_generations:frontend_command.extend(['--audit-directory',str(args.output/'generations')])
+                    front=subprocess.Popen(frontend_command,
                         cwd=ROOT,env=front_env,stdout=front_log,stderr=subprocess.STDOUT)
                     ready=wait_ready('http://127.0.0.1:18084/health',front)
                     check(ready['wsp']['artifact_sha256']==identity['artifact_sha256'],'Unexpected frontend identity')

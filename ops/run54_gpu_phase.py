@@ -192,6 +192,10 @@ def serve_and_evaluate(args, output, cfg, snapshot):
                 run_logged([args.python, "-u", "ops/smoke_clients.py", "--base-url", f"http://127.0.0.1:{args.port}/v1",
                     "--model", cfg["served_model_name"], "--image", args.image, "--output", str(output / "clients")],
                     output, "clients.log", 1000, accepted_codes=(0, 2))
+            if getattr(args, 'projects', False):
+                run_logged([args.python, '-u', 'ops/project_clients.py', '--base-url', f'http://127.0.0.1:{args.port}/v1',
+                    '--model', cfg['served_model_name'], '--image', args.image, '--output', str(output / 'projects')],
+                    output, 'projects.log', 2400, accepted_codes=(0, 2))
             if args.humaneval or args.phase == "benchmark":
                 run_logged([args.python, "-u", "scripts/evaluate_humaneval.py", "--base-url", f"http://127.0.0.1:{args.port}/v1",
                     "--model", cfg["served_model_name"], "--image", args.image, "--output", str(output / "humaneval.json")],
@@ -213,6 +217,7 @@ def main():
     parser.add_argument("--port", type=int, default=18084)
     parser.add_argument("--allow-pause-bonsai", action="store_true")
     parser.add_argument("--clients", action="store_true")
+    parser.add_argument('--projects', action='store_true', help='Also run both isolated two-module client/terminal trials')
     parser.add_argument("--humaneval", action="store_true")
     parser.add_argument("--restore-only", action="store_true")
     args = parser.parse_args()

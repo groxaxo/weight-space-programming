@@ -367,6 +367,8 @@ class PromotionTests(unittest.TestCase):
             "results": [{"id": f"HumanEval/{i}", "passed": i != 0} for i in range(164)]}
         candidate = copy.deepcopy(human)
         candidate["identity"] = b["identity"]
+        candidate['results'][0]['passed'] = True
+        candidate['passed'] = 164
         clients = {"identity": b["identity"], "sandbox_image": b["sandbox_image"], "passed": True,
                    "harness_sha256": digest(Path(__file__).resolve().parents[1] / "ops/smoke_clients.py"),
                    "results": [{"client": n, "passed": True, "exit_code": 0, "timed_out": False,
@@ -396,7 +398,7 @@ class PromotionTests(unittest.TestCase):
         for kind in ("missing_task", "fake_total", "wrong_adapter", "missing_client", "client_harness", "smoke", "nonfinite"):
             values = self.complete_evidence()
             if kind == "missing_task": values[3]["results"].pop()
-            elif kind == "fake_total": values[3]["passed"] = 164
+            elif kind == "fake_total": values[3]["passed"] = 163
             elif kind == "wrong_adapter": values[4]["identity"] = values[0]["identity"]
             elif kind == "missing_client": values[4]["results"].pop()
             elif kind == "client_harness": values[4]["harness_sha256"] = "different"

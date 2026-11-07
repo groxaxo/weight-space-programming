@@ -2,6 +2,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -35,8 +36,13 @@ class EvaluationTests(unittest.TestCase):
         self.assertEqual(len({c.sample_seed('q1', s, 4) for s in range(4)}), 4)
 
     def test_gpu_not_initialized_on_module_import(self):
-        self.assertNotIn('vllm', sys.modules)
-        self.assertNotIn('torch', sys.modules)
+        # Other suites legitimately import Torch for CPU training/API controls.
+        # Verify this module's cold import instead of depending on test order.
+        code = "import sys; import compare_gpu; assert 'vllm' not in sys.modules; assert 'torch' not in sys.modules"
+        env=dict(os.environ,CUDA_VISIBLE_DEVICES='',PYTHONDONTWRITEBYTECODE='1')
+        result=subprocess.run([sys.executable,'-c',code],cwd=Path(c.__file__).parent,
+                              env=env,capture_output=True,text=True,timeout=15)
+        self.assertEqual(result.returncode,0,result.stderr)
 
     def test_queue_required(self):
         with patch.dict(os.environ, {}, clear=True):

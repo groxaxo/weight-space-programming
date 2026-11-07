@@ -17,6 +17,16 @@ from prepare_coder_data import read_dataset
 from coder_artifacts import capture_recipe
 
 
+def adapter_targets(named_modules, linear_type, scope='all-language'):
+    """Select an explicit adaptation scope while keeping vision/head frozen."""
+    check(isinstance(scope, str) and scope in ('all-language', 'mlp'), 'Invalid LoRA target scope')
+    targets = [name for name, module in named_modules
+               if '.language_model.layers.' in name and isinstance(module, linear_type)
+               and (scope == 'all-language' or '.mlp.' in name)]
+    check(targets, 'No language-layer linear modules found for the requested scope')
+    return targets
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=Path(__file__).resolve().parents[1] / "configs/qwen35-4b.json")
@@ -84,9 +94,7 @@ def main():
         model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True,
             gradient_checkpointing_kwargs={"use_reentrant": False})
     model.config.use_cache = False
-    targets = [name for name, module in model.named_modules()
-               if ".language_model.layers." in name and isinstance(module, torch.nn.Linear)]
-    check(targets, "No language-layer linear modules found; refusing an empty/vision-only adapter")
+    targets = adapter_targets(model.named_modules(), torch.nn.Linear, cfg.get('lora_target_scope', 'all-language'))
     model = get_peft_model(model, LoraConfig(r=cfg["lora_rank"], lora_alpha=cfg["lora_alpha"],
         target_modules=targets, lora_dropout=0.05, bias="none", task_type="CAUSAL_LM"))
     model.print_trainable_parameters()

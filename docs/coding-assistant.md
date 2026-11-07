@@ -2,6 +2,8 @@
 
 This track adapts the official Qwen3.5-4B checkpoint for coding and structured tool use. It produces a separate LoRA adapter and preserves the base files. A completed training run is a candidate; deployment and broad coding reliability are separate questions assessed through the paired evaluations and real clients.
 
+For the 7 November follow-up, the user selected the **nine historical Experimentos failures through OpenCode**, replacing the planned new all-164 run. Follow the separate [HE9 contract](he9-acceptance.md): fresh VM/client state, original frozen Base+Plus tests, 262,144 context, Q8 K/V and a strict matched gain before promotion. The all-164 utilities below retain their broader contract and historical evidence; HE9 qualification does not pass that gate.
+
 ## Pinned inputs and attribution
 
 | Input | Immutable revision | Terms |
@@ -55,7 +57,7 @@ systemd-run --user --collect --unit=wsp54-train-example \
   --phase train --output "$OUT" --allow-pause-bonsai
 ```
 
-Use `--phase smoke` for two optimizer steps, or `--phase evaluate` for the model tests. Evaluation accepts `--adapter /absolute/path/to/training/adapter`, `--clients`, and `--humaneval`. A smoke adapter is explicitly refused as a serving candidate.
+Use `--phase smoke` for two optimizer steps, or `--phase evaluate` for the model tests. Evaluation accepts `--adapter /absolute/path/to/training/adapter`, `--clients`, `--projects`, and `--humaneval`. `--projects` runs both contained two-module file/terminal trials sequentially after file-edit clients and before HumanEval. Client quality failures are retained without suppressing the remaining benchmark. A smoke adapter is explicitly refused as a serving candidate.
 
 Use `--phase benchmark` to run HumanEval alone against the same serving identity. Client failures are recorded in `acceptance.json`; they do not prevent gathering the remaining benchmark evidence.
 
@@ -99,7 +101,25 @@ Generation explicitly stops at both the native chat boundary (`<|im_end|>`, toke
 
 The development suite has eight executable Python tasks and six multi-turn tool scenarios, including dependent calls, error recovery, typed arguments, and untrusted file text. The gate requires a complete matching pair, at least 80% coding success, all tool scenarios passing, no per-case regressions, and an actual improvement. Different base revisions, quantization, inference runtimes, serving protocols, or evaluator implementations cannot be silently compared. HumanEval adds all 164 official tasks, with the same output budget and sandbox for baseline and candidate. Its public status prevents a claim of uncontaminated generalization.
 
-For the complete local acceptance gate, also pass `--baseline-humaneval`, `--candidate-humaneval`, `--clients` (the candidate's `acceptance.json`), and `--training` (its `training-result.json`) to `compare_coder.py`. This requires all 164 paired tasks, no aggregate HumanEval regression, both installed clients making edits that pass independent tests, and a finite improvement in held-out validation loss. A missing or mismatched report fails closed. Weight/configuration checksums and the training-result fingerprint are mandatory. Each successful client result must also carry a verified request attestation from the current proxy. Historical schema-1 reports are rejected by the current gate; use their frozen source to inspect historical decisions, and regenerate baseline/candidate evidence for a new qualification run. Do not add identity fields to old reports retroactively.
+For the complete local acceptance gate, also pass `--baseline-humaneval`, `--candidate-humaneval`, `--clients` (the candidate's `acceptance.json`), and `--training` (its `training-result.json`) to `compare_coder.py`. This requires all 164 paired tasks, a HumanEval solved count strictly higher than the base, both installed clients making edits that pass independent tests, and a finite improvement in held-out validation loss. The user strengthened this requirement on 7 November 2026: a tie no longer qualifies. The native Q8 gate also requires a strict win within its own paired profile. A missing or mismatched report fails closed. Weight/configuration checksums and the training-result fingerprint are mandatory. Each successful client result must also carry a verified request attestation from the current proxy. Historical schema-1 reports are rejected by the current gate; use their frozen source to inspect historical decisions, and regenerate baseline/candidate evidence for a new qualification run. Do not add identity fields to old reports retroactively.
+
+## Corrective tuning with public replay
+
+The optional `configs/qwen35-4b-corrective-mlp.json` recipe trains a rank-8 adapter only on language-layer MLP linear modules. Attention, vision and the output head remain frozen. Existing recipes retain the default `all-language` scope. Reduced scope is an experiment whose quality must be measured; it does not establish preservation of the base's capabilities.
+
+Build the corrective corpus on .54 using the existing authenticated public import:
+
+```bash
+CUDA_VISIBLE_DEVICES='' .venv-train/bin/python scripts/build_corrective_corpus.py \
+  --public-corpus assets/coder-corpus-v1 \
+  --output assets/coder-corpus-v3-corrective \
+  --config configs/qwen35-4b-corrective-mlp.json \
+  --model-proof reports/model-inputs.json
+```
+
+The producer authenticates replay files against their prepared manifest, retains the original public task split, adds 128 authored coding and 160 authored tool conversations, and checks every authored coding target through executable assertions in the pinned Docker grader. Whole conversations must fit the native tokenizer's training budget. All variants of an authored semantic family share a task identity and stay together in one split. The recorded V3 dataset has 832 training and 96 validation conversations.
+
+The generator reads no HumanEval or client-fixture files. Known development failures inform its requirements, including empty ranges, concise code, escaped text, observed failure summaries and grounded file edits. Development scores are therefore tuning evidence. Family separation and a prompt-only lexical audit cannot establish semantic disjointness or exclude public/pretraining contamination. Preserve `build.json`, source identities, dataset hashes and the exact generator with any exported adapter. Keep original failures and rejected candidates when selecting a checkpoint. A complete training epoch or lower held-out loss does not authorize promotion.
 
 Generated Python executes only in the pinned Docker image with networking disabled, a read-only root filesystem, an unprivileged user, bounded memory/CPU/processes, and a read-only fixture mount. Sandbox self-tests run before scoring. This isolates generated code for these evaluations; it is not a general policy for unrestricted agent shell commands.
 

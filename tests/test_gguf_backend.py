@@ -61,6 +61,16 @@ class GgufBackendTests(unittest.TestCase):
             result=self.backend(url).complete(self.request())
         self.assertEqual(result['choices'][0]['finish_reason'],'length')
 
+    def test_declared_instruct_sampling_reaches_the_native_engine(self):
+        sampling={'temperature':0.7,'top_p':0.8,'top_k':20,'min_p':0.0,
+            'presence_penalty':1.5,'frequency_penalty':0.0,'repeat_penalty':1.0,'seed':20261106}
+        with native_control(self.result(generation_settings=sampling)) as (url,requests):
+            backend=self.backend(url)
+            backend.identity['runtime']={'sampling':sampling}
+            request={**self.request(),**sampling}
+            backend.complete(request)
+        self.assertEqual({k:requests[0][k] for k in sampling},sampling)
+
     def test_wrong_loaded_artifact_and_silent_context_truncation_fail_closed(self):
         for changes in [{'model':'/tmp/wrong-model.gguf'},{'truncated':True}]:
             with self.subTest(changes=changes),native_control(self.result(**changes)) as (url,_):

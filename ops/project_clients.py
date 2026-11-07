@@ -323,6 +323,7 @@ def main():
     from evaluate_coder import Client
     from ops.client_proxy import IdentityProxy
     from ops.smoke_clients import execute
+    from coder_sampling import request_sampling, client_limits
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--base-url', default='http://127.0.0.1:18084/v1')
     parser.add_argument('--model', default='wsp-qwen35-4b-coder')
@@ -376,7 +377,8 @@ def main():
                     'provider': {'wsp-local': {'npm': '@ai-sdk/openai-compatible', 'name': 'WSP contained project',
                         'options': {'baseURL': 'http://127.0.0.1:18084/v1', 'apiKey': 'local-only'},
                         'models': {args.model: {'name': 'Qwen project trial', 'toolcall': True,
-                                               'limit': {'context': 16384, 'output': 2048}}}}},
+                                               'limit': client_limits(client.identity)}}}},
+                    'agent':{'build':{'temperature':request_sampling(client.identity)['temperature']}},
                     'tools': {'task': False, 'webfetch': False, 'websearch': False, 'glob': False, 'grep': False},
                     'permission': {'*': 'deny', 'read': 'allow', 'edit': 'allow', 'write': 'allow', 'bash': 'allow', 'external_directory': 'deny'}}
                 write_json(work/'opencode.json', config)

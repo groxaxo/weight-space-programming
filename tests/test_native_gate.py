@@ -37,6 +37,15 @@ class NativeGateTests(unittest.TestCase):
                 result=compare_native(*reports,{'passed':130},{'passed':130},{},{},conversion)
                 self.assertEqual(result['status'],'not_promoted')
 
+    def test_development_gain_cannot_promote_a_humaneval_tie(self):
+        with tempfile.TemporaryDirectory() as directory:
+            reports,conversion,validated=self.fixture(Path(directory))
+            validated['development']['improvements']=['fixed development case']
+            validated['humaneval'].update(candidate=130,strict_improvement=False)
+            with patch('compare_gguf_coder.acceptance',return_value=validated):
+                result=compare_native(*reports,{'passed':130},{'passed':130},{},{},conversion)
+                self.assertEqual(result['status'],'not_promoted')
+
     def test_broader_gain_cannot_hide_development_regression_or_quality_floor_failure(self):
         with tempfile.TemporaryDirectory() as directory:
             reports,conversion,validated=self.fixture(Path(directory))

@@ -163,6 +163,7 @@ def handler_for(backend):
                 result['wsp'] = {**result.get('wsp', {}), 'identity': backend.identity, 'instance_id': instance}
             except (ValueError, KeyError, TypeError) as error:
                 self.close_connection = True
+                print(f'Request/completion validation failed: {type(error).__name__}: {error}', flush=True)
                 self.send_json(400, {"error": {"message": str(error), "type": "invalid_request_error"}})
                 return
             except Exception as error:

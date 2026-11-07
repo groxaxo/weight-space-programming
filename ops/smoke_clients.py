@@ -22,6 +22,7 @@ sys.path[:0] = [str(ROOT), str(ROOT / "scripts")]
 from coder_common import check, digest, write_json
 from evaluate_coder import Client, run_python
 from ops.client_proxy import IdentityProxy
+from coder_sampling import request_sampling, client_limits
 
 INITIAL = '''def wsp_client_discount(price, percent):
     """Apply a percentage discount. Negative prices and percentages outside 0..100 are invalid."""
@@ -113,7 +114,8 @@ def main():
                     "provider": {"wsp-local": {"npm": "@ai-sdk/openai-compatible", "name": "WSP local trial",
                     "options": {"baseURL": cli_base_url, "apiKey": "local-only"},
                     "models": {args.model: {"name": "Qwen 4B trial", "toolcall": True,
-                        "limit": {"context": 16384, "output": 2048}}}}},
+                        "limit": client_limits(client.identity)}}}},
+                    "agent": {"build": {"temperature":request_sampling(client.identity)['temperature']}},
                     "tools": {"bash": False, "task": False, "webfetch": False, "websearch": False},
                     "permission": {"*": "deny", "read": "allow", "edit": "allow", "write": "allow",
                                    "glob": "allow", "grep": "allow", "list": "allow", "external_directory": "deny"}}

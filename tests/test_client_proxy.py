@@ -6,6 +6,8 @@ import tempfile
 import sys
 import threading
 import unittest
+import socket
+import struct
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -54,6 +56,22 @@ class ClientProxyTests(unittest.TestCase):
             with self.assertRaises(HTTPError): self.post(proxy)
             with self.assertRaises(CoderError): proxy.verify()
 
+    def test_sse_effective_sampling_drift_is_rejected_even_with_the_same_model(self):
+        self.backend.identity={'runtime':{'sampling':{'temperature':0.7,'presence_penalty':1.5}}}
+        with urlopen(self.url+'/models') as response:self.info=json.load(response)
+        original=self.backend.complete
+        sample=dict(self.backend.identity['runtime']['sampling'])
+        def completion(request):
+            value=original(request)
+            value['wsp']={'sampling':dict(sample)}
+            return value
+        self.backend.complete=completion
+        with self.proxy() as proxy:
+            self.post(proxy,True)
+            sample['presence_penalty']=0
+            with self.assertRaises(HTTPError):self.post(proxy,True)
+            with self.assertRaises(CoderError):proxy.verify()
+
     def test_restarted_instance_with_identical_model_is_rejected(self):
         with IdentityProxy(self.url, self.info['wsp'], 'different-process') as proxy:
             with self.assertRaises(HTTPError): self.post(proxy, True)
@@ -62,6 +80,49 @@ class ClientProxyTests(unittest.TestCase):
     def test_provider_fallback_and_no_requests_do_not_attest(self):
         with self.proxy() as proxy:
             with self.assertRaises(CoderError): proxy.verify()
+
+    def test_deadline_waits_for_the_last_request_before_attribution(self):
+        entered, release = threading.Event(), threading.Event()
+        original = self.backend.complete
+        def blocked(request):
+            entered.set()
+            release.wait(timeout=10)
+            return original(request)
+        self.backend.complete = blocked
+        with self.proxy() as proxy:
+            worker = threading.Thread(target=self.post, args=(proxy,), daemon=True)
+            worker.start()
+            try:
+                self.assertTrue(entered.wait(timeout=3))
+                with self.assertRaises(CoderError): proxy.drain(0.01)
+            finally:
+                release.set()
+                worker.join(timeout=5)
+            proxy.drain(2)
+            self.assertEqual(proxy.verify()['requests'], 1)
+
+    def test_stopped_actor_disconnect_does_not_discard_a_validated_response(self):
+        entered, release = threading.Event(), threading.Event()
+        original = self.backend.complete
+        def blocked(request):
+            entered.set()
+            release.wait(timeout=10)
+            return original(request)
+        self.backend.complete = blocked
+        with self.proxy() as proxy:
+            client = socket.create_connection(proxy.server.server_address, timeout=3)
+            client.sendall(b'POST /v1/chat/completions HTTP/1.1\r\nHost: localhost\r\nContent-Length: 2\r\n\r\n{}')
+            try:
+                self.assertTrue(entered.wait(timeout=3))
+                client.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack('ii', 1, 0))
+                client.close()
+            finally:
+                release.set()
+                client.close()
+            proxy.drain(3)
+            self.assertEqual(proxy.verify()['requests'], 1)
+            self.assertEqual(proxy.errors, [])
+            self.assertEqual(proxy.delivery_disconnects, 1)
 
     def test_capability_discovery_404_does_not_invalidate_real_completions(self):
         with self.proxy() as proxy:

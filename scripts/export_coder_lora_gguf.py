@@ -47,6 +47,15 @@ def install_reorder_patch(qwen):
     return counts
 
 
+def verify_permutations(targets, counts):
+    """Require only the hybrid transforms present in this adapter's targets."""
+    row_names = ('in_proj_qkv', 'in_proj_z', 'in_proj_b', 'in_proj_a')
+    expected_rows = sum('.linear_attn.' in n and n.rsplit('.', 1)[-1] in row_names for n in targets)
+    expected_columns = sum('.linear_attn.' in n and n.endswith('.out_proj') for n in targets)
+    check(counts == {'rows': expected_rows, 'columns': expected_columns},
+          'Native adapter permutation coverage differs from its target modules')
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--llama-source',type=Path,required=True)
@@ -91,7 +100,7 @@ def main():
         check(len(reader.tensors)==2*len(targets),'Export changed the LoRA tensor count')
         check(all(t.data.dtype==np.dtype('float32') and np.isfinite(t.data).all() for t in reader.tensors),
               'Expected finite FP32 GGUF factors')
-        check(counts['columns']>0,'Expected hybrid column permutations were not applied')
+        verify_permutations(targets, counts)
         del reader
         record={'schema_version':1,'status':'exported_unpromoted','created_at_utc':datetime.now(timezone.utc).isoformat(),
             'model_id':cfg['model_id'],'revision':cfg['revision'],'source_adapter':str(adapter.resolve()),
