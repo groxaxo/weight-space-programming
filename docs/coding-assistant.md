@@ -323,3 +323,50 @@ systemd-run --user --collect --unit=wsp54-pipeline-example \
 ```
 
 A pinned model/corpus, the full training environment, installed clients, Docker, and the protected native runtime must already exist. Use a unique unit and output directory. `--restore-only` covers both the HF and native lease outputs. `verification.json` distinguishes pipeline execution, client/code quality results, and whether HumanEval was regenerated. Add `--humaneval` only for a fresh all-164-task measurement of both HF profiles; it substantially extends runtime, so raise the transient unit’s `RuntimeMaxSec` to `21600` for that mode. The ordinary bounded control does not update the original HumanEval scores or promote its adapter. The [nine-finding resolution record](reviews/20261107-pipeline-fixes.md) maps each fix to its regression evidence.
+
+## Experimental HE9 community release
+
+[Qwen3.5-4B-WSP-HE9-MLP](https://huggingface.co/groxaxo/Qwen3.5-4B-WSP-HE9-MLP)
+shares the strongest measured adapter from the selected historical nine-task
+OpenCode experiment. It improves Base 6/9 → 7/9 and Base+Plus 3/9 → 5/9.
+Its complete assistant qualification fails: development drops 12/14 → 11/14
+and the Hermes two-module project fails. The official base remains the selected
+default. Publication is a research release, separate from promotion.
+
+The model repository includes unchanged PEFT factors and an unmerged native F32
+LoRA, a pinned public base locator, loading examples, method, raw evaluation,
+artifact hashes, tested source, license and corpus attribution. Only the portable
+configuration's base locator/revision differ from the measured configuration;
+both hashes and the original configuration are retained. A CPU shape-only-base
+standard-PEFT control verifies all 192 factors load exactly; it does not run
+inference or establish quality for a different precision/runtime.
+
+Follow the model card's pinned Qwen3_5ForConditionalGeneration/PEFT example for
+Python use. The measured native profile uses the existing authenticated export
+and conversion workflow, this project's chat/tool frontend, 262,144-token
+context and Q8 K/V cache. Conversion manifests bind measured local paths and
+are not portable installation files. The supervisor is specific to .54; adapt
+GPU/service ownership deliberately on another machine. Examples define separate
+OpenCode/Hermes profiles without changing existing providers. Full allocation
+does not establish recall or coding quality at the full window.
+
+The [comprehensive HE9 report](experiments/qwen35-4b-he9-20261107.md) and
+[integration findings](reviews/20261107-he9-integration-findings.md) retain the
+failed flow/continuation experiments, original incomplete client record and
+all regression evidence. The later continuation has lower held-out loss but
+only 9/14 development success; further tuning was stopped at the user's request
+to close out and share current work. Next work should address family-disjoint
+executable coverage, truthful tool-failure handling, permitted-command planning
+and cross-module Hermes correctness, followed by repeated paired trials and
+unseen repository tasks. No gate is relaxed for this release.
+
+The final continuation Hermes project has an additional measured limitation:
+requests omit both output-limit fields and receive the frontend's 1,024-token
+default, despite the 8,192-token server cap. Eighteen patch/tool completions hit
+that limit and are correctly rejected as incomplete. Hermes times out and the
+complete qualifier refuses missing attribution. The original record is retained;
+a separate saved-artifact diagnostic is not a replacement for request proof.
+Declare a larger explicit client output budget and repeat both compatibility
+arms before attributing this failure solely to training. This remains an open
+follow-up; the seven fixed integration discrepancies and 240-test result refer
+to the unchanged executed C2b source.

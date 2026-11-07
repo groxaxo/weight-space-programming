@@ -1,0 +1,15 @@
+Weight-Space Programming Lab
+Copyright 2026 Weight-Space Programming contributors.
+
+Original project code and documentation are licensed under Apache-2.0.
+This grant does not replace the terms of imported datasets, checkpoints,
+research edit artifacts or third-party runtime code.
+
+Qwen3.5 checkpoints: Qwen team / Alibaba Cloud, Apache-2.0.
+NVIDIA OpenCodeInstruct: NVIDIA, CC-BY-4.0; selected and converted examples.
+Hermes function calling v1: Nous Research and dataset contributors, Apache-2.0;
+selected and converted conversations.
+See docs/coder-attribution.md for pinned sources, changes and attribution.
+Research/edit provenance and terms remain with the cited upstream projects.
+The separately published experimental adapter includes its own model card,
+upstream license, attribution and exact artifact provenance.

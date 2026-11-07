@@ -19,10 +19,21 @@ with 7/9 completed actors in each arm. Both newly solved tasks and the remaining
 partial-result regressions are retained. The complete qualification rejects the
 MLP adapter: development success falls from 12/14 to 11/14, and the Hermes project
 trial fails. A further all-language adapter scores 6/9 Base and 4/9 Base+Plus,
-solving task 132 while losing base-solved task 76. **No adapter has been promoted**.
-Authenticated continuation from a completed adapter is now available, with exact
-factor-loading controls and a separate new optimizer. The
-[HE9 contract](docs/he9-acceptance.md) defines this separate selected-subset gate.
+solving task 132 while losing base-solved task 76. An authenticated MLP
+continuation scores 6/9 Base, 4/9 Base+Plus and 9/14 development cases despite
+lower held-out loss. **No adapter has been promoted**.
+
+The best MLP checkpoint is shared as an **experimental community release**:
+[Qwen3.5-4B-WSP-HE9-MLP on Hugging Face](https://huggingface.co/groxaxo/Qwen3.5-4B-WSP-HE9-MLP).
+It includes the unchanged PEFT/native LoRA weights, portable configuration,
+model card, method, all candidate results, tested code and attribution. This is
+a partial research success and a failed complete assistant qualification.
+Publication does not change the default provider or relax the promotion gate.
+The [complete HE9 report](docs/experiments/qwen35-4b-he9-20261107.md),
+[machine-readable evidence](docs/experiments/qwen35-4b-he9-20261107.json),
+[seven additional integration fixes](docs/reviews/20261107-he9-integration-findings.md)
+and [HE9 contract](docs/he9-acceptance.md) record the gains, regressions, remaining
+Hermes/tool failures, exact loading controls and recommended next work.
 
 In the earlier, separately frozen broad experiment, the official base scored
 6/8 authored coding tasks, 6/6 tool scenarios and 128/164
@@ -118,6 +129,10 @@ See [review comparison](docs/reviews/20261106-comparison.md), [Sol's original st
 - Format: [Safetensors specification](https://github.com/safetensors/safetensors#format).
 
 This project does not redistribute checkpoint or edit binaries in Git. Their upstream terms apply. Local testing is independent of GitHub Actions. Successful weight reconstruction establishes artifact integrity, not a new discovery result or reproduction of benchmark scores. Keep practice data separate from held-out evaluation when adding the research-agent stages.
+
+Original project code and documentation use [Apache-2.0](LICENSE), with
+[third-party notices](NOTICE). Imported models, datasets and research artifacts
+retain their respective terms; see [corpus attribution](docs/coder-attribution.md).
 
 ## Actual token accounting and benchmark observations
 
