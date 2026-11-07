@@ -79,6 +79,8 @@ Predeclared requirements for the matched pair:
 
 `scripts/qualify_he9.py` combines the completed replay pair with both complete native development/client phases and the measured adapter's training record. It supports the declared 262,144-token profile, checks the actual Q8 runtime/cache settings, binds client attestations to each phase's server instance, checks paired client versions and rejects partial, inconsistent or source-mismatched evidence. A tie or a remaining development/client failure returns `not_promoted`. A valid result is named `qualified_for_native_he9_use`; it still leaves `adapter_promoted: false` and makes no client, endpoint or default-model change. The separate all-164 acceptance utilities keep their broader contract.
 
+Project command detection accepts both `python3 -m unittest -v test_scheduler` and `python3 -m unittest test_scheduler -v`, including the `.py` module spelling and the protected workspace prefix. A real OpenCode trace exposed a false negative for the second form. Its interrupted compatibility pass is retained as incomplete evidence; both compatibility arms must be rerun after the correction. The observed command alone never overrides a timeout or failing independent assertions.
+
 This small, publicly known failure-selected slice is diagnostic tuning evidence. Even 9/9 cannot establish broad repository competence, uncontaminated generalization, all-164 HumanEval accuracy, frontier equivalence or perfection.
 
 ## Operation
@@ -122,5 +124,7 @@ After both native `--phase evaluate --clients --project` phases finish at the sa
   --training runs/training-unique/training-result.json \
   --output reports/he9-complete-qualification-unique.json
 ```
+
+The default source authority is the current working source. To combine a frozen HE9 pair with a later, separately paired client-harness correction, pass `--he9-source-commit` and `--compatibility-source-commit` with the full 40-character commits that produced each measurement. Both must be ancestors of the current checkout. The qualifier hashes the actual Git blobs and checks them against the reports; it does not trust arbitrary declared hashes or rewrite old identities. An inference, actor or grading change still requires a new matched HE9 pair.
 
 Preserve host commands/logs, guest transcripts, saved candidates, grader logs/results, reference controls, source hashes, VM creation/virgin proof and comparison. SSH private keys and personal profiles stay out of reports, archives and Git. Clear HF cache only when necessary, preserving needed authenticated inputs and Bonsai/Moss runtimes.

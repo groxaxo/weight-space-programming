@@ -5,10 +5,12 @@ This selected-subset qualification never asserts that the separate all-164 gate
 passed, changes a client profile, starts a server or promotes an adapter.
 """
 import argparse
+import hashlib
 import json
 import math
 from pathlib import Path
 import re
+import subprocess
 import sys
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -18,15 +20,36 @@ from compare_he9 import compare_he9
 from evaluate_coder import CODE_CASES,TOOL_CASES
 from ops.replay_he9 import LIMITS
 
+HE9_SOURCES=tuple('ops/'+name for name in ('replay_he9_vm54.py','replay_he9.py','he9_actor.py',
+    'client_proxy.py','project_clients.py','run54_gguf_phase.py'))+tuple('scripts/'+name for name in
+    ('serve_coder_gguf.py','serve_coder.py','coder_common.py','coder_sampling.py'))
+COMPATIBILITY_SOURCES=('scripts/evaluate_coder.py','ops/smoke_clients.py','ops/project_clients.py','ops/client_proxy.py')
+
+
+def source_hashes(commit,paths):
+    """Use working files or an explicitly pinned ancestor's actual Git blobs."""
+    if commit is None:return {name:digest(ROOT/name) for name in paths}
+    check(isinstance(commit,str) and re.fullmatch('[a-f0-9]{40}',commit) is not None,
+          'Measurement source requires a full immutable Git commit')
+    ancestor=subprocess.run(['git','-C',str(ROOT),'merge-base','--is-ancestor',commit,'HEAD'],
+        capture_output=True,timeout=10)
+    check(ancestor.returncode==0,'Measurement commit must be present in this repository and an ancestor of HEAD')
+    result={}
+    for name in paths:
+        blob=subprocess.run(['git','-C',str(ROOT),'show',commit+':'+name],capture_output=True,timeout=10)
+        check(blob.returncode==0,'Measurement commit lacks required source: '+name)
+        result[name]=hashlib.sha256(blob.stdout).hexdigest()
+    return result
+
 
 def valid_hash(value):
     return isinstance(value,str) and re.fullmatch('[a-f0-9]{64}',value) is not None
 
 
-def development(report,identity):
+def development(report,identity,sources):
     check(report['schema_version']==1 and report['identity']==identity,'Development model identity differs')
     check(report['suite_sha256']==fingerprint([CODE_CASES,TOOL_CASES]) and
-          report['evaluator_sha256']==digest(ROOT/'scripts/evaluate_coder.py'),'Different development suite or source')
+          report['evaluator_sha256']==sources['scripts/evaluate_coder.py'],'Different development suite or source')
     expected={row[0]:'code' for row in CODE_CASES}|{row['id']:'tools' for row in TOOL_CASES}
     rows=report['results']
     check(len(rows)==14 and len({r['id'] for r in rows})==14 and {r['id'] for r in rows}==set(expected),
@@ -44,10 +67,10 @@ def development(report,identity):
     return {r['id']:r for r in rows}
 
 
-def clients(report,identity,instance,kind):
+def clients(report,identity,instance,kind,sources):
     check(report['schema_version']==1 and report['identity']==identity,'Client model identity differs')
     harness='smoke_clients.py' if kind=='file' else 'project_clients.py'
-    check(report['harness_sha256']==digest(ROOT/'ops'/harness),'Different actual-client harness source')
+    check(report['harness_sha256']==sources['ops/'+harness],'Different actual-client harness source')
     rows=report['results']
     check(len(rows)==2 and {r['client'] for r in rows}=={'opencode','hermes'} and
           all(type(r['passed']) is bool for r in rows),'Both actual clients are required')
@@ -58,7 +81,7 @@ def clients(report,identity,instance,kind):
         proof=row.get('model_attestation',{})
         check(proof.get('verified') is True and type(proof.get('requests')) is int and proof['requests']>0
             and proof.get('instance_id')==instance and proof.get('identity_sha256')==fingerprint(identity)
-            and proof.get('proxy_sha256')==digest(ROOT/'ops/client_proxy.py'),'Missing matching actual-client attribution')
+            and proof.get('proxy_sha256')==sources['ops/client_proxy.py'],'Missing matching actual-client attribution')
         tests=row.get('independent_tests',{})
         complete=(row['passed'] and row.get('exit_code')==0 and row.get('timed_out') is False
             and tests.get('passed') is True and tests.get('tests_completed') is True
@@ -86,8 +109,14 @@ def clients(report,identity,instance,kind):
     return passed,{r['client']:r for r in rows}
 
 
-def qualify(base_he9,candidate_he9,base_phase,candidate_phase,training):
+def qualify(base_he9,candidate_he9,base_phase,candidate_phase,training,*,he9_sources=None,compatibility_sources=None):
     he9=compare_he9(base_he9,candidate_he9)
+    he9_sources=source_hashes(None,HE9_SOURCES) if he9_sources is None else he9_sources
+    compatibility_sources=source_hashes(None,COMPATIBILITY_SOURCES) if compatibility_sources is None else compatibility_sources
+    check(set(he9_sources)==set(HE9_SOURCES) and set(compatibility_sources)==set(COMPATIBILITY_SOURCES),
+          'Incomplete measurement source authority')
+    for report in (base_he9,candidate_he9):
+        check(report['protocol_sha256']==he9_sources,'HE9 source does not match the declared measurement revision')
     identities=[r['results'][0]['identity'] for r in (base_he9,candidate_he9)]
     cfg=load_config(ROOT/'configs/qwen35-4b.json')
     for identity in identities:
@@ -106,12 +135,12 @@ def qualify(base_he9,candidate_he9,base_phase,candidate_phase,training):
         ready=phase['ready']
         check(ready.get('status')=='ok' and ready.get('wsp')==identity and
               isinstance(ready.get('wsp_instance'),str) and ready['wsp_instance'],'Different compatibility serving instance')
-        evaluated.append(development(phase['development'],identity))
+        evaluated.append(development(phase['development'],identity,compatibility_sources))
         pairs={}
         for kind in ('file','project'):
             report=phase[kind]
             check(report['sandbox_image']==phase['development']['sandbox_image'],'Client and development sandboxes differ')
-            passed,rows=clients(report,identity,ready['wsp_instance'],kind)
+            passed,rows=clients(report,identity,ready['wsp_instance'],kind,compatibility_sources)
             pairs[kind]=rows
             if identity.get('adapter'):client_pass.append(passed)
         client_rows.append(pairs);images.append(phase['development']['sandbox_image'])
@@ -139,6 +168,7 @@ def qualify(base_he9,candidate_he9,base_phase,candidate_phase,training):
             'candidate_passed':sum(r['passed'] for r in second.values()),'regressions':losses,'improvements':gains},
         'candidate_file_clients_passed':client_pass[0],'candidate_project_clients_passed':client_pass[1],
         'validation_loss_improved':after<before,'identity':identities[1],
+        'measurement_source_sha256':{'he9':he9_sources,'compatibility':compatibility_sources},
         'scope':'Exact failure-selected HE9 plus fourteen authored development cases and paired actual file/project clients. '
             'No all-164 HumanEval qualification, general coding guarantee, client-profile change or automatic endpoint promotion.'}
 
@@ -156,9 +186,14 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('baseline-he9','candidate-he9','baseline-phase','candidate-phase','training','output'):
         parser.add_argument('--'+name,type=Path,required=True)
+    parser.add_argument('--he9-source-commit',help='Verify HE9 against the Git blobs of this full ancestor commit')
+    parser.add_argument('--compatibility-source-commit',help='Verify client/development sources against this full ancestor commit')
     args=parser.parse_args();paths=[args.baseline_he9,args.candidate_he9,args.training]
     result=qualify(loads(args.baseline_he9.read_text()),loads(args.candidate_he9.read_text()),
-        phase_inputs(args.baseline_phase,paths),phase_inputs(args.candidate_phase,paths),loads(args.training.read_text()))
+        phase_inputs(args.baseline_phase,paths),phase_inputs(args.candidate_phase,paths),loads(args.training.read_text()),
+        he9_sources=source_hashes(args.he9_source_commit,HE9_SOURCES),
+        compatibility_sources=source_hashes(args.compatibility_source_commit,COMPATIBILITY_SOURCES))
+    result['measurement_source_commits']={'he9':args.he9_source_commit,'compatibility':args.compatibility_source_commit}
     result['input_sha256']={str(p):digest(p) for p in paths}
     result['qualifier_sha256']=digest(Path(__file__))
     write_json(args.output,result)

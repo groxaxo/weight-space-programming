@@ -240,7 +240,9 @@ def is_test_command(command):
     return words in [['python3', '-m', 'unittest'], ['python3', '-m', 'unittest', '-v'],
                      ['python3', '-m', 'unittest', 'discover', '-v'],
                      ['python3', '-m', 'unittest', '-v', 'test_scheduler'],
-                     ['python3', '-m', 'unittest', '-v', 'test_scheduler.py']]
+                     ['python3', '-m', 'unittest', '-v', 'test_scheduler.py'],
+                     ['python3', '-m', 'unittest', 'test_scheduler', '-v'],
+                     ['python3', '-m', 'unittest', 'test_scheduler.py', '-v']]
 
 
 def ran_tests(log, name):

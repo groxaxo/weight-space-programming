@@ -1,13 +1,18 @@
 """Synthetic acceptance evidence: no model scores or live clients in these tests."""
 import copy
+import hashlib
 from pathlib import Path
 import sys
+import subprocess
+import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path[:0]=[str(ROOT),str(ROOT/'scripts')]
 from coder_common import CoderError,adapter_identity,digest,fingerprint,load_config
 from evaluate_coder import CODE_CASES,TOOL_CASES
+import qualify_he9 as gate
 from qualify_he9 import qualify
 from ops.replay_he9 import LIMITS
 import test_he9 as he9_fixtures
@@ -27,7 +32,7 @@ class QualificationTests(unittest.TestCase):
             identity['runtime']['launch_options']=dict(LIMITS)
             identity['runtime']['backend']='llama.cpp'
             if identity['adapter']:identity.update(adapter_identity(training))
-            report['protocol_sha256']['ops/client_proxy.py']=digest(ROOT/'ops/client_proxy.py')
+            report['protocol_sha256']=gate.source_hashes(None,gate.HE9_SOURCES)
             for row in report['results']:
                 row['identity']=identity
                 row['harness_sha256']={'ops/client_proxy.py':digest(ROOT/'ops/client_proxy.py')}
@@ -123,6 +128,24 @@ class QualificationTests(unittest.TestCase):
                 for kind in ('file','project'):
                     for row in phase[kind]['results']:row['model_attestation']['identity_sha256']=fingerprint(identity)
             with self.subTest(mode=mode),self.assertRaises(CoderError):qualify(*data)
+
+    def test_pinned_measurement_sources_use_ancestor_blobs_and_reject_unknown_revisions(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);(root/'ops').mkdir()
+            path=root/'ops/project_clients.py';path.write_text('old frozen detector\n')
+            def git(*args):
+                return subprocess.check_output(['git','-C',str(root),'-c','core.hooksPath=/dev/null',
+                    '-c','commit.gpgsign=false',*args],stderr=subprocess.DEVNULL,text=True).strip()
+            git('init','-q');git('config','user.name','Synthetic test');git('config','user.email','test@example.invalid')
+            git('add','.');git('commit','-qm','frozen');old=git('rev-parse','HEAD')
+            path.write_text('later corrected detector\n');git('add','.');git('commit','-qm','correction')
+            with patch.object(gate,'ROOT',root):
+                frozen=gate.source_hashes(old,('ops/project_clients.py',))
+                self.assertEqual(frozen['ops/project_clients.py'],hashlib.sha256(b'old frozen detector\n').hexdigest())
+                self.assertNotEqual(frozen,gate.source_hashes(None,('ops/project_clients.py',)))
+                for revision in ('HEAD','0'*40):
+                    with self.subTest(revision=revision),self.assertRaises(CoderError):
+                        gate.source_hashes(revision,('ops/project_clients.py',))
 
 
 if __name__=='__main__':unittest.main()
