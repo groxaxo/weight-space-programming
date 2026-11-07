@@ -12,8 +12,16 @@ The current coding experiment runs on **`100.85.200.54`**, an RTX 3060 with 12 G
 
 ## Current measured findings
 
-**No fine-tuned adapter passed the complete acceptance gate.** The official base
-remains the default: 6/8 authored coding tasks, 6/6 tool scenarios and 128/164
+The latest selected **Experimentos HE9** replay uses actual OpenCode in a fresh
+VM on `.54`, full 262,144-token context and Q8 K/V cache. The matched base scores
+**6/9 Base and 3/9 Base+Plus**; the MLP adapter scores **7/9 and 5/9**, respectively,
+with 7/9 completed actors in each arm. Both newly solved tasks and the remaining
+partial-result regressions are retained. The independent coding/tool and installed
+client checks are still running; **no adapter has been promoted**. The
+[HE9 contract](docs/he9-acceptance.md) defines this separate selected-subset gate.
+
+In the earlier, separately frozen broad experiment, the official base scored
+6/8 authored coding tasks, 6/6 tool scenarios and 128/164
 HumanEval tasks (78.05%). Both real OpenCode/Hermes clients passed the initial
 single-module file-edit fixture. Lower-rate adapters improved the small coding
 suite to 7/8 but scored 127/164 and 126/164 HumanEval, so neither was promoted.
@@ -31,14 +39,14 @@ checkpoint export, literal tool markup and attribution of actual client requests
 Serving identity schema 2 requires fresh paired evidence; the historical quality
 measurements above remain attached to their original source.
 
-The source regression suite contains 218 tests. Use the independent CPU setup
+The source regression suite contains 223 tests. Use the independent CPU setup
 below; optional training-library checks skip in that environment. Full sandbox
 checks additionally require Docker and `WSP_TEST_DOCKER_IMAGE`, as configured
 in the included GitHub Actions workflow.
 
 **GPU comparison and accounting (7 November 2026):** a targeted, single-GPU-per-arm MATH-500 runner compares original-thinking, repaired-thinking, and original-nonthinking through the existing GPUQ queue. The three jobs were subsequently cancelled after entering generation, with zero saved samples and no accuracy result. The token-accounting audit and interruption evidence are retained. See [protocol, job IDs, and operations](docs/THREE_GPU_COMPARISON.md).
 
-**Research-agent components still not implemented:** autonomous Sol/Astra orchestration, frontier token or spending budgets, activation extraction, a general evaluation/serving service, and an isolated execution environment for agent-written code. The targeted comparison is not that complete system. [Sol 6.1 Max produced the implementation plan](docs/plans/sol-6.1-max-20261107.md), with [invocation provenance](docs/plans/sol-plan-provenance-20261107.json).
+**Research-agent components still not implemented:** autonomous Sol/Astra orchestration, frontier token or spending budgets, activation extraction, a general evaluation/serving service, and a sandbox for unrestricted research agents. The coding and HE9 tracks do provide isolated execution for their bounded fixtures. [Sol 6.1 Max produced the broader implementation plan](docs/plans/sol-6.1-max-20261107.md), with [invocation provenance](docs/plans/sol-plan-provenance-20261107.json).
 
 ## Quick start — Linux, Python 3.12
 

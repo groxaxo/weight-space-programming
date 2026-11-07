@@ -121,6 +121,22 @@ The producer authenticates replay files against their prepared manifest, retains
 
 The generator reads no HumanEval or client-fixture files. Known development failures inform its requirements, including empty ranges, concise code, escaped text, observed failure summaries and grounded file edits. Development scores are therefore tuning evidence. Family separation and a prompt-only lexical audit cannot establish semantic disjointness or exclude public/pretraining contamination. Preserve `build.json`, source identities, dataset hashes and the exact generator with any exported adapter. Keep original failures and rejected candidates when selecting a checkpoint. A complete training epoch or lower held-out loss does not authorize promotion.
 
+The additional `scripts/build_agent_flow_corpus.py` producer adds 256 authored read/edit/test/finish trajectories to that authenticated corpus. Eight unrelated helper families use reduced OpenCode/Hermes tool schemas; every argument name is supported by the recorded installed APIs. These are synthetic trajectories, with simulated file-tool feedback and actual separately executed Docker unittest results. Both the broken starter and the corrected whole-file implementation are executed. Raw controls are archived; only their workspace paths are rebound and their displayed stderr is bounded when constructing a conversation. No client fixture or HE9 answer is imported.
+
+```bash
+CUDA_VISIBLE_DEVICES='' .venv-train/bin/python scripts/build_agent_flow_corpus.py \
+  --project /home/op/work/weight-space-programming-20261106 \
+  --public-corpus assets/coder-corpus-v1 \
+  --existing-corpus assets/coder-corpus-v3-corrective \
+  --output assets/coder-corpus-v4-agent-flows \
+  --config configs/qwen35-4b-agent-flows.json \
+  --model-proof reports/model-inputs.json
+```
+
+The recorded flow corpus has 992 training and 192 validation conversations. Every client, repair state and variant of one helper stays in the same split; three new helper families are held out. The 256 additional conversations fit within 1,338 tokens, below the 1,536-token training budget. The optional flow recipe changes adaptation to all language-layer linear modules at rank 8/alpha 16, one epoch and learning rate 3e-6. This is a joint data/scope/rate experiment, so a downstream change cannot be attributed to one of those factors alone. Its checkpoint is selected by held-out loss before model testing.
+
+Rebuilding the corpus executes fresh controls, whose observed timing text can change the data hash. Use the archived prepared files and their authenticated manifest to reproduce the exact recorded training inputs. Both source producers reject an existing output directory and retain the generated data, source identity and control record. The flow producer also retains its exact generator. The maximum training sequence length is separate from the measured 262,144-token native inference context.
+
 Generated Python executes only in the pinned Docker image with networking disabled, a read-only root filesystem, an unprivileged user, bounded memory/CPU/processes, and a read-only fixture mount. Sandbox self-tests run before scoring. This isolates generated code for these evaluations; it is not a general policy for unrestricted agent shell commands.
 
 The checker requires a completion exit marker after all assertions, so an ordinary `exit(0)` cannot bypass the tests and produce a passing score. The Docker integration tests cover correct code, incorrect code, `SystemExit(0)`, and `os._exit(0)`. Run them with `WSP_TEST_DOCKER_IMAGE` set to the pinned image; the CPU CI workflow sets this automatically. This completion check is for grading, rather than a guarantee against deliberate grader manipulation.
