@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "imported_utc": "2026-11-06T19:50:54.584907+00:00",
+  "scope": "Three recovered delegated GPT-6.1 Sol Max invocations only; not full ChatGPT/account/project usage.",
+  "sessions": [
+    {
+      "session_id": "01a1af00-cdbe-7f82-8442-0d3ad95654f7",
+      "model": "gpt-6.1-sol",
+      "reasoning_effort": "max",
+      "started_utc": "2026-11-06T03:57:07.908Z",
+      "last_usage_utc": "2026-11-06T03:59:55.760Z",
+      "usage": {
+        "input_tokens": 1057241,
+        "output_tokens": 7168,
+        "cached_input_tokens": 991872,
+        "cache_write_input_tokens": 0,
+        "reasoning_output_tokens": 4415,
+        "total_tokens": 1064409,
+        "noncached_input_tokens": 65369,
+        "noncached_input_plus_output_tokens": 72537,
+        "non_reasoning_output_tokens": 2753
+      },
+      "unique_response_receipts": 17,
+      "reconciled_to_final_cumulative_counter": true,
+      "source": {
+        "kind": "codex_rollout",
+        "filename": "rollout-2026-11-06T16-57-07-01a1af00-cdbe-7f82-8442-0d3ad95654f7.jsonl",
+        "sha256": "a883c62cb04a1e855e1da50c360f3c746b2b2cf32875ac6b86466a8b1b21e694"
+      },
+      "stage": "Blocked implementation attempt",
+      "outcome": "Agent invocation completed but execution/write permissions blocked implementation. No code changes, tests, or commit were produced by this agent.",
+      "cli_display_tokens_used": 72537,
+      "cli_display_semantics_verified": "input_tokens - cached_input_tokens + output_tokens",
+      "cli_log_sha256": "2e8f3118107f20d39b10943e2873037a8209915a428b091f8c455722c6c7c805"
+    },
+    {
+      "session_id": "01a1af02-5213-7461-b8c6-62bd19c11e10",
+      "model": "gpt-6.1-sol",
+      "reasoning_effort": "max",
+      "started_utc": "2026-11-06T03:58:47.322Z",
+      "last_usage_utc": "2026-11-06T04:01:53.871Z",
+      "usage": {
+        "input_tokens": 786523,
+        "output_tokens": 9054,
+        "cached_input_tokens": 708096,
+        "cache_write_input_tokens": 0,
+        "reasoning_output_tokens": 5188,
+        "total_tokens": 795577,
+        "noncached_input_tokens": 78427,
+        "noncached_input_plus_output_tokens": 87481,
+        "non_reasoning_output_tokens": 3866
+      },
+      "unique_response_receipts": 13,
+      "reconciled_to_final_cumulative_counter": true,
+      "source": {
+        "kind": "codex_rollout",
+        "filename": "rollout-2026-11-06T16-58-47-01a1af02-5213-7461-b8c6-62bd19c11e10.jsonl",
+        "sha256": "bd90248dfb68e190984f50ae543550432246e6a86cd92b55007b0c755a020a14"
+      },
+      "stage": "Static code review",
+      "outcome": "Completed a source-only review with seven findings; no tests or rebuild were run by this agent.",
+      "cli_display_tokens_used": 87481,
+      "cli_display_semantics_verified": "input_tokens - cached_input_tokens + output_tokens",
+      "cli_log_sha256": "77503beb80004b839c90bcdc5e3166f3740742402ecb80465b9903133b290927"
+    },
+    {
+      "session_id": "01a1b243-e6b0-7971-beec-bd67afa96b65",
+      "model": "gpt-6.1-sol",
+      "reasoning_effort": "max",
+      "usage": {
+        "input_tokens": 33691,
+        "output_tokens": 10358,
+        "cached_input_tokens": 12288,
+        "cache_write_input_tokens": 0,
+        "reasoning_output_tokens": 7250,
+        "total_tokens": 44049,
+        "noncached_input_tokens": 21403,
+        "noncached_input_plus_output_tokens": 31761,
+        "non_reasoning_output_tokens": 3108
+      },
+      "completed_turns": 1,
+      "unique_response_receipts": null,
+      "reconciled_to_committed_provenance": true,
+      "source": {
+        "kind": "codex_exec_events",
+        "filename": "events.jsonl",
+        "sha256": "dba79642dca8c401bbcfd671360a892e7d9734b9ed5d48912aa4d5117ae65e22",
+        "provenance_sha256": "3419782412e41aacc9a862f908ae05aadc5285ebf4be42c19f05efb18bdd418e"
+      },
+      "stage": "Completed architecture plan",
+      "outcome": "Plan-only Sol Max invocation completed. No tools, code changes or benchmark data access by the planner."
+    }
+  ],
+  "totals": {
+    "input_tokens": 1877455,
+    "output_tokens": 26580,
+    "cached_input_tokens": 1712256,
+    "cache_write_input_tokens": 0,
+    "reasoning_output_tokens": 16853,
+    "total_tokens": 1904035,
+    "noncached_input_tokens": 165199,
+    "noncached_input_plus_output_tokens": 191779,
+    "non_reasoning_output_tokens": 9727
+  },
+  "api_cost_usd": null,
+  "subscription_credit_consumption": null,
+  "pricing_note": "Token receipts are not an invoice; no currency or credit cost estimated.",
+  "unknown_usage": [
+    "ChatGPT conversation and primary assistant authoring/review/tool orchestration",
+    "Other unrecorded attempts and automation execution",
+    "Any future autonomous discovery loop"
+  ],
+  "no_extra_frontier_invocations_for_this_audit": true
+}

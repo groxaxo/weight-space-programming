@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-07",
+  "verified_source_commit": "c2b4ed05f1b7fd0ff959f85950d76f7310cdb322",
+  "original_nine_findings": "docs/reviews/20261107-pipeline-fixes.json",
+  "findings": [
+    {
+      "id": "HE9-01",
+      "status": "fixed",
+      "title": "Recently closed TCP sockets were mistaken for active listeners",
+      "resolution": "The native readiness probe now uses SO_REUSEADDR, accepting TIME_WAIT while continuing to refuse an active listener.",
+      "implementation": [
+        "ops/run54_gguf_phase.py"
+      ],
+      "regression_tests": [
+        "test_native_profile.NativeProfileTests.test_native_port_probe_allows_time_wait_and_rejects_a_live_listener"
+      ]
+    },
+    {
+      "id": "HE9-02",
+      "status": "fixed",
+      "title": "Declared sampling settings and seed did not consistently reach native generation",
+      "resolution": "Request construction forwards the chosen sampling profile, rejects explicit drift and verifies the actual native generation settings per response. The matched pair was restarted after correction.",
+      "implementation": [
+        "scripts/serve_coder_gguf.py",
+        "scripts/coder_sampling.py",
+        "scripts/evaluate_coder.py"
+      ],
+      "regression_tests": [
+        "test_gguf_backend.GgufBackendTests.test_declared_instruct_sampling_reaches_the_native_engine",
+        "test_sampling.SamplingTests.test_engine_report_must_confirm_all_effective_settings"
+      ]
+    },
+    {
+      "id": "HE9-03",
+      "status": "fixed",
+      "title": "A 200-message API limit rejected valid conversations far below the token limit",
+      "resolution": "Conversation validation now follows configured context while preserving the 2 MiB body limit and exact rendered-token/output reservation checks. A real 202-message Qwen request returned READY.",
+      "implementation": [
+        "scripts/coder_common.py",
+        "scripts/serve_coder.py",
+        "scripts/serve_coder_gguf.py"
+      ],
+      "regression_tests": [
+        "test_coder.ProtocolTests.test_short_tool_conversations_are_not_rejected_at_200_messages"
+      ]
+    },
+    {
+      "id": "HE9-04",
+      "status": "fixed",
+      "title": "Back-to-back GPU samples could disagree during authorized Bonsai teardown",
+      "resolution": "Native admission retries the same strict zero-utilization/10500-MiB-free check for at most 60 seconds. Persistent occupancy and unknown layouts remain rejected; unknown jobs are not stopped.",
+      "implementation": [
+        "scripts/coder_common.py",
+        "ops/run54_gguf_phase.py"
+      ],
+      "regression_tests": [
+        "test_gpu_supervisor.AdmissionTests.test_native_admission_waits_for_a_later_strictly_idle_sample",
+        "test_gpu_supervisor.RestorationTests.test_readiness_timeout_does_not_relax_memory_or_utilization_requirements"
+      ]
+    },
+    {
+      "id": "HE9-05",
+      "status": "fixed",
+      "title": "The detector missed a real module-before-options unittest command",
+      "resolution": "Both python3 -m unittest -v test_scheduler and python3 -m unittest test_scheduler -v are recognized, including .py and protected workspace/stderr forms. A frozen-log audit proves oldFalse/newTrue. The original timeout/failing-code verdict stays rejected; both compatibility arms were repeated in fresh directories.",
+      "implementation": [
+        "ops/project_clients.py"
+      ],
+      "regression_tests": [
+        "test_project_command_forms.ProjectCommandForms.test_module_before_verbose_executes_the_same_protected_suite"
+      ]
+    },
+    {
+      "id": "HE9-06",
+      "status": "fixed",
+      "title": "The qualifier assumed the native health shape for the frontend response",
+      "resolution": "The qualifier now checks the actual single-model discovery body, model identity and nonempty process nonce. A real HTTP-handler RED control reproduced the error; substituted/duplicate/status-only records remain rejected. The corrected complete real pair returns not_promoted for model-quality failures.",
+      "implementation": [
+        "scripts/qualify_he9.py"
+      ],
+      "regression_tests": [
+        "test_he9_qualification.QualificationTests.test_real_frontend_health_discovery_is_accepted_with_matching_client_instances",
+        "test_he9_qualification.QualificationTests.test_discovery_cannot_omit_or_substitute_the_model_or_instance"
+      ]
+    },
+    {
+      "id": "HE9-07",
+      "status": "fixed",
+      "title": "Stopped clients verified identity before their final provider request drained",
+      "resolution": "Drain already-issued requests before model discovery; preserve deadline/timeout verdicts. Stop only own labeled project containers before source hashing and independent grading, then verify cleanup again. Both client harnesses have real HTTP RED/GREEN controls; the original incomplete flow record is retained and a fresh compatibility baseline is required.",
+      "implementation": [
+        "ops/smoke_clients.py",
+        "ops/project_clients.py"
+      ],
+      "regression_tests": [
+        "test_client_finalization.ClientFinalizationTests.test_file_client_timeout_drains_and_attests_without_becoming_a_pass",
+        "test_client_finalization.ClientFinalizationTests.test_project_client_timeout_drains_and_attests_without_becoming_a_pass"
+      ]
+    }
+  ],
+  "validation": {
+    "full_tests": 240,
+    "skips": 0,
+    "seconds": 39.121,
+    "ci_run": 42347035658,
+    "ci_conclusion": "success"
+  },
+  "model_status": {
+    "mlp": "not_promoted",
+    "mlp_he9_plus": 5,
+    "base_he9_plus": 3,
+    "total_he9": 9,
+    "development_base": 12,
+    "development_mlp": 11,
+    "flow": "he9_rejected_complete_compatibility_invalid",
+    "model_promoted": false,
+    "continuation": "he9_improved_complete_compatibility_invalid",
+    "continuation_he9_base": 6,
+    "continuation_he9_plus": 4,
+    "continuation_development": 9,
+    "community_publication": "experimental_mlp_checkpoint_104"
+  },
+  "scope": "Implementation fixes and model quality are separate. Exact selected HE9 is not all-164 HumanEval or official EvalPlus parity. Source/identity checks do not establish frontier-model equivalence.",
+  "additional_capabilities": {
+    "authenticated_adapter_continuation": "Completed non-smoke parent; verified recipe/files/base/rank/scale/scope/targets; exact FP32 loaded tensor equality before memory probe; explicit new optimizer.",
+    "regression_controls": [
+      "test_adapter_initialization.AdapterAuthenticationTests",
+      "test_adapter_initialization.AdapterLoadingTests",
+      "test_agent_continuation_data.AgentContinuationDataTests"
+    ],
+    "evidence_scope": "CPU controls establish loader, trainability, grounding and split behavior. Full measured Qwen results remain separately gated."
+  },
+  "assessment": {
+    "outcome": "partial_research_success_complete_assistant_goal_not_achieved",
+    "established_improvement": "Selected HE9 Base 6/9 to 7/9; Base+Plus 3/9 to 5/9 on the earlier MLP.",
+    "full_gate": "not_promoted",
+    "publication_type": "experimental_community_release_explicitly_requested_even_with_failed_full_gate",
+    "selected_adapter": "MLP checkpoint-104",
+    "weights_sha256": "0aa61a13cdb0f8f4c29c5367995944981021584965f4a9c4c2c1c82cdf6b2188",
+    "no_further_tuning_after_closeout_request": true,
+    "next_work": [
+      "Declare a larger explicit Hermes output budget and repeat the matched client pair; omission currently falls back to 1024 and truncates long tool patches.",
+      "Family-disjoint executable coverage for chunk boundaries and half-open intervals.",
+      "Truthful failure observations and permitted-command, cross-module Hermes planning.",
+      "Repeated seeded paired trials and unseen repository tasks before promotion."
+    ],
+    "scope": "Selected historical development-informed replay; not official EvalPlus parity, all-164 accuracy, full-window recall or frontier equivalence."
+  },
+  "continuation_complete_qualification_failure": {
+    "status": "failed",
+    "error": "AssertionError: Invalid continuation qualification evidence"
+  },
+  "continuation_output_budget_finding": {
+    "status": "open_followup",
+    "code_changed": false,
+    "observation": "Hermes omits max_tokens/max_completion_tokens. The serving validator falls back to1024; all18 malformed calls stop at1024 with stop_type=limit. The8192 value is the server cap, not this effective request budget.",
+    "next_step": "Set an explicit larger client budget, record it in comparison identity, and rerun both compatibility arms before attributing remaining failures to model quality."
+  },
+  "portable_release_preflight": {
+    "status": "passed",
+    "scope": "CPU shape-only base standard PeftModel.from_pretrained configuration/injection and exact factor loading. Target matrices use expanded FP32 scalar placeholders solely for CPU placement and exact FP32 loading. No base checkpoint weights, inference or GPU use.",
+    "tensor_count": 192,
+    "exact_loaded_tensor_equality": true,
+    "all_finite_fp32": true,
+    "base_model": "Qwen/Qwen3.5-4B",
+    "base_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "changed_config_fields": [
+      "base_model_name_or_path",
+      "revision"
+    ],
+    "published_config_sha256": "65c222eae6171037425b09503f8103c4bb81a147f062da597470ce393093d50a",
+    "weights_sha256": "0aa61a13cdb0f8f4c29c5367995944981021584965f4a9c4c2c1c82cdf6b2188",
+    "precision_note": "PEFT can round factors through BF16 when the base target weights are BF16; this exactness control deliberately uses FP32. Native measured inference retains the published F32 GGUF factors."
+  }
+}

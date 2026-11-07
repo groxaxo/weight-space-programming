@@ -1,2 +1,4 @@
-# Sole runtime dependency. CPU-only; no torch, CUDA, agent API or Hugging Face credentials.
+# CPU-only reconstruction, protocol validation and regression-check dependencies.
+# No torch, CUDA, agent API or Hugging Face credentials are required for this environment.
 numpy==2.5.4
+jsonschema==4.26.0

@@ -1,0 +1,725 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-07",
+  "timezone": "Pacific/Auckland",
+  "created_at_utc": "2026-11-06T21:42:50.248606+00:00",
+  "reviewed_commit": "d2a92cf3b5fbc4ea4debdfa7a488cf5136a1893e",
+  "status": "all_nine_fixed",
+  "findings": [
+    {
+      "id": "F01",
+      "priority": "P1",
+      "status": "fixed",
+      "original_title": "A completed phase can restart Bonsai during a newer GPU phase",
+      "original_source_url": "https://github.com/groxaxo/weight-space-programming/blob/d2a92cf3b5fbc4ea4debdfa7a488cf5136a1893e/ops/run54_gpu_phase.py#L36-L42",
+      "implementation": [
+        "ops/run54_gpu_phase.py"
+      ],
+      "resolution": "All checkouts share a host lock and durable owner lease. Cleanup is idempotent and cannot restore an older owner inside a newer GPU window. Abandoned leases recover under the lock; initially inactive services stay inactive. A bounded post-stop readiness wait retains strict GPU admission and recovery uses only the standard library.",
+      "regression_tests": [
+        "test_gpu_supervisor.RestorationTests",
+        "test_pipeline_contracts.PipelineContracts.test_f01_old_restore_cannot_restart_a_new_owners_gpu_window"
+      ]
+    },
+    {
+      "id": "F02",
+      "priority": "P1",
+      "status": "fixed",
+      "original_title": "Omitting the adapter hash bypasses the training-to-evaluation binding",
+      "original_source_url": "https://github.com/groxaxo/weight-space-programming/blob/d2a92cf3b5fbc4ea4debdfa7a488cf5136a1893e/scripts/compare_coder.py#L86-L88",
+      "implementation": [
+        "scripts/compare_coder.py"
+      ],
+      "resolution": "Every candidate requires valid weight, configuration and training-result identities. Complete acceptance also requires attestations for actual client requests. Missing/legacy/mismatched evidence fails before a quality verdict.",
+      "regression_tests": [
+        "test_pipeline_contracts.PipelineContracts.test_f02_missing_weight_identity_fails_closed",
+        "test_pipeline_contracts.PipelineContracts.test_f02_wrong_configuration_cannot_borrow_validation_loss",
+        "test_pipeline_contracts.PipelineContracts.test_f02_client_proof_is_required_and_bound_to_the_candidate"
+      ]
+    },
+    {
+      "id": "F03",
+      "priority": "P2",
+      "status": "fixed",
+      "original_title": "The exporter requires a source archive that training never writes",
+      "original_source_url": "https://github.com/groxaxo/weight-space-programming/blob/d2a92cf3b5fbc4ea4debdfa7a488cf5136a1893e/scripts/select_coder_checkpoint.py#L75-L79",
+      "implementation": [
+        "scripts/coder_artifacts.py",
+        "scripts/train_coder.py",
+        "scripts/select_coder_checkpoint.py"
+      ],
+      "resolution": "Training captures and authenticates its recipe/configuration. Selection verifies that archive, preserves the parent source, stores selection source separately and atomically publishes a complete export. Failures remove only staging, allowing retry.",
+      "regression_tests": [
+        "test_artifact_flow.ArtifactFlowTests.test_frozen_recipe_detects_missing_and_changed_files",
+        "test_artifact_flow.ArtifactFlowTests.test_selected_checkpoint_compiles_and_preserves_parent_recipe",
+        "test_artifact_flow.ArtifactFlowTests.test_failed_export_leaves_no_destination_and_can_be_retried"
+      ]
+    },
+    {
+      "id": "F04",
+      "priority": "P2",
+      "status": "fixed",
+      "original_title": "Tool-call markup inside ordinary Python code is interpreted as a real call",
+      "original_source_url": "https://github.com/groxaxo/weight-space-programming/blob/d2a92cf3b5fbc4ea4debdfa7a488cf5136a1893e/scripts/coder_common.py#L344-L348",
+      "implementation": [
+        "scripts/coder_common.py"
+      ],
+      "resolution": "Fenced examples and valid Python are literal output. Native function blocks are recognized at top-level call boundaries, with strict argument validation and malformed-call rejection preserved.",
+      "regression_tests": [
+        "test_pipeline_contracts.PipelineContracts.test_f04_fenced_code_and_unfenced_python_strings_are_literal",
+        "test_pipeline_contracts.PipelineContracts.test_f04_real_call_after_code_fence_and_adjacent_calls_survive"
+      ]
+    },
+    {
+      "id": "F05",
+      "priority": "P2",
+      "status": "fixed",
+      "original_title": "The HF serving identity omits behavior-changing adapter configuration and limits",
+      "original_source_url": "https://github.com/groxaxo/weight-space-programming/blob/d2a92cf3b5fbc4ea4debdfa7a488cf5136a1893e/scripts/serve_coder.py#L94-L100",
+      "implementation": [
+        "scripts/serve_coder.py",
+        "ops/run54_gguf_phase.py"
+      ],
+      "resolution": "Schema-2 profile identity binds input proof, effective limits, adapter weights/configuration and training-result fingerprint. A separate per-process nonce binds individual JSON/SSE requests without preventing paired runs across processes.",
+      "regression_tests": [
+        "test_pipeline_contracts.ServingIdentityContracts.test_f05_adapter_scaling_and_effective_limits_change_identity",
+        "test_pipeline_contracts.PipelineContracts.test_f05_malformed_profile_hash_and_limits_cannot_be_paired"
+      ]
+    },
+    {
+      "id": "F06",
+      "priority": "P2",
+      "status": "fixed",
+      "original_title": "A proof can omit the model weights and still pass verification",
+      "original_source_url": "https://github.com/groxaxo/weight-space-programming/blob/d2a92cf3b5fbc4ea4debdfa7a488cf5136a1893e/scripts/coder_common.py#L200-L207",
+      "implementation": [
+        "scripts/coder_common.py"
+      ],
+      "resolution": "The authenticated index must name exactly the proof\u2019s weight shards. Every loader file present in the snapshot must be authenticated. Changed or omitted weights/sidecars are rejected.",
+      "regression_tests": [
+        "test_pipeline_contracts.PipelineContracts.test_f06_all_index_shards_must_be_authenticated",
+        "test_coder.ProtocolTests.test_snapshot_proof_rejects_changed_inputs_and_wrong_identity"
+      ]
+    },
+    {
+      "id": "F07",
+      "priority": "P2",
+      "status": "fixed",
+      "original_title": "Tool argument strings bypass chat-control-token validation",
+      "original_source_url": "https://github.com/groxaxo/weight-space-programming/blob/d2a92cf3b5fbc4ea4debdfa7a488cf5136a1893e/scripts/coder_common.py#L274-L278",
+      "implementation": [
+        "scripts/coder_common.py"
+      ],
+      "resolution": "Nested tool arguments and tool descriptions/schemas receive the same delimiter and credential-pattern validation as message content before native-template rendering.",
+      "regression_tests": [
+        "test_pipeline_contracts.PipelineContracts.test_f07_nested_arguments_and_tool_descriptions_cannot_inject_roles",
+        "test_coder.ProtocolTests.test_mask_excludes_system_user_and_tool_tokens"
+      ]
+    },
+    {
+      "id": "F08",
+      "priority": "P2",
+      "status": "fixed",
+      "original_title": "Client results are labeled with one initial health identity, not the actual requests",
+      "original_source_url": "https://github.com/groxaxo/weight-space-programming/blob/d2a92cf3b5fbc4ea4debdfa7a488cf5136a1893e/ops/smoke_clients.py#L138-L140",
+      "implementation": [
+        "ops/client_proxy.py",
+        "ops/smoke_clients.py",
+        "ops/project_clients.py"
+      ],
+      "resolution": "Both installed-client harnesses use a loopback proxy that validates every completion response/chunk against the expected model and server instance, requires actual completion traffic and records an attestation. Unsupported capability probes return 404 and never count as completions.",
+      "regression_tests": [
+        "test_client_proxy.ClientProxyTests",
+        "test_pipeline_contracts.PipelineContracts.test_f02_client_proof_is_required_and_bound_to_the_candidate"
+      ]
+    },
+    {
+      "id": "F09",
+      "priority": "P2",
+      "status": "fixed",
+      "original_title": "The published native workflow has no producer for its required conversion manifest",
+      "original_source_url": "https://github.com/groxaxo/weight-space-programming/blob/d2a92cf3b5fbc4ea4debdfa7a488cf5136a1893e/ops/run54_gguf_phase.py#L119-L122",
+      "implementation": [
+        "scripts/convert_coder_gguf.py"
+      ],
+      "resolution": "The committed producer authenticates inputs, runs CPU Q8 conversion, creates compiled or unmerged manifests, supports authenticated base reuse and publishes atomically. Its output is consumed by the native supervisor without hand-authored fields.",
+      "regression_tests": [
+        "test_artifact_flow.ArtifactFlowTests.test_conversion_manifest_is_consumable_and_tampering_fails_closed",
+        "test_artifact_flow.ArtifactFlowTests.test_compiled_manifest_binds_provenance_and_failed_conversion_is_retryable"
+      ]
+    }
+  ],
+  "code_sha256": {
+    "scripts/coder_artifacts.py": "efe17413a6a536c62943bd8858cc10335824f970f8d8eb430e97f3fc3268f8a1",
+    "scripts/coder_common.py": "69e45a9ced2aa100bea8288c06ff4e19c4f4c8d4b0e180a2e311b73837d40801",
+    "scripts/compare_coder.py": "d1ad4b5364892bb9b5a26a28d9bb55e6dcc54987ae425d5c19e8e53aee0f807b",
+    "scripts/compare_gguf_coder.py": "07b158bf174bd3d6ccc7fd70fc941bd3e38fbfe4adcf7ace2c552d2313d3b3b6",
+    "scripts/compile_coder.py": "e1bd3a4679c3deac053de1e50f2e76229f88188d7d8f6d084df5d49841422e5e",
+    "scripts/convert_coder_gguf.py": "676365235004cc2d45f72be39041df5433b5178c1ea668844822e91f95adceca",
+    "scripts/download_coder.py": "190ce2dbfe73bd0340dc7ff236825d278309616d1d1bba60a5f53a9eaee0140d",
+    "scripts/evaluate_coder.py": "02f8a251b606dcb2d68af6c7d73868fb719b8f4b82531720c1fc4fb1e6b152e1",
+    "scripts/evaluate_humaneval.py": "e1d170de11e0b005eb0b05252513d6ee792ed4b5161938f963b0c842c82ae178",
+    "scripts/export_coder_lora_gguf.py": "9bef9d2b7ffa0b0c415e1d53a14e8ae380336bba1739ad1aee7ece39bbcb370d",
+    "scripts/import_coder_corpora.py": "f2ac14c4094af3f213b11633791008675dda434a427b25335fc431bfe62faa2c",
+    "scripts/pipeline.py": "edd3d1445a5775cd97d092e957b66793773afd586087135f6f4e1b32ffafb2c5",
+    "scripts/prepare_coder_data.py": "5ab3b68c167316a1d7f172b64ad017e680106e8c9e9fb800ed8a546597f1af51",
+    "scripts/rescore_humaneval.py": "932f9be87bedc3d37d2154f2eddbd78133c1697cfac8a692a83535acc2317da4",
+    "scripts/select_coder_checkpoint.py": "2ffb919b297f6ddfb47a3988fe79c1c3b8280eb142260952a7af4fdbfe1a120b",
+    "scripts/serve_coder.py": "a8745ad742e259874929d24b7cbe290c09bfa72b662cdf565dd84ee9ea5fe4be",
+    "scripts/serve_coder_gguf.py": "49a026bffd98ea1be8e5cd4a887d09cabc2f774850de4f102aea9f39cff035a6",
+    "scripts/train_coder.py": "8a3f0726d7ad546d9280ad0ae010548504ff8db28e5e162741138befc5290b52",
+    "ops/client_proxy.py": "bed18245040446c5192fc276dc60af0fa4e9e819c65d941ad40cb9a744c9f077",
+    "ops/local_coder54.py": "2c1a8f0117ee15f12e5d2e00ee1616ac26aed7819bc3c0c97a1fc332bbf5af09",
+    "ops/project_clients.py": "c3ed52ef5b1a54f84d38f62e47f3200b557bdfe6865c379938f066aa7c4721b3",
+    "ops/run54_gguf_phase.py": "5ae4ff6e30297cfe55a09f8d7463e7bc92e9a6e261db4088b87ea0e45c4e814b",
+    "ops/run54_gpu_phase.py": "32850d1b7c03f6239b15b3fd7065ad746d1651c8a6364609534af29036b182cb",
+    "ops/smoke_clients.py": "bececb8eac46c43bd50731cae16173a88ace0ec358bddebaa4de256a11f2366f",
+    "ops/verify_pipeline54.py": "27c5e8b4db8622a25226fbe96a4500c83206b2e331d9f5f470dbf115140cf28f",
+    "tests/test_artifact_flow.py": "427603382a57d4b06e467b1f1427a6d37d4fb5146146c1236cf5eccbf15c63db",
+    "tests/test_client_proxy.py": "6484b66de1bf0acb11057c0f7ba4c0b473f52c717eb2c8c3afef55f2cdad9012",
+    "tests/test_coder.py": "c77a540bcc3b593224a3a6233afc682d1fde69924553ae6c43a2edb027d38617",
+    "tests/test_compile_coder.py": "8c92c323013016b3b87a460346400b1e7726f44e10f8b83d0a1d3bf9cbdaaccc",
+    "tests/test_gguf_backend.py": "dd17728008ed0d7ba7b2910210c8446fae49996538fa6276d40bdc11348bd542",
+    "tests/test_gpu_supervisor.py": "df867fc82593037007cd7a895d5fc4cc24acb2dc03cda96fa8b471f2fb7bdf5f",
+    "tests/test_lora_permutation.py": "6460b0efe77916a57609abc666e241411ddee8069667f91eeed8f79115060a1d",
+    "tests/test_native_gate.py": "8cdb4d77eea164b0aeca4f24874b6285e1be2e9dda875f52beb007ca6fa0a8a3",
+    "tests/test_pipeline.py": "1916dc9b9b109a4e96c99206a00fdaf324ec5a4996a748c474c0ae875abe5405",
+    "tests/test_pipeline_contracts.py": "c4e0bd69a2c478e03085d30a3263bade2bc9f13772856237d3574f6cada47ebf",
+    "tests/test_project_clients.py": "eb69c8f6ea9d27ec836704e270b51bc1944ed8bc376a325d087d2c6c265976e7",
+    "tests/test_sandbox.py": "5e832d4021dd044b4818aa428feb12eced23e108a8651a40c338359329546526",
+    "tests/test_training_runtime.py": "bdff29375d4470bed83a801f90077d48226028895a0bc4c658bf57371e53d07d"
+  },
+  "regressions": {
+    "full": {
+      "tests": 136,
+      "skips": 0,
+      "passed": true,
+      "log_sha256": "b5eb029594e26fe64c8acf52a67d8c372f9055a7f46db3dde28dbc1c32cd7f22"
+    },
+    "minimal_cpu": {
+      "tests": 136,
+      "skips": 5,
+      "passed": true,
+      "log_sha256": "e39701eb7fa107d775c43aaec67802966829ed4bed21a9547701606b64e6e128"
+    }
+  },
+  "live_verification": {
+    "status": "pipeline_verified",
+    "created_at_utc": "2026-11-06T21:38:13.815180+00:00",
+    "scope": "Successful recorded stages, including separate native retry; short control is not promoted",
+    "training_steps": 2,
+    "exported_checkpoint_step": 1,
+    "humaneval_regenerated": false,
+    "profiles": {
+      "hf-base": {
+        "scores": {
+          "code": {
+            "passed": 6,
+            "total": 8
+          },
+          "tools": {
+            "passed": 6,
+            "total": 6
+          }
+        },
+        "clients_passed": true,
+        "identity": {
+          "identity_schema": 2,
+          "base_model": "Qwen/Qwen3.5-4B",
+          "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+          "adapter": null,
+          "model_proof_sha256": "3c13326f8440abefcef083788626ac35d9d8c95d5fb3a5cac7e497b3f934ac8b",
+          "limits": {
+            "context": 16384,
+            "output": 2048
+          },
+          "quantization": "nf4-double",
+          "runtime": {
+            "torch": "2.11.0",
+            "transformers": "5.22.1",
+            "peft": "0.21.2",
+            "bitsandbytes": "0.49.2",
+            "flash-linear-attention": "0.6.0",
+            "fla-core": "0.6.0",
+            "causal-conv1d": null
+          },
+          "protocol_sha256": "648b15af03875a981cf287a75eba0458e9f9050db1ec0b2a5a0cabff4903796b",
+          "chat_stop_token_ids": [
+            248044,
+            248046
+          ]
+        },
+        "client_requests": {
+          "opencode": {
+            "schema_version": 1,
+            "verified": true,
+            "requests": 4,
+            "stream_requests": 4,
+            "discovery_requests": 0,
+            "instance_id": "3c3430a96b6947ad88b12d49a187f8c0",
+            "identity_sha256": "528db53c7e4fe607fc3f590234058d072ef032ba0e793b9b4b5462bd7a097f39",
+            "proxy_sha256": "bed18245040446c5192fc276dc60af0fa4e9e819c65d941ad40cb9a744c9f077"
+          },
+          "hermes": {
+            "schema_version": 1,
+            "verified": true,
+            "requests": 4,
+            "stream_requests": 3,
+            "discovery_requests": 6,
+            "instance_id": "3c3430a96b6947ad88b12d49a187f8c0",
+            "identity_sha256": "528db53c7e4fe607fc3f590234058d072ef032ba0e793b9b4b5462bd7a097f39",
+            "proxy_sha256": "bed18245040446c5192fc276dc60af0fa4e9e819c65d941ad40cb9a744c9f077"
+          }
+        },
+        "development_sha256": "67bd77b1c6f758c6bea5edf822de8fc2196599b6135547b928b73c2844760859",
+        "clients_sha256": "b72c886903a55d96738c72bc449cc82fc3a120d24b5a0184e5ade158f04bf5a4"
+      },
+      "hf-control": {
+        "scores": {
+          "code": {
+            "passed": 6,
+            "total": 8
+          },
+          "tools": {
+            "passed": 6,
+            "total": 6
+          }
+        },
+        "clients_passed": true,
+        "identity": {
+          "identity_schema": 2,
+          "base_model": "Qwen/Qwen3.5-4B",
+          "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+          "adapter": "/home/op/work/weight-space-programming-20261106/reports/pipeline-fixes-20261107-live-02/selected/adapter",
+          "model_proof_sha256": "3c13326f8440abefcef083788626ac35d9d8c95d5fb3a5cac7e497b3f934ac8b",
+          "limits": {
+            "context": 16384,
+            "output": 2048
+          },
+          "quantization": "nf4-double",
+          "runtime": {
+            "torch": "2.11.0",
+            "transformers": "5.22.1",
+            "peft": "0.21.2",
+            "bitsandbytes": "0.49.2",
+            "flash-linear-attention": "0.6.0",
+            "fla-core": "0.6.0",
+            "causal-conv1d": null
+          },
+          "protocol_sha256": "648b15af03875a981cf287a75eba0458e9f9050db1ec0b2a5a0cabff4903796b",
+          "adapter_sha256": "6d68a3bf423e14d426ddd1ba1aa709e8bbdddedda5fe631c9a54c4dfee5bdbae",
+          "adapter_config_sha256": "8d8ffc988d3e3656b2c0fe20b26786e838375bbfb4828d93ccf6a80e4d0653ec",
+          "training_result_sha256": "9ae50fd6b466c48ff6f9e15ec694ad74fddcac199a6b286c182ba4902ea571cf",
+          "chat_stop_token_ids": [
+            248044,
+            248046
+          ]
+        },
+        "client_requests": {
+          "opencode": {
+            "schema_version": 1,
+            "verified": true,
+            "requests": 4,
+            "stream_requests": 4,
+            "discovery_requests": 0,
+            "instance_id": "392db4f10aae43e0b410d70f87a68f85",
+            "identity_sha256": "26ed6b1e6797f6d2e79939d1fd356572007df8232ec4e7a89fd65ac223c69aa3",
+            "proxy_sha256": "bed18245040446c5192fc276dc60af0fa4e9e819c65d941ad40cb9a744c9f077"
+          },
+          "hermes": {
+            "schema_version": 1,
+            "verified": true,
+            "requests": 4,
+            "stream_requests": 3,
+            "discovery_requests": 6,
+            "instance_id": "392db4f10aae43e0b410d70f87a68f85",
+            "identity_sha256": "26ed6b1e6797f6d2e79939d1fd356572007df8232ec4e7a89fd65ac223c69aa3",
+            "proxy_sha256": "bed18245040446c5192fc276dc60af0fa4e9e819c65d941ad40cb9a744c9f077"
+          }
+        },
+        "development_sha256": "ec10c0f6f022d4fdf36eeed72d6425b2eefcee5972d04a885ef2c4cd863bf632",
+        "clients_sha256": "59156cdd480bf82bae289505ec0032de2155a4b0d26212ac17e34025e8b1e7d5"
+      },
+      "native": {
+        "scores": {
+          "code": {
+            "passed": 6,
+            "total": 8
+          },
+          "tools": {
+            "passed": 5,
+            "total": 6
+          }
+        },
+        "clients_passed": false,
+        "identity": {
+          "identity_schema": 2,
+          "model_proof_sha256": "3c13326f8440abefcef083788626ac35d9d8c95d5fb3a5cac7e497b3f934ac8b",
+          "limits": {
+            "context": 16384,
+            "output": 2048
+          },
+          "base_model": "Qwen/Qwen3.5-4B",
+          "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+          "adapter": "/home/op/work/weight-space-programming-20261106/reports/pipeline-fixes-20261107-live-02/selected/adapter",
+          "quantization": "Q8_0",
+          "runtime": {
+            "backend": "llama.cpp",
+            "server_sha256": "943d35a2b9798d7f223d511a72fc64c4f5c22174dc0c9240afa58eda93cf5a13",
+            "shared_libraries": {
+              "libggml-base.so.0.21.0": "cf0f94d23ab8f36b1bc895de65f427cace06bea61e722cbdadc5bf0c3848782d",
+              "libggml-cpu.so.0.21.0": "0acd235f5093f0383825500612f90a5e12e02b57a01c5e1763ea46ba83dbd34c",
+              "libggml-cuda.so.0.21.0": "7252e37d06acc595fb273ac40c6a18f5e5afa8337a8e0c0a3b1c56480d4818e5",
+              "libggml.so.0.21.0": "3972d167587bab25d3911fa4c1b828732362199b807396a37d9b3af4ad4d55dc",
+              "libllama-cli-impl.so": "dab82a7958f46c3738b108279fb49185d2c3a95578077985f1906784843c9f36",
+              "libllama-common.so.0.2.0": "25d1706aed337e481ca3fda2659789c5f25a334d758146a972e6706ac73da725",
+              "libllama-server-impl.so": "18dbce7f6056a77622432ec4f67176b2ef12bd9d6d79f01d6484d4146a60030b",
+              "libllama.so.0.2.0": "9d1879c845d52c7aa8e0353139d53e72a67f4d383b5d6a24c6a491154631055e",
+              "libmtmd.so.0.2.0": "ecdf47dd5c58e9818851cb3fbeb844bab89d834654626d49b554fa6d2403cbad"
+            },
+            "launch_options": {
+              "context": 16384,
+              "slots": 1,
+              "gpu_layers": "all",
+              "flash_attention": "on",
+              "threads": 4,
+              "threads_batch": 4,
+              "context_shift": false,
+              "cache_prompt": false,
+              "warmup": false,
+              "seed": 20261106
+            },
+            "tokenizer": {
+              "transformers": "5.22.1",
+              "tokenizers": "0.23.3"
+            }
+          },
+          "artifact_path": "/home/op/work/weight-space-programming-20261106/runs/gguf-profile-q8-01/base-Q8_0.gguf",
+          "artifact_sha256": "2164b7e8728dc954702d86fe423da3a240964877d3d31b8f6530d38702c38547",
+          "conversion_manifest_sha256": "1ef366119ad190e77ce61ccc134c754666df19ffb9a7d64495c3d6fb21aa1ec0",
+          "conversion_profile": "control",
+          "adapter_sha256": "6d68a3bf423e14d426ddd1ba1aa709e8bbdddedda5fe631c9a54c4dfee5bdbae",
+          "adapter_config_sha256": "8d8ffc988d3e3656b2c0fe20b26786e838375bbfb4828d93ccf6a80e4d0653ec",
+          "adapter_provenance_sha256": "3eceb50c9e6614d0eceb364cdef5a8ee7f1b458188b081a6cbaf652b18b8e386",
+          "training_result_sha256": "9ae50fd6b466c48ff6f9e15ec694ad74fddcac199a6b286c182ba4902ea571cf",
+          "adapter_application": "native-f32-lora-on-q8_0",
+          "lora_artifact_path": "/home/op/work/weight-space-programming-20261106/reports/pipeline-fixes-20261107-live-02/lora/adapter-F32.gguf",
+          "lora_artifact_sha256": "e66230825e88c51c76791fb1d2d57c0f1289ded723bd78707b4a1935195fdad4",
+          "lora_id": 0,
+          "lora_scale": 1.0,
+          "protocol_sha256": "c02edd87d0c7281e5ff4eb218906c2930d39c2a00dd53d591badf8514c326311",
+          "chat_stop_token_ids": [
+            248044,
+            248046
+          ]
+        },
+        "client_requests": {
+          "opencode": {
+            "schema_version": 1,
+            "verified": true,
+            "requests": 4,
+            "stream_requests": 4,
+            "discovery_requests": 0,
+            "instance_id": "595635dbd3f54037af084404aba78f53",
+            "identity_sha256": "3663718d43635e7b1e712ae83c41b6ca4465a3d5e7f2a0cca942413903681b1e",
+            "proxy_sha256": "bed18245040446c5192fc276dc60af0fa4e9e819c65d941ad40cb9a744c9f077"
+          },
+          "hermes": {
+            "schema_version": 1,
+            "verified": true,
+            "requests": 4,
+            "stream_requests": 3,
+            "discovery_requests": 6,
+            "instance_id": "595635dbd3f54037af084404aba78f53",
+            "identity_sha256": "3663718d43635e7b1e712ae83c41b6ca4465a3d5e7f2a0cca942413903681b1e",
+            "proxy_sha256": "bed18245040446c5192fc276dc60af0fa4e9e819c65d941ad40cb9a744c9f077"
+          }
+        },
+        "development_sha256": "b8b92cd1d8eaa544d43e307fb612b9711636ddc653044e2a23c23ca0aac95070",
+        "clients_sha256": "1f7cc34c4b6ecebb6aebbe1f058e5861e96aa5b20ae9fbc47888893b8d1863e7"
+      }
+    },
+    "compiled_tensors": {
+      "status": "compiled_output_verified",
+      "edited_tensors": 248,
+      "all_unedited_bytes_preserved": true
+    },
+    "gate": {
+      "status": "not_promoted",
+      "regressions": [],
+      "improvements": [],
+      "requires_real_client_acceptance": true,
+      "scope": "Passing this gate alone does not authorize deployment or establish broad coding reliability."
+    },
+    "bonsai_health": {
+      "status": "ok"
+    },
+    "stage_runs": {
+      "training_export_hf_compilation": "/home/op/work/weight-space-programming-20261106/reports/pipeline-fixes-20261107-live-02",
+      "native_retry": "/home/op/work/weight-space-programming-20261106/reports/pipeline-fixes-native-retry-20261107"
+    },
+    "failed_attempts": [
+      {
+        "path": "reports/pipeline-fixes-20261107-live-01",
+        "reason": "Proxy counted unsupported capability discovery as fatal; actual CLI control diagnosed and verified correction"
+      },
+      {
+        "path": "/home/op/work/weight-space-programming-20261106/reports/pipeline-fixes-20261107-live-02/native",
+        "reason": "Admission refused stale GPU activity immediately after Bonsai stop; bounded strict readiness wait fixed the handoff"
+      }
+    ],
+    "source_sha256": {
+      "scripts/serve_coder_gguf.py": "49a026bffd98ea1be8e5cd4a887d09cabc2f774850de4f102aea9f39cff035a6",
+      "scripts/download_coder.py": "190ce2dbfe73bd0340dc7ff236825d278309616d1d1bba60a5f53a9eaee0140d",
+      "scripts/train_coder.py": "8a3f0726d7ad546d9280ad0ae010548504ff8db28e5e162741138befc5290b52",
+      "scripts/compile_coder.py": "e1bd3a4679c3deac053de1e50f2e76229f88188d7d8f6d084df5d49841422e5e",
+      "scripts/convert_coder_gguf.py": "676365235004cc2d45f72be39041df5433b5178c1ea668844822e91f95adceca",
+      "scripts/serve_coder.py": "a8745ad742e259874929d24b7cbe290c09bfa72b662cdf565dd84ee9ea5fe4be",
+      "scripts/compare_coder.py": "d1ad4b5364892bb9b5a26a28d9bb55e6dcc54987ae425d5c19e8e53aee0f807b",
+      "scripts/evaluate_humaneval.py": "e1d170de11e0b005eb0b05252513d6ee792ed4b5161938f963b0c842c82ae178",
+      "scripts/select_coder_checkpoint.py": "2ffb919b297f6ddfb47a3988fe79c1c3b8280eb142260952a7af4fdbfe1a120b",
+      "scripts/compare_gguf_coder.py": "07b158bf174bd3d6ccc7fd70fc941bd3e38fbfe4adcf7ace2c552d2313d3b3b6",
+      "scripts/import_coder_corpora.py": "f2ac14c4094af3f213b11633791008675dda434a427b25335fc431bfe62faa2c",
+      "scripts/rescore_humaneval.py": "932f9be87bedc3d37d2154f2eddbd78133c1697cfac8a692a83535acc2317da4",
+      "scripts/pipeline.py": "edd3d1445a5775cd97d092e957b66793773afd586087135f6f4e1b32ffafb2c5",
+      "scripts/coder_artifacts.py": "efe17413a6a536c62943bd8858cc10335824f970f8d8eb430e97f3fc3268f8a1",
+      "scripts/prepare_coder_data.py": "5ab3b68c167316a1d7f172b64ad017e680106e8c9e9fb800ed8a546597f1af51",
+      "scripts/evaluate_coder.py": "02f8a251b606dcb2d68af6c7d73868fb719b8f4b82531720c1fc4fb1e6b152e1",
+      "scripts/coder_common.py": "69e45a9ced2aa100bea8288c06ff4e19c4f4c8d4b0e180a2e311b73837d40801",
+      "scripts/export_coder_lora_gguf.py": "9bef9d2b7ffa0b0c415e1d53a14e8ae380336bba1739ad1aee7ece39bbcb370d",
+      "ops/local_coder54.py": "2c1a8f0117ee15f12e5d2e00ee1616ac26aed7819bc3c0c97a1fc332bbf5af09",
+      "ops/client_proxy.py": "bed18245040446c5192fc276dc60af0fa4e9e819c65d941ad40cb9a744c9f077",
+      "ops/smoke_clients.py": "bececb8eac46c43bd50731cae16173a88ace0ec358bddebaa4de256a11f2366f",
+      "ops/run54_gguf_phase.py": "5ae4ff6e30297cfe55a09f8d7463e7bc92e9a6e261db4088b87ea0e45c4e814b",
+      "ops/project_clients.py": "c3ed52ef5b1a54f84d38f62e47f3200b557bdfe6865c379938f066aa7c4721b3",
+      "ops/verify_pipeline54.py": "27c5e8b4db8622a25226fbe96a4500c83206b2e331d9f5f470dbf115140cf28f",
+      "ops/run54_gpu_phase.py": "32850d1b7c03f6239b15b3fd7065ad746d1651c8a6364609534af29036b182cb"
+    },
+    "frozen_client_regrade": {
+      "scope": "Same frozen generated file, independent grader rerun after parallel CPU conversion; no model regeneration",
+      "parent_acceptance_sha256": "1f7cc34c4b6ecebb6aebbe1f058e5861e96aa5b20ae9fbc47888893b8d1863e7",
+      "generated_source_sha256": "962dad2caed9f53c42d7f3a683c9b20d568440d59068650a87a12421f95479b0",
+      "checks_sha256": "5dad4e832e4dd6786222c63b63f898abbb27ba16e601a7f3ee10847b7a3b4fbf",
+      "runner_sha256": "02f8a251b606dcb2d68af6c7d73868fb719b8f4b82531720c1fc4fb1e6b152e1",
+      "sandbox_image": "python:3.12-slim@sha256:4840d514c583a4d3d8cad3940e68dee6f0f6f3635c12fcd0a3d74c21a5b93a54",
+      "original_independent_result": {
+        "passed": false,
+        "exit_code": null,
+        "timed_out": true
+      },
+      "regraded_independent_result": {
+        "passed": true,
+        "exit_code": 0,
+        "container_exit_code": 73,
+        "tests_completed": true,
+        "timed_out": false
+      },
+      "passed": true
+    },
+    "nonzero_update": {
+      "passed": true,
+      "real_cpu_conversion": true,
+      "compiled_tensors": 248,
+      "selected_step": 2,
+      "changed_merged_tensors": 248,
+      "artifact_bytes": 4482402592,
+      "artifact_sha256": "bb2fe64b4624874faf8812ebbfbb1a4f4601663a355babcc7aa971f45c8eb218",
+      "conversion_manifest_sha256": "1075966a1508198c191d1ed979c1e64344c458fa5f847b63364038eb28ca38e1",
+      "identity": {
+        "identity_schema": 2,
+        "model_proof_sha256": "3c13326f8440abefcef083788626ac35d9d8c95d5fb3a5cac7e497b3f934ac8b",
+        "limits": {
+          "context": 16384,
+          "output": 2048
+        },
+        "base_model": "Qwen/Qwen3.5-4B",
+        "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+        "adapter": "/home/op/work/weight-space-programming-20261106/reports/pipeline-fixes-nonzero-selected/adapter",
+        "quantization": "Q8_0",
+        "runtime": {
+          "backend": "llama.cpp",
+          "server_sha256": "943d35a2b9798d7f223d511a72fc64c4f5c22174dc0c9240afa58eda93cf5a13",
+          "shared_libraries": {
+            "libggml-base.so.0.21.0": "cf0f94d23ab8f36b1bc895de65f427cace06bea61e722cbdadc5bf0c3848782d",
+            "libggml-cpu.so.0.21.0": "0acd235f5093f0383825500612f90a5e12e02b57a01c5e1763ea46ba83dbd34c",
+            "libggml-cuda.so.0.21.0": "7252e37d06acc595fb273ac40c6a18f5e5afa8337a8e0c0a3b1c56480d4818e5",
+            "libggml.so.0.21.0": "3972d167587bab25d3911fa4c1b828732362199b807396a37d9b3af4ad4d55dc",
+            "libllama-cli-impl.so": "dab82a7958f46c3738b108279fb49185d2c3a95578077985f1906784843c9f36",
+            "libllama-common.so.0.2.0": "25d1706aed337e481ca3fda2659789c5f25a334d758146a972e6706ac73da725",
+            "libllama-server-impl.so": "18dbce7f6056a77622432ec4f67176b2ef12bd9d6d79f01d6484d4146a60030b",
+            "libllama.so.0.2.0": "9d1879c845d52c7aa8e0353139d53e72a67f4d383b5d6a24c6a491154631055e",
+            "libmtmd.so.0.2.0": "ecdf47dd5c58e9818851cb3fbeb844bab89d834654626d49b554fa6d2403cbad"
+          },
+          "launch_options": {
+            "context": 16384,
+            "slots": 1,
+            "gpu_layers": "all",
+            "flash_attention": "on",
+            "threads": 4,
+            "threads_batch": 4,
+            "context_shift": false,
+            "cache_prompt": false,
+            "warmup": false,
+            "seed": 20261106
+          }
+        },
+        "artifact_path": "/home/op/work/weight-space-programming-20261106/reports/pipeline-fixes-compiled-native-20261107/compiled-control-Q8_0.gguf",
+        "artifact_sha256": "bb2fe64b4624874faf8812ebbfbb1a4f4601663a355babcc7aa971f45c8eb218",
+        "conversion_manifest_sha256": "1075966a1508198c191d1ed979c1e64344c458fa5f847b63364038eb28ca38e1",
+        "conversion_profile": "compiled-control",
+        "adapter_sha256": "4187fea323fab6ffd1ef445bfc76d2b97715e8aca260da948fe3c04de249cbea",
+        "adapter_config_sha256": "8d8ffc988d3e3656b2c0fe20b26786e838375bbfb4828d93ccf6a80e4d0653ec",
+        "adapter_provenance_sha256": "4ea3ffa31aa475d1ad8a810869c3760ce0fd39807fd7ed3d7636a5c55e4fe907",
+        "training_result_sha256": "82277ef489a2ebef4a1fc6838af6f85b52d906ea9e2caf2565ab8374ac0fe461",
+        "adapter_application": "compiled-bf16-then-q8_0"
+      },
+      "scope": "Actual compiled-to-Q8 conversion and native manifest consumer. GPU inference is covered separately by the unmerged live profile."
+    },
+    "warmup_control": {
+      "checkpoint1": {
+        "nonzero_B_factors": 0,
+        "weights_sha256": "6d68a3bf423e14d426ddd1ba1aa709e8bbdddedda5fe631c9a54c4dfee5bdbae"
+      },
+      "checkpoint2": {
+        "nonzero_B_factors": 248,
+        "weights_sha256": "4187fea323fab6ffd1ef445bfc76d2b97715e8aca260da948fe3c04de249cbea"
+      },
+      "checkpoint1_merged_tensors_changed": 0
+    },
+    "actual_stale_callback_control": {
+      "passed": true,
+      "completed_callback_noop": true,
+      "uncompleted_stale_callback_deferred": true,
+      "owner_unchanged": true,
+      "bonsai_inactive_before_and_after": true,
+      "scope": "Actual stale callbacks while a live verified model phase owns the GPU; no service restart"
+    }
+  },
+  "synthetic_reference_control": {
+    "passed": true,
+    "control": "synthetic canonical references; no Qwen inference",
+    "reference_cases": 164,
+    "all_completed": true,
+    "raw_report_sha256": "44a8ec96bdd66db865ea3b1123ec7fc95f34c87f27b3e966592c5952fab83be6",
+    "runner_sha256": "02f8a251b606dcb2d68af6c7d73868fb719b8f4b82531720c1fc4fb1e6b152e1",
+    "script_sha256": "9164052bcfc65c40e1b55c12d9446d34d9320f879fe648113ee63061cf7eeca8"
+  },
+  "actual_hermes_route_control": {
+    "exit_code": 0,
+    "requests": [
+      {
+        "request_sha256": "852eae8efa60424d4b37d9711a8c2a884d02fc69219ae4eebf10eebc363096d3",
+        "stream": true
+      },
+      {
+        "request_sha256": "050ed1dad924d8d7ce7f1ecc8010c627cb644ab566735b8e41b73565c5f8a7e0",
+        "stream": false
+      }
+    ],
+    "errors": [],
+    "discovery": [
+      {
+        "method": "GET",
+        "path": "/api/v1/models"
+      },
+      {
+        "method": "GET",
+        "path": "/api/tags"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/props"
+      },
+      {
+        "method": "GET",
+        "path": "/props"
+      },
+      {
+        "method": "GET",
+        "path": "/version"
+      },
+      {
+        "method": "POST",
+        "path": "/api/show"
+      }
+    ],
+    "scope": "synthetic actual-CLI routing control, no Qwen inference",
+    "attestation": {
+      "schema_version": 1,
+      "verified": true,
+      "requests": 2,
+      "stream_requests": 1,
+      "discovery_requests": 6,
+      "instance_id": "a7624dd4cc344a6d9def7fe6306621e8",
+      "identity_sha256": "5c71173d3b5f5ca58f7098d2cde43116199b4b41184bd5ee6f430f362df7aa9a",
+      "proxy_sha256": "bed18245040446c5192fc276dc60af0fa4e9e819c65d941ad40cb9a744c9f077"
+    }
+  },
+  "real_compiled_conversion": {
+    "passed": true,
+    "real_cpu_conversion": true,
+    "compiled_tensors": 248,
+    "selected_step": 2,
+    "changed_merged_tensors": 248,
+    "artifact_bytes": 4482402592,
+    "artifact_sha256": "bb2fe64b4624874faf8812ebbfbb1a4f4601663a355babcc7aa971f45c8eb218",
+    "conversion_manifest_sha256": "1075966a1508198c191d1ed979c1e64344c458fa5f847b63364038eb28ca38e1",
+    "identity": {
+      "identity_schema": 2,
+      "model_proof_sha256": "3c13326f8440abefcef083788626ac35d9d8c95d5fb3a5cac7e497b3f934ac8b",
+      "limits": {
+        "context": 16384,
+        "output": 2048
+      },
+      "base_model": "Qwen/Qwen3.5-4B",
+      "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+      "adapter": "/home/op/work/weight-space-programming-20261106/reports/pipeline-fixes-nonzero-selected/adapter",
+      "quantization": "Q8_0",
+      "runtime": {
+        "backend": "llama.cpp",
+        "server_sha256": "943d35a2b9798d7f223d511a72fc64c4f5c22174dc0c9240afa58eda93cf5a13",
+        "shared_libraries": {
+          "libggml-base.so.0.21.0": "cf0f94d23ab8f36b1bc895de65f427cace06bea61e722cbdadc5bf0c3848782d",
+          "libggml-cpu.so.0.21.0": "0acd235f5093f0383825500612f90a5e12e02b57a01c5e1763ea46ba83dbd34c",
+          "libggml-cuda.so.0.21.0": "7252e37d06acc595fb273ac40c6a18f5e5afa8337a8e0c0a3b1c56480d4818e5",
+          "libggml.so.0.21.0": "3972d167587bab25d3911fa4c1b828732362199b807396a37d9b3af4ad4d55dc",
+          "libllama-cli-impl.so": "dab82a7958f46c3738b108279fb49185d2c3a95578077985f1906784843c9f36",
+          "libllama-common.so.0.2.0": "25d1706aed337e481ca3fda2659789c5f25a334d758146a972e6706ac73da725",
+          "libllama-server-impl.so": "18dbce7f6056a77622432ec4f67176b2ef12bd9d6d79f01d6484d4146a60030b",
+          "libllama.so.0.2.0": "9d1879c845d52c7aa8e0353139d53e72a67f4d383b5d6a24c6a491154631055e",
+          "libmtmd.so.0.2.0": "ecdf47dd5c58e9818851cb3fbeb844bab89d834654626d49b554fa6d2403cbad"
+        },
+        "launch_options": {
+          "context": 16384,
+          "slots": 1,
+          "gpu_layers": "all",
+          "flash_attention": "on",
+          "threads": 4,
+          "threads_batch": 4,
+          "context_shift": false,
+          "cache_prompt": false,
+          "warmup": false,
+          "seed": 20261106
+        }
+      },
+      "artifact_path": "/home/op/work/weight-space-programming-20261106/reports/pipeline-fixes-compiled-native-20261107/compiled-control-Q8_0.gguf",
+      "artifact_sha256": "bb2fe64b4624874faf8812ebbfbb1a4f4601663a355babcc7aa971f45c8eb218",
+      "conversion_manifest_sha256": "1075966a1508198c191d1ed979c1e64344c458fa5f847b63364038eb28ca38e1",
+      "conversion_profile": "compiled-control",
+      "adapter_sha256": "4187fea323fab6ffd1ef445bfc76d2b97715e8aca260da948fe3c04de249cbea",
+      "adapter_config_sha256": "8d8ffc988d3e3656b2c0fe20b26786e838375bbfb4828d93ccf6a80e4d0653ec",
+      "adapter_provenance_sha256": "4ea3ffa31aa475d1ad8a810869c3760ce0fd39807fd7ed3d7636a5c55e4fe907",
+      "training_result_sha256": "82277ef489a2ebef4a1fc6838af6f85b52d906ea9e2caf2565ab8374ac0fe461",
+      "adapter_application": "compiled-bf16-then-q8_0"
+    },
+    "scope": "Actual compiled-to-Q8 conversion and native manifest consumer. GPU inference is covered separately by the unmerged live profile."
+  },
+  "model_promoted": false,
+  "historical_humaneval": {
+    "base": 128,
+    "lower_rate_step18": 127,
+    "lower_rate_step72": 126,
+    "total": 164,
+    "scope": "Unchanged historical results from frozen schema-1 profiles. No fresh Qwen HumanEval run in this bounded verification."
+  }
+}

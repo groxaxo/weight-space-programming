@@ -1,10 +1,67 @@
 # Weight-Space Programming Lab
 
-A verified, CPU-only reproduction of the published **Qwen3.5-0.8B p50c weight repair**. The base checkpoint stays unchanged. The output includes the full checkpoint, tokenizer, configuration, index, and a reconstruction record.
+A verified reproduction of the published **Qwen3.5-0.8B p50c weight repair**, plus a pinned **Qwen3.5-4B coding-assistant adaptation and evaluation track**. Both keep the original base checkpoint unchanged.
 
-**Implemented and tested:** pinned downloads, full input authentication, sparse BF16 reconstruction, non-overwriting publication, output verification, and 40 CPU regression tests. A real 1.75 GB checkpoint has been reconstructed and checked on the Ubuntu 12700.
+**Reconstruction:** pinned downloads, full input authentication, sparse BF16 reconstruction, non-overwriting publication, output and provenance verification, and CPU regression tests. A real 1.75 GB checkpoint has been reconstructed and checked on the Ubuntu 12700. `verify-output` now also authenticates the reconstruction record against the actual files and trusted lock.
 
-**Not implemented:** autonomous Sol/Astra orchestration, token or spending budgets, activation extraction, an evaluation runner, GPU serving, or an isolated execution environment for agent-written code. This repository is a verified reproduction foundation, not the complete research-agent system discussed earlier.
+**Coding track:** authenticated official model snapshots, licensed public corpus imports, complete task-disjoint conversations, assistant-only loss masks, BF16 LoRA / NF4 QLoRA, separate validation and checkpoint selection, bounded OpenAI-compatible serving, executable coding and multi-turn tool checks, all 164 HumanEval tasks, and isolated OpenCode/Hermes file-edit acceptance checks. Generated Python is graded in a digest-pinned Docker sandbox with no network and a read-only root filesystem. See [the coding-assistant workflow](docs/coding-assistant.md).
+
+**Scope:** this does not implement autonomous Sol/Astra orchestration, activation extraction, or a general sandbox for unrestricted agents. Model quality is established by the actual paired reports and client results, not by successful training or reconstruction alone. The compact development suite is not evidence of frontier-model equivalence.
+
+The current coding experiment runs on **`100.85.200.54`**, an RTX 3060 with 12 GB VRAM. Its supervisor temporarily pauses the existing Bonsai service only when explicitly authorized and restores it at the end of each GPU phase, including failures. Moss and Bonsai models/runtimes are preserved.
+
+## Current measured findings
+
+The latest selected **Experimentos HE9** replay uses actual OpenCode in a fresh
+VM on `.54`, full 262,144-token context and Q8 K/V cache. The matched base scores
+**6/9 Base and 3/9 Base+Plus**; the MLP adapter scores **7/9 and 5/9**, respectively,
+with 7/9 completed actors in each arm. Both newly solved tasks and the remaining
+partial-result regressions are retained. The complete qualification rejects the
+MLP adapter: development success falls from 12/14 to 11/14, and the Hermes project
+trial fails. A further all-language adapter scores 6/9 Base and 4/9 Base+Plus,
+solving task 132 while losing base-solved task 76. An authenticated MLP
+continuation scores 6/9 Base, 4/9 Base+Plus and 9/14 development cases despite
+lower held-out loss. **No adapter has been promoted**.
+
+The best MLP checkpoint is shared as an **experimental community release**:
+[Qwen3.5-4B-WSP-HE9-MLP on Hugging Face](https://huggingface.co/groxaxo/Qwen3.5-4B-WSP-HE9-MLP).
+It includes the unchanged PEFT/native LoRA weights, portable configuration,
+model card, method, all candidate results, tested code and attribution. This is
+a partial research success and a failed complete assistant qualification.
+Publication does not change the default provider or relax the promotion gate.
+The [complete HE9 report](docs/experiments/qwen35-4b-he9-20261107.md),
+[machine-readable evidence](docs/experiments/qwen35-4b-he9-20261107.json),
+[seven additional integration fixes](docs/reviews/20261107-he9-integration-findings.md)
+and [HE9 contract](docs/he9-acceptance.md) record the gains, regressions, remaining
+Hermes/tool failures, exact loading controls and recommended next work.
+
+In the earlier, separately frozen broad experiment, the official base scored
+6/8 authored coding tasks, 6/6 tool scenarios and 128/164
+HumanEval tasks (78.05%). Both real OpenCode/Hermes clients passed the initial
+single-module file-edit fixture. Lower-rate adapters improved the small coding
+suite to 7/8 but scored 127/164 and 126/164 HumanEval, so neither was promoted.
+
+The [comprehensive experiment report](docs/experiments/qwen35-4b-20261107.md) records
+the training recipe, all rejected profiles, harder project trials, the corrected
+Hermes Docker configuration, grader controls, storage cleanup and service
+restoration. [Machine-readable findings](docs/experiments/qwen35-4b-20261107.json)
+preserve identities and per-case changes. Successful training or a small edit
+fixture does not establish broad coding reliability or frontier-model parity.
+
+The [pipeline review and fixes](docs/reviews/20261107-pipeline-fixes.md) close all nine
+reviewed discrepancies, including GPU ownership, mandatory artifact binding, atomic
+checkpoint export, literal tool markup and attribution of actual client requests.
+Serving identity schema 2 requires fresh paired evidence; the historical quality
+measurements above remain attached to their original source.
+
+The source regression suite contains 240 tests. Use the independent CPU setup
+below; optional training-library checks skip in that environment. Full sandbox
+checks additionally require Docker and `WSP_TEST_DOCKER_IMAGE`, as configured
+in the included GitHub Actions workflow.
+
+**GPU comparison and accounting (7 November 2026):** a targeted, single-GPU-per-arm MATH-500 runner compares original-thinking, repaired-thinking, and original-nonthinking through the existing GPUQ queue. The three jobs were subsequently cancelled after entering generation, with zero saved samples and no accuracy result. The token-accounting audit and interruption evidence are retained. See [protocol, job IDs, and operations](docs/THREE_GPU_COMPARISON.md).
+
+**Research-agent components still not implemented:** autonomous Sol/Astra orchestration, frontier token or spending budgets, activation extraction, a general evaluation/serving service, and a sandbox for unrestricted research agents. The coding and HE9 tracks do provide isolated execution for their bounded fixtures. [Sol 6.1 Max produced the broader implementation plan](docs/plans/sol-6.1-max-20261107.md), with [invocation provenance](docs/plans/sol-plan-provenance-20261107.json).
 
 ## Quick start — Linux, Python 3.12
 
@@ -72,3 +129,13 @@ See [review comparison](docs/reviews/20261106-comparison.md), [Sol's original st
 - Format: [Safetensors specification](https://github.com/safetensors/safetensors#format).
 
 This project does not redistribute checkpoint or edit binaries in Git. Their upstream terms apply. Local testing is independent of GitHub Actions. Successful weight reconstruction establishes artifact integrity, not a new discovery result or reproduction of benchmark scores. Keep practice data separate from held-out evaluation when adding the research-agent stages.
+
+Original project code and documentation use [Apache-2.0](LICENSE), with
+[third-party notices](NOTICE). Imported models, datasets and research artifacts
+retain their respective terms; see [corpus attribution](docs/coder-attribution.md).
+
+## Actual token accounting and benchmark observations
+
+[Actual measured token usage](docs/TOKEN_USAGE.md) separates recovered Sol session input, cached input, output, and reasoning subsets from local Qwen sample tokens. A read-only observer can refresh counts without another model call. It does not claim complete accounting for the main ChatGPT conversation or monetary billing.
+
+The three RTX 3090 benchmark attempts loaded and entered generation on 7 November 2026, then received SIGINT before saving any samples. They are cancelled, with no accuracy result. [Interruption evidence and limitations](docs/usage/benchmark-interruption-20261107.md) records the unknown cancellation initiator and discarded-token accounting gap.

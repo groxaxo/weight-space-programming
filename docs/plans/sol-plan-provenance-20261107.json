@@ -1,0 +1,18 @@
+{
+  "model": "gpt-6.1-sol",
+  "reasoning_effort": "max",
+  "source_commit": "17611902e37ff76e7bf0d5e7b3012e8bd55fffbe",
+  "prompt_sha256": "68eb55fe26f8546259544b8080a779d0416adf9df2da6d6adb491e2b8fc9d3d0",
+  "task": "plan_only_no_tools",
+  "status": "completed",
+  "usage": [
+    {
+      "input_tokens": 33691,
+      "cached_input_tokens": 12288,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 10358,
+      "reasoning_output_tokens": 7250
+    }
+  ],
+  "tool_events": []
+}

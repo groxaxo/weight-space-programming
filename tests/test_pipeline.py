@@ -129,6 +129,21 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(json.loads((self.out / "rebuild.json").read_text()), report)
         self.assertTrue(p.verify_output(self.lock, self.base, self.assets, self.out)["all_other_bytes_preserved"])
 
+    def test_output_requires_intact_reconstruction_provenance(self):
+        self.build()
+        path = self.out / "rebuild.json"
+        original = path.read_text()
+        for key, value in (("base_revision", "f" * 40), ("changed_entries_total", 999),
+                           ("lock_sha256", "0" * 64), ("output_file_sha256", {})):
+            report = json.loads(original)
+            report[key] = value
+            path.write_text(json.dumps(report))
+            with self.subTest(key=key), self.assertRaises(p.ValidationError):
+                p.verify_output(self.lock, self.base, self.assets, self.out)
+        path.unlink()
+        with self.assertRaises(p.ValidationError):
+            p.verify_output(self.lock, self.base, self.assets, self.out)
+
     def test_corruption_in_unedited_base_is_rejected(self):
         path = self.base / self.shard
         data = bytearray(path.read_bytes()); data[-1] ^= 1; path.write_bytes(data)
