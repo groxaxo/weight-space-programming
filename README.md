@@ -12,6 +12,8 @@ The current coding experiment runs on **`100.85.200.54`**, an RTX 3060 with 12 G
 
 ## Current measured findings
 
+**Semantic repair round (8 November 2026):** A new MLP continuation lowered held-out loss from 0.2627 to 0.1165 but scored **10/14 development cases and 2/4 actual clients**, against a fresh base **12/14 and 3/4**. It is rejected: `bounded_chunks` still fails, escaping/version comparison regress, OpenCode's project times out, and Hermes's project fails. All eight client trials have valid request attribution; all 177 client requests receive the 28,192 native allowance. See [the full negative result](docs/experiments/semantic-repair-20261108-round1.md), [raw paired evidence](docs/experiments/semantic-repair-20261108-round1-paired.json) and the [predeclared formatted-data follow-up](docs/experiments/formatted-repair-protocol-20261108.md). Released Hugging Face weights remain unchanged pending a measured replacement win.
+
 **28,192-token client follow-up:** The paired 28,192-token client rerun records base **3/4** and released MLP **3/4** passes. All actual clients have complete request attribution: **True**. The omitted-limit fallback is fixed, native output allowances are verified, and the original HE9 measurements retain their separate 8,192-token identity. No additional training or model promotion is performed. See [paired results and budget proof](docs/experiments/hermes-output28192-20261107.md).
 
 The latest selected **Experimentos HE9** replay uses actual OpenCode in a fresh
@@ -56,7 +58,7 @@ checkpoint export, literal tool markup and attribution of actual client requests
 Serving identity schema 2 requires fresh paired evidence; the historical quality
 measurements above remain attached to their original source.
 
-The source regression suite contains 243 tests. Use the independent CPU setup
+The source regression suite contains 250 tests. Use the independent CPU setup
 below; optional training-library checks skip in that environment. Full sandbox
 checks additionally require Docker and `WSP_TEST_DOCKER_IMAGE`, as configured
 in the included GitHub Actions workflow.
