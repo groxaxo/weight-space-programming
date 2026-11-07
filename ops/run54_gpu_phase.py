@@ -213,6 +213,7 @@ def main():
     parser.add_argument("--data", type=Path, default=ROOT / "assets/coder-corpus-v1/prepared")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--adapter", type=Path)
+    parser.add_argument("--init-training", type=Path, help="Completed adapter for a new training optimizer")
     parser.add_argument("--image", default="python:3.12-slim@sha256:4840d514c583a4d3d8cad3940e68dee6f0f6f3635c12fcd0a3d74c21a5b93a54")
     parser.add_argument("--port", type=int, default=18084)
     parser.add_argument("--allow-pause-bonsai", action="store_true")
@@ -227,13 +228,15 @@ def main():
         return
     check(not args.output.exists(), "Refusing existing phase output")
     check(not args.adapter or args.phase in ("evaluate", "benchmark", "serve"), "Adapter is only valid for inference")
+    check(not args.init_training or args.phase in ("train", "smoke"), "Initial training adapter is only valid for training")
     args.output.mkdir(parents=True)
     (ROOT / "runs").mkdir(exist_ok=True)
     cfg = load_config(args.config)
     snapshot = loads(args.model_proof.read_text())["snapshot"]
     write_json(args.output / "phase.json", {"phase": args.phase, "source": str(ROOT),
         "started_at_utc": datetime.now(timezone.utc).isoformat(), "model_revision": cfg["revision"],
-        "quantization": "nf4-double", "adapter": str(args.adapter) if args.adapter else None})
+        "quantization": "nf4-double", "adapter": str(args.adapter) if args.adapter else None,
+        "init_training": str(args.init_training) if args.init_training else None})
     def terminate(_signal, _frame):
         raise SystemExit(128 + _signal)
     signal.signal(signal.SIGTERM, terminate)
@@ -248,6 +251,8 @@ def main():
                 command = [args.python, "-u", "scripts/train_coder.py", "--config", str(args.config), "--data", str(args.data),
                     "--model-path", snapshot, "--model-proof", str(args.model_proof), "--four-bit", "--direct-idle-gpu",
                     "--output", str(args.output / "training")]
+                if args.init_training:
+                    command.extend(["--init-training", str(args.init_training)])
                 if args.phase == "smoke":
                     command.extend(["--max-steps", "2"])
                 run_logged(command, args.output, "training.log", 10800)

@@ -15,6 +15,7 @@ import sys
 from coder_common import allocate_device, check, digest, encode_record, load_coder_model, load_config, runtime_identity, verify_model_proof, write_json
 from prepare_coder_data import read_dataset
 from coder_artifacts import capture_recipe
+from coder_initialization import initialize_adapter, verify_initial_adapter
 
 
 def adapter_targets(named_modules, linear_type, scope='all-language'):
@@ -37,10 +38,17 @@ def main():
     parser.add_argument("--model-proof", type=Path, required=True)
     parser.add_argument("--four-bit", action="store_true", help="NF4 QLoRA for the 12 GB .54 GPU")
     parser.add_argument("--direct-idle-gpu", action="store_true", help="Explicit admission on .54, which has no GPUQ")
+    parser.add_argument("--init-training", type=Path, help="Authenticated completed adapter; starts a new optimizer, not an optimizer resume")
     args = parser.parse_args()
     cfg = load_config(args.config)
     verify_model_proof(cfg, args.model_path, args.model_proof)
     manifest, splits = read_dataset(args.data)
+    initial = None
+    if args.init_training is not None:
+        check(not args.output.resolve().is_relative_to(args.init_training.resolve())
+              and not args.init_training.resolve().is_relative_to(args.output.resolve()),
+              "Training output overlaps the immutable initial adapter")
+        initial = verify_initial_adapter(args.init_training, cfg)
     allocation = allocate_device(args.direct_idle_gpu)
     check(args.max_steps == -1 or args.max_steps > 0, "Invalid max_steps")
     check(not args.output.exists() and not args.output.is_symlink(), "Refusing existing training output")
@@ -87,7 +95,7 @@ def main():
            "runtime": runtime_identity(),
            "examples": {n: len(v) for n, v in encoded.items()}, "oversize_tasks_dropped": dropped,
            "supervised_tokens": {n: sum(sum(t != -100 for t in r["labels"]) for r in v) for n, v in encoded.items()},
-           "smoke_only": args.max_steps > 0, "status": "running"}
+           "initial_adapter": initial, "smoke_only": args.max_steps > 0, "status": "running"}
     write_json(args.output / "run-manifest.json", run)
     model = load_coder_model(cfg, args.model_path, args.four_bit)
     if args.four_bit:
@@ -97,6 +105,8 @@ def main():
     targets = adapter_targets(model.named_modules(), torch.nn.Linear, cfg.get('lora_target_scope', 'all-language'))
     model = get_peft_model(model, LoraConfig(r=cfg["lora_rank"], lora_alpha=cfg["lora_alpha"],
         target_modules=targets, lora_dropout=0.05, bias="none", task_type="CAUSAL_LM"))
+    if args.init_training is not None:
+        write_json(args.output / "initial-adapter.json", initialize_adapter(model, args.init_training, cfg, targets))
     model.print_trainable_parameters()
     write_json(args.output / "adapter-targets.json", targets)
 

@@ -316,6 +316,18 @@ def observe_containers(label, area, allowed_extra, stopping, observations):
         stopping.wait(0.5)
 
 
+def stop_trial_containers(trial_label):
+    """Stop only this trial's labeled processes before snapshotting its files."""
+    owned = subprocess.run(['docker', 'ps', '-aq', '--filter', 'label=' + trial_label],
+                           capture_output=True, text=True, timeout=15, check=True).stdout.split()
+    if owned:
+        # --rm containers can disappear between inspection and removal. The
+        # verified postcondition below, rather than that benign race, decides.
+        subprocess.run(['docker', 'rm', '-f', *owned], capture_output=True, timeout=30)
+    return subprocess.run(['docker', 'ps', '-aq', '--filter', 'label=' + trial_label],
+                          capture_output=True, text=True, timeout=15, check=True).stdout.split()
+
+
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == '--container-client':
         container_client()
@@ -415,6 +427,12 @@ def main():
                     '--toolsets', 'file,terminal', '--max-turns', '16', '--query-file', str(work/'prompt.txt')]
                 row['command_argv'] = command
                 row.update(execute(command, work, env, area/'client.log', timeout=1000))
+            check(not stop_trial_containers(trial_label), 'Own client containers did not stop before snapshot')
+            row['owned_containers_stopped_before_snapshot'] = True
+            # The actor deadline does not cancel an already-issued provider
+            # request. Finish attribution after it drains; never extend the
+            # actor's time budget or change its recorded timeout verdict.
+            proxy.drain()
             row['model_attestation'] = proxy.verify()
             for path, expected in protected.items():
                 check((work/path).is_file() and not (work/path).is_symlink() and digest(work/path) == expected, 'Client changed protected fixture: '+path)
@@ -429,24 +447,25 @@ def main():
         except Exception as error:
             row['error'] = f'{type(error).__name__}: {error}'
         finally:
-            if proxy is not None:
-                proxy.close()
             observation_stop.set()
             observer.join(timeout=12)
             row['container_isolation'] = observations
             row['passed'] = row['passed'] and bool(observations) and all(p['verified'] for p in observations)
             try:
-                owned = subprocess.run(['docker', 'ps', '-aq', '--filter', 'label='+trial_label],
-                                       capture_output=True, text=True, timeout=15, check=True).stdout.split()
-                if owned:
-                    subprocess.run(['docker', 'rm', '-f', *owned], capture_output=True, timeout=30)
-                remaining = subprocess.run(['docker', 'ps', '-aq', '--filter', 'label='+trial_label],
-                                           capture_output=True, text=True, timeout=15, check=True).stdout.split()
+                remaining = stop_trial_containers(trial_label)
                 row['remaining_test_containers'] = remaining
                 row['passed'] = row['passed'] and not remaining
             except Exception as cleanup_error:
                 row['cleanup_error'] = str(cleanup_error)
                 row['passed'] = False
+            if proxy is not None:
+                try:
+                    proxy.drain()
+                except Exception as drain_error:
+                    row['provider_drain_error'] = str(drain_error)
+                    row['passed'] = False
+                finally:
+                    proxy.close()
             if bridge is not None:
                 shutil.rmtree(bridge)
         rows.append(row)

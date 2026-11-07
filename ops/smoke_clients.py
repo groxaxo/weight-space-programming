@@ -130,6 +130,7 @@ def main():
                     "--toolsets", "file", "--max-turns", "8", "--query-file", str(work / "prompt.txt")]
             row["command_argv"] = command
             row.update(execute(command, work, env, work / "client.log"))
+            proxy.drain()
             row["model_attestation"] = proxy.verify()
             check((work / "calc.py").is_file() and not (work / "calc.py").is_symlink(), "Client did not leave a regular source file")
             check(digest(work / "test_calc.py") == tests_hash, "Client modified the fixture tests")
@@ -137,12 +138,18 @@ def main():
             row["independent_tests"] = run_python((work / "calc.py").read_text(), CHECKS, args.image)
             row["source_after_sha256"] = digest(work / "calc.py")
             row["tests_sha256"] = tests_hash
-            row["passed"] = row["exit_code"] == 0 and row["independent_tests"]["passed"]
+            row["passed"] = row["exit_code"] == 0 and not row["timed_out"] and row["independent_tests"]["passed"]
         except Exception as error:
             row["error"] = f"{type(error).__name__}: {error}"
         finally:
             if proxy is not None:
-                proxy.close()
+                try:
+                    proxy.drain()
+                except Exception as drain_error:
+                    row["provider_drain_error"] = str(drain_error)
+                    row["passed"] = False
+                finally:
+                    proxy.close()
         results.append(row)
         print(json.dumps(row), flush=True)
     report = {"schema_version": 1, "identity": client.identity, "results": results,

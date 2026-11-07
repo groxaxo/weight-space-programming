@@ -16,8 +16,12 @@ The latest selected **Experimentos HE9** replay uses actual OpenCode in a fresh
 VM on `.54`, full 262,144-token context and Q8 K/V cache. The matched base scores
 **6/9 Base and 3/9 Base+Plus**; the MLP adapter scores **7/9 and 5/9**, respectively,
 with 7/9 completed actors in each arm. Both newly solved tasks and the remaining
-partial-result regressions are retained. The independent coding/tool and installed
-client checks are still running; **no adapter has been promoted**. The
+partial-result regressions are retained. The complete qualification rejects the
+MLP adapter: development success falls from 12/14 to 11/14, and the Hermes project
+trial fails. A further all-language adapter scores 6/9 Base and 4/9 Base+Plus,
+solving task 132 while losing base-solved task 76. **No adapter has been promoted**.
+Authenticated continuation from a completed adapter is now available, with exact
+factor-loading controls and a separate new optimizer. The
 [HE9 contract](docs/he9-acceptance.md) defines this separate selected-subset gate.
 
 In the earlier, separately frozen broad experiment, the official base scored
@@ -39,7 +43,7 @@ checkpoint export, literal tool markup and attribution of actual client requests
 Serving identity schema 2 requires fresh paired evidence; the historical quality
 measurements above remain attached to their original source.
 
-The source regression suite contains 225 tests. Use the independent CPU setup
+The source regression suite contains 240 tests. Use the independent CPU setup
 below; optional training-library checks skip in that environment. Full sandbox
 checks additionally require Docker and `WSP_TEST_DOCKER_IMAGE`, as configured
 in the included GitHub Actions workflow.
