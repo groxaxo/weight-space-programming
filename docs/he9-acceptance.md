@@ -73,9 +73,11 @@ Predeclared requirements for the matched pair:
 2. **Strictly more Base+Plus tasks solved** than the new Qwen4B base. A tie fails.
 3. No previously solved Base+Plus task or original base-test task is lost.
 4. The number of completed OpenCode actors does not decrease. Correct saved code at a deadline remains a score but is not completed agent work.
-5. Independent OpenCode/Hermes development compatibility must pass before local promotion. Lower training loss alone never qualifies an adapter.
+5. All **eight coding and six multi-turn tool development cases** must pass, together with both OpenCode/Hermes file-edit and two-module terminal/project trials. Each actual-client trial requires the measured model/instance, unchanged tests, completed independent assertions and, for projects, observed test execution and verified container isolation. Held-out training loss must be finite and improve. Lower training loss alone never qualifies an adapter.
 
 `scripts/compare_he9.py` returns `he9_qualified_pending_compatibility` or `not_promoted`. It always records `adapter_promoted: false`; endpoint selection is separate. Keep failed attempts/candidates. Never replace failures with retries, rewrite old identities or import canonical HE9 answers into training. A protocol change requires a new complete matched pair.
+
+`scripts/qualify_he9.py` combines the completed replay pair with both complete native development/client phases and the measured adapter's training record. It supports the declared 262,144-token profile, checks the actual Q8 runtime/cache settings, binds client attestations to each phase's server instance, checks paired client versions and rejects partial, inconsistent or source-mismatched evidence. A tie or a remaining development/client failure returns `not_promoted`. A valid result is named `qualified_for_native_he9_use`; it still leaves `adapter_promoted: false` and makes no client, endpoint or default-model change. The separate all-164 acceptance utilities keep their broader contract.
 
 This small, publicly known failure-selected slice is diagnostic tuning evidence. Even 9/9 cannot establish broad repository competence, uncontaminated generalization, all-164 HumanEval accuracy, frontier equivalence or perfection.
 
@@ -107,6 +109,18 @@ Use identical source/setup/runtime with the candidate's unmerged conversion prof
   --baseline runs/he9-base-unique/replay.json \
   --candidate runs/he9-candidate-unique/replay.json \
   --output reports/he9-comparison-unique.json
+```
+
+After both native `--phase evaluate --clients --project` phases finish at the same full-context/Q8/sampling settings, run the complete qualification. Each phase must contain its completed-phase record, server readiness/identity, all fourteen development results and both client reports:
+
+```bash
+.venv-train/bin/python scripts/qualify_he9.py \
+  --baseline-he9 runs/he9-base-unique/replay.json \
+  --candidate-he9 runs/he9-candidate-unique/replay.json \
+  --baseline-phase runs/native-base-compat-unique \
+  --candidate-phase runs/native-candidate-compat-unique \
+  --training runs/training-unique/training-result.json \
+  --output reports/he9-complete-qualification-unique.json
 ```
 
 Preserve host commands/logs, guest transcripts, saved candidates, grader logs/results, reference controls, source hashes, VM creation/virgin proof and comparison. SSH private keys and personal profiles stay out of reports, archives and Git. Clear HF cache only when necessary, preserving needed authenticated inputs and Bonsai/Moss runtimes.
