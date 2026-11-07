@@ -56,7 +56,9 @@ def validate_request(request, model_name, max_context, max_output):
     check(choice in ("auto", "none"), "Only auto/none tool_choice is supported")
     if choice == "none":
         tools = []
-    tokens = request.get("max_completion_tokens", request.get("max_tokens", min(1024, max_output)))
+    # Hermes one-shot may omit both fields. Use the configured/advertised
+    # allowance rather than silently truncating a tool patch at 1,024 tokens.
+    tokens = request.get("max_completion_tokens", request.get("max_tokens", max_output))
     check(type(tokens) is int and 1 <= tokens <= max_output and tokens < max_context, "Invalid output token limit")
     temperature = request.get("temperature", 0.0)
     check(type(temperature) in (int, float) and math.isfinite(temperature) and 0 <= temperature <= 2, "Invalid temperature")

@@ -1,4 +1,6 @@
 # Example for a separate Hermes profile. Do not overwrite an existing profile.
+# Run the Qwen frontend with --max-output 28192 for the paired client profile.
+# Hermes may omit max_tokens; the frontend then uses that serving allowance.
 model:
   provider: custom
   default: wsp-qwen35-4b-coder
