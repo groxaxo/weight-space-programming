@@ -88,7 +88,8 @@ for row in rows:
        env={**os.environ,'PYTHONDONTWRITEBYTECODE':'1'},timeout=5)
    states[state]={'exit_code':p.returncode,'stdout':p.stdout,'stderr':p.stderr}
   assert states['before']['exit_code']!=0 and states['after']['exit_code']==0,row['key']
-  assert 'Ran '+str(row['checks'])+' tests' in states['after']['stderr'],row['key']
+  expected = 'Ran '+str(row['checks'])+' test'+('s' if row['checks'] != 1 else '')+' in '
+  assert expected in states['after']['stderr'],row['key']
   results[row['key']]={'control_cwd':str(root),**states}
 print(json.dumps(results))
 '''
