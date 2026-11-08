@@ -15,11 +15,13 @@ import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
-from direct_weights import read_json, publish_json
+from direct_weights import read_json, read_bound_json, publish_json, sha_bytes
 from pipeline import require, sha256
 from evaluate_coder import CODE_CASES, extract_code
 
 IMAGE = 'python@sha256:4840d514c583a4d3d8cad3940e68dee6f0f6f3635c12fcd0a3d74c21a5b93a54'
+SOURCE_AT_IMPORT = {name: sha256(path) for name, path in {
+    'grading': Path(__file__), 'evaluator': ROOT / 'scripts/evaluate_coder.py'}.items()}
 
 
 def prepare(generation, request):
@@ -32,6 +34,8 @@ def prepare(generation, request):
             'Practice prompt differs from the exposed frozen regression')
     require(type(generation['hit_token_limit']) is bool, 'Missing completion budget status')
     require(not generation['hit_token_limit'], 'Censored output: not a completed semantic trial')
+    if 'censored' in generation:
+        require(generation['censored'] is False, 'Censored or unknown stopping cause')
     return extract_code(generation['text']), case[2]
 
 
@@ -43,7 +47,18 @@ def main():
     args = parser.parse_args()
     require(not os.path.lexists(args.output), 'Refusing an existing grading output')
     args.output.mkdir(parents=True, mode=0o755)
-    generation, request = read_json(args.generation), read_json(args.request)
+    inputs = args.output / 'inputs'; inputs.mkdir(mode=0o700)
+    generation, generation_hash, generation_raw = read_bound_json(args.generation)
+    request, request_hash, request_raw = read_bound_json(args.request)
+    for name, raw in (('generation.json', generation_raw), ('request.json', request_raw)):
+        with (inputs / name).open('xb') as frozen:
+            frozen.write(raw)
+    sources = args.output / 'source'; sources.mkdir(mode=0o700)
+    for name, path in (('grading', Path(__file__)), ('evaluator', ROOT / 'scripts/evaluate_coder.py')):
+        raw = path.read_bytes()
+        require(sha_bytes(raw) == SOURCE_AT_IMPORT[name], 'Grader source changed after import')
+        with (sources / (name + '.py')).open('xb') as frozen:
+            frozen.write(raw)
     code, tests = prepare(generation, request)
     task = args.output / 'task'; task.mkdir(mode=0o755)
     with (task / 'solution.py').open('x') as handle:
@@ -86,10 +101,11 @@ def main():
             and not state[0]['State'].get('Error'),
             'Grading container did not execute cleanly; infrastructure failure, not a model verdict')
     report = {'schema_version': 1, 'role': 'practice', 'id': generation['id'],
-        'generation_sha256': sha256(args.generation), 'request_sha256': sha256(args.request),
+        'generation_sha256': generation_hash, 'request_sha256': request_hash,
+        'frozen_inputs': {'generation': 'inputs/generation.json', 'request': 'inputs/request.json'},
         'solution_sha256': sha256(task / 'solution.py'), 'checker_sha256': sha256(task / 'check.py'),
-        'evaluator_source_sha256': sha256(ROOT / 'scripts/evaluate_coder.py'),
-        'grading_source_sha256': sha256(Path(__file__)), 'image': IMAGE,
+        'evaluator_source_sha256': SOURCE_AT_IMPORT['evaluator'],
+        'grading_source_sha256': SOURCE_AT_IMPORT['grading'], 'image': IMAGE,
         'passed': exit_code == 73 and not timed_out, 'container_exit_code': exit_code,
         'tests_completed': exit_code == 73 and not timed_out, 'timed_out': timed_out,
         'scope': 'Completed exposed practice assertion checks only; not independent paired evaluation',

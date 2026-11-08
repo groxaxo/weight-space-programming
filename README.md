@@ -16,6 +16,13 @@ The finite 14-forward activation study found a reproducible effect in layers
 justified, independent paired model quality remains `NOT_RUN`, and the baseline
 remains the retained reference.
 
+The [follow-up harness repair report](docs/reviews/20261108-direct-harness-fixes.md)
+records eight fixes for parent/input authentication, concurrent admission,
+interrupted observations, completion, donor gates, host evidence and exact-cap
+EOS handling. New worker acceptance requires source-bound evidence schema 2.
+These engineering repairs preserve the negative scientific result above; they
+introduce no weight candidate or independent quality claim.
+
 **Historical coding track:** the preserved LoRA/QLoRA work contains authenticated model snapshots, licensed corpora, assistant-only loss masks, adapter selection, serving, executable coding/tool checks, HumanEval and OpenCode/Hermes fixtures. Those artifacts and results remain useful records, but they are not implementations of the active no-training method. Legacy training, supervised-corpus preparation and trained-derivative CLI entry points are guarded by `scripts/method_policy.py`. See [the historical coding-assistant workflow](docs/coding-assistant.md).
 
 **Scope:** the original `0be1a86` wrapper reconstructs an existing 0.8B patch; it does not discover a repair. Its selected coordinates are never transferred to 4B. Model quality requires matched reports and independent evaluation, beyond successful reconstruction or a valid numeric patch. The exposed HE9/development/client fixtures are regressions, not a fresh untouched holdout. No result here establishes frontier-model equivalence.

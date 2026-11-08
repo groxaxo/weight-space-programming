@@ -132,43 +132,30 @@ class ForwardBoundaryTests(unittest.TestCase):
                                             [], Path('/out'), Path('/request'), direct_edit54.GIB, 'probe')
 
     def test_bare_success_exit_or_wrong_identity_cannot_replace_a_worker_report(self):
-        request = {'protocol_sha256': 'b' * 64}
+        from direct_evidence_fixtures import make_worker
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory)
             with self.assertRaisesRegex(ValidationError, 'without its bound result'):
-                direct_edit54.worker_evidence(output, 'verify', request, 'a' * 64, 'c' * 64)
-            report = {'request_sha256': 'a' * 64, 'protocol_sha256': 'b' * 64,
-                'parent': {'model_id': direct_weights.MODEL_ID, 'revision': direct_weights.REVISION,
-                           'lock_sha256': 'c' * 64}, 'mode': 'verify', 'training': False,
-                'patch_applied': False, 'quality_improvement_claimed': False}
-            path = output / 'worker.json'; path.write_text(json.dumps(report))
-            self.assertTrue(direct_edit54.worker_evidence(output, 'verify', request, 'a' * 64, 'c' * 64)['worker_complete'])
-            for field, value in [('request_sha256', '0' * 64), ('training', True),
-                                  ('quality_improvement_claimed', True)]:
-                bad = dict(report); bad[field] = value; path.write_text(json.dumps(bad))
-                with self.assertRaises(ValidationError):
-                    direct_edit54.worker_evidence(output, 'verify', request, 'a' * 64, 'c' * 64)
+                direct_edit54.worker_evidence(output, 'verify', {}, 'f' * 64, direct_weights.load_lock()['_sha256'])
+            value, report, path = make_worker(output, 'verify')
+            check = lambda: direct_edit54.worker_evidence(output, 'verify', value, 'f' * 64, value['lock_sha256'])
+            self.assertTrue(check()['worker_complete'])
+            for field, changed in [('request_sha256', '0' * 64), ('training', True),
+                                    ('quality_improvement_claimed', True), ('baseline_verification', None)]:
+                path.write_text(json.dumps({**report, field: changed}))
+                with self.subTest(field=field), self.assertRaises(ValidationError): check()
 
     def test_incomplete_probe_is_never_a_quality_pass(self):
-        request = {'protocol_sha256': 'b' * 64, 'patient_sha256': 'd' * 64,
-                   'source_request_sha256': 'e' * 64}
+        from direct_evidence_fixtures import make_worker
         with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory); (output / 'probe').mkdir()
-            report = {'request_sha256': 'a' * 64, 'protocol_sha256': 'b' * 64,
-                'parent': {'model_id': direct_weights.MODEL_ID, 'revision': direct_weights.REVISION,
-                           'lock_sha256': 'c' * 64}, 'training': False, 'role': 'practice',
-                'status': 'practice_only', 'weights_edited': False, 'quality_evaluation': 'NOT_RUN',
-                'patient_sha256': 'd' * 64, 'source_request_sha256': 'e' * 64,
-                'parameters_unchanged': True, 'parameter_postcheck_complete': True, 'complete': False,
-                'loaded_parameter_sha256_before': {'weight': 'f' * 64},
-                'loaded_parameter_sha256_after': {'weight': 'f' * 64}}
-            path = output / 'probe/result.json'; path.write_text(json.dumps(report))
-            result = direct_edit54.worker_evidence(output, 'probe', request, 'a' * 64, 'c' * 64)
+            output = Path(directory)
+            value, report, path = make_worker(output, 'probe', skipped=('length_control',))
+            check = lambda: direct_edit54.worker_evidence(output, 'probe', value, 'f' * 64, value['lock_sha256'])
+            result = check()
             self.assertFalse(result['worker_complete'])
             self.assertFalse(result['quality_improvement_claimed'])
             report['weights_edited'] = True; path.write_text(json.dumps(report))
-            with self.assertRaises(ValidationError):
-                direct_edit54.worker_evidence(output, 'probe', request, 'a' * 64, 'c' * 64)
+            with self.assertRaises(ValidationError): check()
 
 
 if __name__ == '__main__':

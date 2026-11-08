@@ -110,6 +110,42 @@ Short diagnostic contexts cannot establish the native client's 262,144 context,
 Q8 K/V or 28,192 output profile. Quantized conversion and deployment require their
 own pinned original-versus-edited paired experiment after BF16 evidence.
 
+## Audited worker invariants
+
+The eight audited harness repairs are documented in
+`docs/reviews/20261108-direct-harness-fixes.md`. Preserve these invariants:
+
+- A full file SHA-256 check must remain bound to the file generation actually
+  consumed. Retain inode/device/size/mtime/ctime identities, read-only descriptors
+  and before/after stability checks. A changed parent requires a new full
+  authentication, never a timestamp adjustment or reuse of an old proof.
+- Capture input bytes and hashes before execution, preserve those exact bytes,
+  and bind the producer sources captured before execution. Never hash mutable
+  source paths afterward to attribute earlier results.
+- Use the shared host/user worker lease before sampling resources, and hold it
+  through confirmed container exit. Never unlink its inode. A dead broker PID,
+  expired age or missing/unknown container state is not proof of released
+  resources. Inspect only the retained owned container; do not stop other jobs.
+- Check all loaded parameters in `finally`, including observation startup and
+  generation interruption. Save incomplete results and propagate postcheck
+  failure. Retain all partial evidence.
+- Distinguish contrast completion, all requested arms, execution completion,
+  scientific control success and independent model quality. Recompute cached
+  gates from complete, unique, finite raw score rows. A skipped requested arm
+  cannot be complete, and an execution-complete failed gate cannot be a pass.
+- New host acceptance requires `evidence_schema_version: 2`: exact 426 unique
+  official language parameter names and before/after hashes, full 12-file
+  baseline and loaded-parent proofs, frozen source identities, tokenization,
+  raw scores and numeric observations. Do not upgrade historical artifacts by
+  rewriting or relabelling them. Request schema versions remain separate.
+- EOS at the last allowed token is a completed generation. A length cap without
+  EOS, or an unexplained short stop, remains censored. Preserve actual EOS IDs,
+  token counts and stop reasons; never infer a semantic failure from a cap flag
+  that contradicts the raw tokens.
+
+These repairs do not reopen the `STOP_controls_failed` study or authorize
+training, a new hypothesis, a weight candidate, model promotion or cleanup.
+
 ## Preservation and claims
 
 Preserve all originals, intermediate artifacts, staging files, manifests,

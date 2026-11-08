@@ -8,6 +8,7 @@ repository lock are trusted; an adversary rewriting them is outside this boundar
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
 import hashlib
 import json
 import math
@@ -101,8 +102,13 @@ def _json_bytes(data: bytes) -> dict:
 
 
 def read_json(path: Path) -> dict:
-    with Path(path).open("rb") as source:
-        return _json_bytes(source.read(MAX_JSON_BYTES + 1))
+    return read_bound_json(path)[0]
+
+
+def read_bound_json(path: Path) -> tuple[dict, str, bytes]:
+    """Parse and hash the exact same bounded read, never a later pathname read."""
+    raw = _read_artifact(path)
+    return _json_bytes(raw), sha_bytes(raw), raw
 
 
 def _read_artifact(path: Path) -> bytes:
@@ -193,6 +199,52 @@ def _fingerprint(info):
     return (info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
 
 
+def file_identity(info):
+    return dict(zip(('dev', 'ino', 'size', 'mtime_ns', 'ctime_ns'), _fingerprint(info)))
+
+
+@contextmanager
+def authenticated_file(record):
+    """Pin an authenticated inode and reject replacement/in-place mutation.
+
+    A shared cache remains externally writable. Its recorded generation must
+    stay stable for every consumption; read-only handles alone do not prove it.
+    """
+    expected = record.get('identity')
+    require(type(expected) is dict and set(expected) == {'dev', 'ino', 'size', 'mtime_ns', 'ctime_ns'}
+            and all(type(v) is int for v in expected.values()), 'Missing authenticated file identity')
+    path = Path(record['path'])
+    descriptor = os.open(path, os.O_RDONLY | getattr(os, 'O_NOFOLLOW', 0) | getattr(os, 'O_CLOEXEC', 0))
+    with os.fdopen(descriptor, 'rb') as source:
+        require(stat.S_ISREG(os.fstat(source.fileno()).st_mode)
+                and file_identity(os.fstat(source.fileno())) == expected,
+                'Authenticated parent changed before consumption: ' + str(path))
+        try:
+            yield source
+        finally:
+            require(file_identity(os.fstat(source.fileno())) == expected
+                    and not path.is_symlink() and file_identity(path.stat()) == expected,
+                    'Authenticated parent changed during consumption: ' + str(path))
+
+
+def assert_baseline_unchanged(verified):
+    require(verified.get('status') == 'baseline_verified' and bool(verified.get('files')),
+            'Missing authenticated baseline generation')
+    for record in verified['files'].values():
+        with authenticated_file(record):
+            pass
+
+
+def read_authenticated_header(record):
+    with authenticated_file(record) as source:
+        return pipeline.read_header_handle(source)
+
+
+def read_authenticated_json(record):
+    with authenticated_file(record) as source:
+        return _json_bytes(source.read(MAX_JSON_BYTES + 1))
+
+
 def verify_baseline(lock: dict, base: Path) -> dict:
     """Fully hash locked inputs using read-only handles, then check index/config/headers."""
     base = Path(base).absolute()
@@ -211,21 +263,21 @@ def verify_baseline(lock: dict, base: Path) -> dict:
         require(h.hexdigest() == spec["sha256"], f"SHA-256 mismatch: {name}")
         require(resolve_readonly(base / name)[0] == path, "Baseline symlink target changed")
         files[name] = {"path": str(path), "symlinks": links, "size": spec["size"],
-                       "sha256": h.hexdigest()}
-    config = read_json(Path(files["config.json"]["path"]))
+                       "sha256": h.hexdigest(), "identity": file_identity(before)}
+    config = read_authenticated_json(files["config.json"])
     config = config.get("text_config", config)
     require(type(config) is dict, "Invalid text config")
     for key, expected in lock["architecture"].items():
         actual = config.get(key, config.get("torch_dtype") if key == "dtype" else None)
         require(actual == expected, f"Config architecture mismatch: {key}")
-    index = read_json(Path(files["model.safetensors.index.json"]["path"]))
+    index = read_authenticated_json(files["model.safetensors.index.json"])
     index = index.get("weight_map")
     require(type(index) is dict and bool(index), "Empty checkpoint index")
     require(all(isinstance(k, str) and isinstance(v, str) for k, v in index.items()),
             "Invalid checkpoint index")
     require({pipeline.leaf(v) for v in index.values()} == SHARDS, "Wrong indexed shard set")
     for shard in SHARDS:
-        header, start = pipeline.read_header(Path(files[shard]["path"]))
+        header, start = read_authenticated_header(files[shard])
         require(set(header) - {"__metadata__"} == {k for k, v in index.items() if v == shard},
                 "Index/header tensor mismatch")
         headers[shard] = (header, start)
@@ -238,9 +290,11 @@ def verify_baseline(lock: dict, base: Path) -> dict:
                 f"Wrong tensor shape/dtype: {name}")
         tensors[name] = {**expected, "offset": start + info["data_offsets"][0],
                          "size": info["data_offsets"][1] - info["data_offsets"][0]}
-    return {"status": "baseline_verified", "parent": parent_identity(lock),
+    verified = {"status": "baseline_verified", "parent": parent_identity(lock),
             "baseline": str(base), "files": files, "tensors": tensors,
             "scope": "Full locked-file SHA-256, config/index/header checks; no model execution"}
+    assert_baseline_unchanged(verified)
+    return verified
 
 
 def parent_identity(lock: dict) -> dict:
@@ -373,8 +427,7 @@ def validate_patch(lock: dict, base: Path, patch_path: Path) -> dict:
     results = []
     for tensor in patch["tensors"]:
         info = baseline["tensors"][tensor["name"]]
-        path = Path(baseline["files"][info["shard"]]["path"])
-        with path.open("rb") as source:
+        with authenticated_file(baseline["files"][info["shard"]]) as source:
             source.seek(info["offset"])
             data = source.read(info["size"])
         require(len(data) == info["size"], "Truncated tensor read")
@@ -382,6 +435,7 @@ def validate_patch(lock: dict, base: Path, patch_path: Path) -> dict:
         edited, report = apply_tensor_patch(original, tensor, lock, patch["limits"])
         results.append(report)
         del edited, original, data
+    assert_baseline_unchanged(baseline)
     return {"status": "patch_verified_cpu_only", "parent": parent_identity(lock),
             "patch_sha256": sha_bytes(raw), "tensors": results,
             "selected_entries_total": sum(t["selected_entries"] for t in results),

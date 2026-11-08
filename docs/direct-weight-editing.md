@@ -361,3 +361,26 @@ replication and independent paired model evaluation are still required.
 The [paired acceptance boundary](direct-paired-acceptance.md) distinguishes
 exposed regression, untouched custody, BF16 evidence and native quantized-client
 acceptance. Its unimplemented or unrun stages must remain explicit.
+
+
+## Audited execution integrity
+
+The [eight-discrepancy repair report](reviews/20261108-direct-harness-fixes.md)
+defines the current worker contract. Full SHA-256 authentication is bound to
+file generations at consumption and loading; grading and worker requests bind
+captured input bytes before execution. All direct brokers share a persistent
+host/user admission lease held through confirmed exit. Unknown orphan state
+fails closed; do not unlink the lease or interrupt another job.
+
+New results use `evidence_schema_version: 2`, separate from request schemas.
+Host acceptance requires the frozen producer, full baseline/loaded-parent
+proofs, the exact 426 protected parameter names and matching before/after
+hashes, tokenization, ordered requested arms, raw score files and safe numeric
+observations. It recomputes diagnostic gates. Interrupted observations retain
+all-parameter postchecks and incomplete evidence. Contrast completion alone
+cannot substitute for requested controls; EOS at the cap is distinguished from
+censoring without EOS. Historical raw records retain their original schema and
+producer identity. No artifact is rewritten to pass the newer verifier.
+
+This is an execution-integrity contract. The closed 8 November hypothesis is
+still `STOP_controls_failed`; new paired model/client quality remains `NOT_RUN`.

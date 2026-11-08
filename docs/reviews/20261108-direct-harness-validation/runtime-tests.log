@@ -1,0 +1,32 @@
+test_cpu_reference_chunk_and_recurrence_agree_without_gpu_dispatch (test_direct_dtype.OriginalDtypeTests.test_cpu_reference_chunk_and_recurrence_agree_without_gpu_dispatch) ... /deps/fla/utils/hardware.py:62: UserWarning: Triton is not supported on current platform, roll back to CPU.
+  _cpu_device_warning()
+/deps/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+/deps/fla/ops/nsa/naive.py:19: ImportWarning: Flash Attention is not installed. Please install it via `pip install flash-attn --no-build-isolation`
+  warnings.warn(
+/deps/fla/ops/nsa/parallel.py:25: ImportWarning: Flash Attention is not installed. Please install it via `pip install flash-attn --no-build-isolation`
+  warnings.warn(
+/deps/fla/layers/attn.py:28: ImportWarning: Flash Attention is not installed. Please install it via `pip install flash-attn --no-build-isolation`
+  warnings.warn(
+/deps/fla/layers/bitattn.py:29: ImportWarning: Flash Attention is not installed. Please install it via `pip install flash-attn --no-build-isolation`
+  warnings.warn(
+/deps/fla/ops/deltaformer/parallel.py:20: ImportWarning: Flash Attention is not installed. Please install it via `pip install flash-attn --no-build-isolation`
+  warnings.warn(
+/deps/fla/layers/mla.py:35: ImportWarning: Flash Attention is not installed. Please install it via `pip install flash-attn --no-build-isolation`
+  warnings.warn(
+/deps/fla/layers/rodimus.py:41: ImportWarning: Flash Attention is not installed. Please install it via `pip install flash-attn --no-build-isolation`
+  warnings.warn(
+ok
+test_fp32_auxiliary_is_reloaded_from_original_words_not_cast_back (test_direct_dtype.OriginalDtypeTests.test_fp32_auxiliary_is_reloaded_from_original_words_not_cast_back) ... ok
+test_installed_tiny_model_loader_metadata_can_be_preserved (test_direct_dtype.OriginalDtypeTests.test_installed_tiny_model_loader_metadata_can_be_preserved) ... Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 869.65it/s]
+Loading weights:   0%|          | 0/14 [00:00<?, ?it/s]Loading weights: 100%|██████████| 14/14 [00:00<00:00, 4911.36it/s]
+ok
+test_original_bf16_is_never_rounded_or_replaced (test_direct_dtype.OriginalDtypeTests.test_original_bf16_is_never_rounded_or_replaced) ... ok
+test_wrong_shape_and_unsupported_dtype_are_rejected (test_direct_dtype.OriginalDtypeTests.test_wrong_shape_and_unsupported_dtype_are_rejected) ... ok
+test_hooks_controls_and_parameter_integrity (test_direct_probe.TinyForwardControls.test_hooks_controls_and_parameter_integrity) ... ok
+test_addition_zero_identity_random_reverse_and_parameter_integrity (test_direct_causal.TinyAdditionTests.test_addition_zero_identity_random_reverse_and_parameter_integrity) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 11.908s
+
+OK

@@ -7,6 +7,8 @@ network, cache cleanup, image pull, host home or Docker socket enters a worker.
 from __future__ import annotations
 
 import argparse
+import fcntl
+import stat
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -23,11 +25,95 @@ import uuid
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from pipeline import ValidationError, require, sha256
-from direct_weights import read_json, publish_json, MODEL_ID, REVISION
+from direct_weights import read_json, read_bound_json, load_lock, publish_json, MODEL_ID, REVISION
+import direct_evidence as evidence_contract
 
 IMAGE = 'python@sha256:4840d514c583a4d3d8cad3940e68dee6f0f6f3635c12fcd0a3d74c21a5b93a54'
 GIB = 1024 ** 3
 MAX_WORKER_SECONDS = 1800
+# One inode per host/user, shared by all worktrees. Never unlink this lock file.
+DEFAULT_LEASE_PATH = Path('/run/user') / str(os.getuid()) / 'wsp-direct-worker.lock'
+
+
+class WorkerLease:
+    """Serialize admission through confirmed exit; retain intent after broker death."""
+    def __init__(self, output):
+        self.output, self.handle, self.active = output, None, None
+        self.exit_confirmed = False
+
+    @staticmethod
+    def exited(name):
+        require(type(name) is str and re.fullmatch(r'wsp-direct-[a-z0-9-]{1,80}', name),
+                'Invalid retained reservation container')
+        result = subprocess.run(['docker', 'inspect', name], capture_output=True, text=True, timeout=15)
+        require(result.returncode == 0, 'Reservation state unknown; inspect retained worker before admission')
+        values = json.loads(result.stdout)
+        require(type(values) is list and len(values) == 1, 'Ambiguous retained container state')
+        state = values[0].get('State', {})
+        require(state.get('Status') in ('exited', 'dead') and state.get('Running') is False
+                and state.get('Restarting') is False, 'Not admitted: reserved worker has not confirmed exit')
+        return values
+
+    def record(self, value):
+        self.handle.seek(0)
+        self.handle.write(json.dumps(value, sort_keys=True).encode())
+        self.handle.truncate()
+        self.handle.flush()
+        os.fsync(self.handle.fileno())
+
+    def __enter__(self):
+        fd = os.open(DEFAULT_LEASE_PATH, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW | os.O_CLOEXEC, 0o600)
+        self.handle = os.fdopen(fd, 'r+b')
+        try:
+            info = os.fstat(fd)
+            require(stat.S_ISREG(info.st_mode) and info.st_uid == os.getuid() and info.st_nlink == 1
+                    and not info.st_mode & 0o077, 'Unsafe shared worker lease file')
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError as error:
+                raise ValidationError('Not admitted: another broker owns the host worker reservation') from error
+            raw = self.handle.read(4097)
+            require(len(raw) <= 4096, 'Oversized shared reservation state')
+            previous = json.loads(raw) if raw else None
+            if previous is not None:
+                require(type(previous) is dict and previous.get('state') in ('active', 'released'),
+                        'Unknown reservation state; manual inspection required')
+                if previous['state'] == 'active':
+                    # PID liveness/age never proves that a Docker worker has exited.
+                    self.exited(previous.get('container'))
+            publish_json({'path': str(DEFAULT_LEASE_PATH), 'previous': previous,
+                          'owner_pid': os.getpid(), 'exclusive': True}, self.output / 'reservation-acquired.json')
+            self.record({'state': 'released', 'owner_pid': os.getpid()})
+            return self
+        except BaseException:
+            self.handle.close()
+            self.handle = None
+            raise
+
+    def launching(self, name, memory_bytes):
+        self.active = {'state': 'active', 'container': name, 'owner_pid': os.getpid(),
+                       'memory_bytes': memory_bytes, 'run': str(self.output.resolve())}
+        # Intent is durable before docker run: a killed broker cannot lose ownership evidence.
+        self.record(self.active)
+        publish_json(self.active, self.output / 'reservation-worker.json')
+
+    def confirm_exit(self):
+        values = self.exited(self.active['container'])
+        self.exit_confirmed = True
+        return values
+
+    def __exit__(self, *_):
+        try:
+            if self.active is None or self.exit_confirmed:
+                state = {'state': 'released', 'owner_pid': os.getpid(),
+                         'container': self.active['container'] if self.active else None,
+                         'worker_exit_confirmed': self.exit_confirmed}
+                self.record(state)
+                publish_json(state, self.output / 'reservation-released.json')
+            # Otherwise leave active intent behind. Next broker fails closed on unknown/live state.
+        finally:
+            self.handle.close()
+
 
 
 def resources(path):
@@ -167,7 +253,7 @@ def freeze_source(destination):
     return hashes
 
 
-def worker_evidence(output, mode, request, request_hash, lock_hash):
+def worker_evidence(output, mode, request, request_hash, lock_hash, *, source_hashes=None):
     path = output / (mode + '/result.json' if mode in ('probe', 'causal') else 'worker.json')
     require(path.is_file(), 'Worker exited without its bound result artifact')
     report = read_json(path)
@@ -199,10 +285,15 @@ def worker_evidence(output, mode, request, request_hash, lock_hash):
         if mode == 'observe':
             require([row['id'] for row in report.get('results', [])] == [row['id'] for row in request['cases']],
                     'Observation did not finish the declared practice replays')
-    if mode in ('observe', 'probe', 'causal'):
-        before, after = (report.get('loaded_parameter_sha256_' + suffix) for suffix in ('before', 'after'))
-        require(type(before) is dict and bool(before) and before == after,
-                'Loaded official parameter hashes differ or are missing')
+    lock = load_lock()
+    require(lock['_sha256'] == lock_hash, 'Host result uses a different official parent lock')
+    source_hashes = evidence_contract.SOURCE_AT_IMPORT if source_hashes is None else source_hashes
+    evidence_contract.verify_common(path.parent, mode, report, lock=lock, source_hashes=source_hashes)
+    if mode == 'observe':
+        evidence_contract.verify_observation(path.parent, report, request)
+    elif mode in ('probe', 'causal'):
+        evidence_contract.verify_arms(path.parent, mode, report, request)
+    complete = report['complete']
     return {'path': str(path), 'sha256': sha256(path), 'worker_complete': complete,
             'quality_improvement_claimed': False, 'independent_evaluation': 'NOT_RUN'}
 
@@ -222,88 +313,92 @@ def main():
     require(os.uname().nodename == '4790', 'This admission profile is only for the .54 host 4790')
     require(not os.path.lexists(args.output), 'Refusing existing output path')
     args.output.mkdir(parents=True, mode=0o700)
-    state = resources(args.output)
-    write_new(args.output / 'resources-before.json', state)
     if args.mode == 'status':
+        state = resources(args.output)
+        write_new(args.output / 'resources-before.json', state)
         print(json.dumps(state))
         return
     require(args.baseline is not None and args.deps is not None and args.request is not None,
             'baseline, deps and request are required')
-    request = read_json(args.request)
+    request, frozen_request_hash, request_bytes = read_bound_json(args.request)
     memory_bytes = (10 * GIB if args.mode in ('observe', 'probe', 'causal') else GIB)
     try:
-        validate_host_request(request, args.mode, sha256(args.lock))
-        admit(state, memory_bytes)
-        model_files = mounted_files(read_json(args.lock), args.baseline)
-        name = 'wsp-direct-' + args.output.name.lower() + '-' + uuid.uuid4().hex[:12]
-        frozen_source = args.output / 'source'
-        source_hashes = freeze_source(frozen_source)
-        # This broker deliberately supports only the checked-in 4B lock.
-        require(sha256(frozen_source / 'configs/qwen35-4b-direct.lock.json') == sha256(args.lock),
-                'Custom lock differs from the frozen official 4B trust anchor')
-        frozen_request = args.output / 'request.json'
-        with args.request.open('rb') as incoming, frozen_request.open('xb') as outgoing:
-            shutil.copyfileobj(incoming, outgoing)
-        require(sha256(frozen_request) == sha256(args.request), 'Request changed during capture')
-        frozen_patient = frozen_source_request = None
-        if args.mode in ('probe', 'causal'):
-            require(args.patient is not None and args.source_request is not None,
-                    'Probe requires patient and source-request files')
-            for source, filename, key in ((args.patient, 'patient.json', 'patient_sha256'),
-                                          (args.source_request, 'source-request.json', 'source_request_sha256')):
-                require(sha256(source) == request.get(key), 'Probe input differs from frozen request: ' + key)
-                target = args.output / filename
-                with source.open('rb') as incoming, target.open('xb') as outgoing:
-                    shutil.copyfileobj(incoming, outgoing)
-                require(sha256(target) == request[key] == sha256(source), 'Probe input changed during capture')
-            frozen_patient = (args.output / 'patient.json').resolve()
-            frozen_source_request = (args.output / 'source-request.json').resolve()
-        frozen_donors = None
-        if args.mode == 'causal':
-            require(args.donors is not None, 'Causal worker requires donor artifacts')
-            frozen_donors = args.output / 'donors'
-            freeze_donors(args.donors, frozen_donors, request)
-        worker_output = args.output / 'worker-output'
-        worker_output.mkdir(mode=0o700)
-        command = container_command(name, frozen_source.resolve(), args.deps.resolve(strict=True), model_files,
-                                    worker_output.resolve(), frozen_request.resolve(), memory_bytes, args.mode,
-                                    patient=frozen_patient, source_request=frozen_source_request,
-                                    donors=frozen_donors.resolve() if frozen_donors is not None else None)
-        write_new(args.output / 'invocation.json', {'schema_version': 1, 'mode': args.mode,
-                  'container': name, 'command': command, 'request_sha256': sha256(args.request),
-                  'source_sha256': source_hashes, 'model_file_mounts': model_files,
-                  'training': False, 'gpu': False, 'service_control': False})
-        timeout = MAX_WORKER_SECONDS if args.mode in ('observe', 'probe', 'causal') else 900
-        with (args.output / 'console.log').open('x') as log:
-            child = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT)
-            start = time.monotonic()
-            def interrupted(signum, _frame):
-                raise SystemExit(128 + signum)
-            signal.signal(signal.SIGTERM, interrupted)
-            signal.signal(signal.SIGINT, interrupted)
-            try:
-                while child.poll() is None:
-                    time.sleep(5)
-                    current = resources(args.output)
-                    require(current['mem_available_bytes'] >= 3 * GIB,
-                            'Host memory reserve fell below 3 GiB; stopping only own worker')
-                    require(current['disk_free_bytes'] >= GIB,
-                            'Host disk reserve fell below 1 GiB; stopping only own worker')
-                    require(time.monotonic() - start < timeout,
-                            'Own worker exceeded its bounded runtime')
-            except BaseException:
-                # Stop only this invocation's precisely named container; retain it.
-                subprocess.run(['docker', 'stop', '--time', '10', name], capture_output=True, timeout=30)
-                child.wait(timeout=30)
-                raise
-        inspect = subprocess.run(['docker', 'inspect', name], capture_output=True, text=True, timeout=15)
-        if inspect.returncode == 0:
-            write_new(args.output / 'container-inspect.json', {'containers': json.loads(inspect.stdout)})
-        write_new(args.output / 'execution.json', {'exit_code': child.returncode,
-                  'resources_after': resources(args.output), 'outputs_retained': True})
-        require(child.returncode == 0, 'Worker failed; inspect the retained console and state')
-        evidence = worker_evidence(worker_output, args.mode, request, sha256(frozen_request), sha256(args.lock))
-        write_new(args.output / 'worker-evidence.json', evidence)
+        with WorkerLease(args.output) as lease:
+            state = resources(args.output)
+            write_new(args.output / 'resources-before.json', state)
+            validate_host_request(request, args.mode, sha256(args.lock))
+            admit(state, memory_bytes)
+            model_files = mounted_files(read_json(args.lock), args.baseline)
+            name = 'wsp-direct-' + args.output.name.lower() + '-' + uuid.uuid4().hex[:12]
+            frozen_source = args.output / 'source'
+            source_hashes = freeze_source(frozen_source)
+            # This broker deliberately supports only the checked-in 4B lock.
+            require(sha256(frozen_source / 'configs/qwen35-4b-direct.lock.json') == sha256(args.lock),
+                    'Custom lock differs from the frozen official 4B trust anchor')
+            frozen_request = args.output / 'request.json'
+            with frozen_request.open('xb') as outgoing:
+                outgoing.write(request_bytes)
+            require(sha256(frozen_request) == frozen_request_hash, 'Frozen request differs from admitted bytes')
+            frozen_patient = frozen_source_request = None
+            if args.mode in ('probe', 'causal'):
+                require(args.patient is not None and args.source_request is not None,
+                        'Probe requires patient and source-request files')
+                for source, filename, key in ((args.patient, 'patient.json', 'patient_sha256'),
+                                              (args.source_request, 'source-request.json', 'source_request_sha256')):
+                    require(sha256(source) == request.get(key), 'Probe input differs from frozen request: ' + key)
+                    target = args.output / filename
+                    with source.open('rb') as incoming, target.open('xb') as outgoing:
+                        shutil.copyfileobj(incoming, outgoing)
+                    require(sha256(target) == request[key] == sha256(source), 'Probe input changed during capture')
+                frozen_patient = (args.output / 'patient.json').resolve()
+                frozen_source_request = (args.output / 'source-request.json').resolve()
+            frozen_donors = None
+            if args.mode == 'causal':
+                require(args.donors is not None, 'Causal worker requires donor artifacts')
+                frozen_donors = args.output / 'donors'
+                freeze_donors(args.donors, frozen_donors, request)
+            worker_output = args.output / 'worker-output'
+            worker_output.mkdir(mode=0o700)
+            command = container_command(name, frozen_source.resolve(), args.deps.resolve(strict=True), model_files,
+                                        worker_output.resolve(), frozen_request.resolve(), memory_bytes, args.mode,
+                                        patient=frozen_patient, source_request=frozen_source_request,
+                                        donors=frozen_donors.resolve() if frozen_donors is not None else None)
+            write_new(args.output / 'invocation.json', {'schema_version': 1, 'mode': args.mode,
+                      'container': name, 'command': command, 'request_sha256': frozen_request_hash,
+                      'source_sha256': source_hashes, 'model_file_mounts': model_files,
+                      'training': False, 'gpu': False, 'service_control': False})
+            timeout = MAX_WORKER_SECONDS if args.mode in ('observe', 'probe', 'causal') else 900
+            with (args.output / 'console.log').open('x') as log:
+                lease.launching(name, memory_bytes)
+                child = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT)
+                start = time.monotonic()
+                def interrupted(signum, _frame):
+                    raise SystemExit(128 + signum)
+                signal.signal(signal.SIGTERM, interrupted)
+                signal.signal(signal.SIGINT, interrupted)
+                try:
+                    while child.poll() is None:
+                        time.sleep(5)
+                        current = resources(args.output)
+                        require(current['mem_available_bytes'] >= 3 * GIB,
+                                'Host memory reserve fell below 3 GiB; stopping only own worker')
+                        require(current['disk_free_bytes'] >= GIB,
+                                'Host disk reserve fell below 1 GiB; stopping only own worker')
+                        require(time.monotonic() - start < timeout,
+                                'Own worker exceeded its bounded runtime')
+                except BaseException:
+                    # Stop only this invocation's precisely named container; retain it.
+                    subprocess.run(['docker', 'stop', '--time', '10', name], capture_output=True, timeout=30)
+                    child.wait(timeout=30)
+                    lease.confirm_exit()
+                    raise
+            write_new(args.output / 'container-inspect.json', {'containers': lease.confirm_exit()})
+            write_new(args.output / 'execution.json', {'exit_code': child.returncode,
+                      'resources_after': resources(args.output), 'outputs_retained': True})
+            require(child.returncode == 0, 'Worker failed; inspect the retained console and state')
+            evidence = worker_evidence(worker_output, args.mode, request, frozen_request_hash, sha256(args.lock),
+                                       source_hashes=source_hashes)
+            write_new(args.output / 'worker-evidence.json', evidence)
     except BaseException as error:
         write_new(args.output / 'failure.json', {'error': type(error).__name__ + ': ' + str(error),
                                                'preserve': True, 'cleanup': False})

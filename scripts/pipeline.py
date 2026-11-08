@@ -156,13 +156,19 @@ def load_edit(lock: dict, assets: Path) -> tuple[dict, dict]:
 
 def read_header(path: Path) -> tuple[dict, int]:
     """Validate safetensors bounds before reading selected BF16 tensors."""
-    size = path.stat().st_size
     with path.open("rb") as f:
-        prefix = f.read(8)
-        require(len(prefix) == 8, "Truncated safetensors prefix")
-        n = struct.unpack("<Q", prefix)[0]
-        require(2 <= n <= min(100_000_000, size - 8), "Invalid safetensors header length")
-        header = json.loads(f.read(n), object_pairs_hook=_unique_object)
+        return read_header_handle(f)
+
+
+def read_header_handle(f) -> tuple[dict, int]:
+    """Use an already pinned read-only descriptor rather than reopening a path."""
+    size = os.fstat(f.fileno()).st_size
+    f.seek(0)
+    prefix = f.read(8)
+    require(len(prefix) == 8, "Truncated safetensors prefix")
+    n = struct.unpack("<Q", prefix)[0]
+    require(2 <= n <= min(100_000_000, size - 8), "Invalid safetensors header length")
+    header = json.loads(f.read(n), object_pairs_hook=_unique_object)
     require(isinstance(header, dict), "Invalid safetensors header")
     spans = []
     for name, info in header.items():

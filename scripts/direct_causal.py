@@ -12,14 +12,14 @@ import os
 from pathlib import Path
 import signal
 import time
-import zipfile
 
 import numpy as np
 
 import direct_probe as probe
 import direct_forward
+import direct_evidence as evidence
 from direct_weights import (DEFAULT_LOCK, load_lock, parent_identity, publish_json,
-                            read_json, verify_baseline, bf16_float)
+                            read_json, read_bound_json, verify_baseline, assert_baseline_unchanged, bf16_float)
 from pipeline import require, sha256
 
 QUESTION = 'half_open_overlap-first-semantic-causality'
@@ -63,41 +63,30 @@ def validate_request(request, lock, *, patient_sha256, source_request_sha256):
             and budget['postcheck_reserve_seconds'] == 120, 'Wall-time/postcheck budget is unsupported')
 
 
-def load_numeric_npz(path):
-    require(path.stat().st_size <= 2 * 1024 * 1024, 'Donor NPZ exceeds bounded size')
-    with zipfile.ZipFile(path) as archive:
-        entries = archive.infolist()
-        require(len(entries) == 64 and {e.filename for e in entries} == {n + '.npy' for n in ARRAY_NAMES},
-                'Duplicate, missing or undeclared NPZ members')
-        require(all(e.compress_type == zipfile.ZIP_STORED and not e.flag_bits & 1
-                    and 0 < e.file_size <= 20000 for e in entries)
-                and sum(e.file_size for e in entries) <= 1024 * 1024, 'Unsafe NPZ ZIP structure')
-    with np.load(path, allow_pickle=False, max_header_size=512) as archive:
-        require(set(archive.files) == ARRAY_NAMES, 'Unexpected donor arrays')
-        arrays = {}
-        for name in sorted(ARRAY_NAMES):
-            value = archive[name]
-            width = 9216 if '_input_' in name else 2560
-            require(value.dtype == np.dtype('<u2') and value.shape == (width,), 'Wrong donor dtype/shape')
-            require(not bool(np.any((value & 0x7f80) == 0x7f80)), 'Non-finite BF16 donor')
-            arrays[name] = value.copy()
-    return arrays
+def load_numeric_npz(path, expected_sha256=None):
+    # Parse only the exact bytes whose digest is bound, without reopening a ZIP path.
+    reference = {'path': path.name, 'sha256': expected_sha256 or sha256(path)}
+    return evidence.numeric_arrays(path.parent, reference)
 
 
 def validate_parameter_map(values):
-    require(type(values) is dict and len(values) == PARAMETER_COUNT, 'Expected all 426 parent parameters')
-    for name, digest in values.items():
-        require(type(name) is str and bool(name), 'Invalid parameter name')
-        probe.digest_string(digest, 'parameter SHA-256')
+    evidence.validate_parameter_map(values)
 
 
 def load_donors(request, lock, root, patient, source_request):
+    documents = {}
     for name, digest in request['donor_files'].items():
         path = root / name
         maximum = 2 * 1024 * 1024 if name.endswith('.npz') else 4 * 1024 * 1024
-        require(path.is_file() and path.stat().st_size <= maximum, 'Missing/oversized donor artifact: ' + name)
-        require(sha256(path) == digest, 'Donor artifact hash mismatch: ' + name)
-    result = read_json(root / 'result.json')
+        require(path.is_file() and not path.is_symlink() and path.stat().st_size <= maximum,
+                'Missing/oversized donor artifact: ' + name)
+        if name.endswith('.json'):
+            document, captured_sha256, _ = read_bound_json(path)
+            require(captured_sha256 == digest, 'Donor artifact hash mismatch: ' + name)
+            documents[name] = document
+        else:
+            require(sha256(path) == digest, 'Donor artifact hash mismatch: ' + name)
+    result = documents['result.json']
     require(result.get('schema_version') == 2 and result.get('question') == probe.FIRST_ASSERTION_QUESTION
             and result.get('role') == 'practice' and result.get('status') == 'practice_only'
             and result.get('complete') is True and result.get('parameters_unchanged') is True
@@ -111,7 +100,7 @@ def load_donors(request, lock, root, patient, source_request):
     before = result.get('loaded_parameter_sha256_before')
     validate_parameter_map(before)
     require(before == result.get('loaded_parameter_sha256_after'), 'Donor parameters were changed')
-    proof = read_json(root / 'request-proof.json')
+    proof = documents['request-proof.json']
     require(proof.get('request_sha256') == result.get('request_sha256')
             and all(proof.get(k) == request[k] for k in ('patient_sha256', 'source_request_sha256')),
             'Donor request proof mismatch')
@@ -121,12 +110,17 @@ def load_donors(request, lock, root, patient, source_request):
                            patient_sha256=request['patient_sha256'],
                            source_request_sha256=request['source_request_sha256'])
     require(original['protocol_sha256'] == result.get('protocol_sha256'), 'Donor protocol mismatch')
-    scores = {row['id']: row for row in result.get('arms', []) if row.get('status') == 'completed'}
-    require(all(name in scores for name in ('cue', 'length_control')), 'Missing donor context scores')
+    rows = result.get('arms')
+    probe.validate_context_scores(rows, probe.required_contexts(original))
+    recomputed_gate = probe.first_assertion_gate(rows)
+    require(recomputed_gate.get('status') == 'diagnostic_gate_passed'
+            and recomputed_gate == result.get('diagnostic_gate'),
+            'Cached donor gate differs from complete raw context scores')
+    scores = {row['id']: row for row in rows}
     for context in ('cue', 'length_control'):
         require(scores[context].get('observation_sha256') == request['donor_files'][context + '-decision.npz'],
                 'Donor observation hash differs from authenticated score')
-    runtime = read_json(root / 'runtime-identity.json')
+    runtime = documents['runtime-identity.json']
     probe.keys(runtime, {'torch', 'transformers', 'numpy', 'cpu_reference_kernels', 'probe_sha256',
                          'direct_forward_sha256', 'provenance'}, 'runtime identity')
     provenance = runtime['provenance']
@@ -143,7 +137,7 @@ def load_donors(request, lock, root, patient, source_request):
             'Historical model-kernel identity mismatch')
     stage1 = None
     if request['stage'] == 2:
-        stage1 = read_json(root / 'stage1-result.json')
+        stage1 = documents['stage1-result.json']
         require(stage1.get('stage') == 1 and stage1.get('question') == QUESTION
                 and stage1.get('role') == 'practice' and stage1.get('status') == 'practice_only'
                 and stage1.get('complete') is True and stage1.get('parameters_unchanged') is True
@@ -157,6 +151,7 @@ def load_donors(request, lock, root, patient, source_request):
                 and all(stage1.get(k) == request[k] for k in ('patient_sha256', 'source_request_sha256'))
                 and all(stage1.get('donor_files', {}).get(k) == request['donor_files'][k] for k in DONOR_NAMES),
                 'Stage 1 ancestry or donor identities differ')
+        probe.validate_context_scores(stage1.get('arms'), [spec['id'] for spec in specifications(1)])
         require(diagnostic_gate(1, stage1.get('arms', [])) == stage1['diagnostic_gate'],
                 'Stage 1 winner does not follow the frozen selection rule')
         by_id = {row['id']: row for row in stage1['arms']}
@@ -166,10 +161,10 @@ def load_donors(request, lock, root, patient, source_request):
                     and type(replay.get('max_token_logprob_difference')) in (float, int)
                     and 0 <= replay['max_token_logprob_difference'] <= tolerance,
                     'Stage 1 lacks complete replay/no-op proof')
-    return {'result': result, 'request': original, 'plans': read_json(root / 'tokenization-proof.json'),
+    return {'result': result, 'request': original, 'plans': documents['tokenization-proof.json'],
             'scores': scores, 'runtime': runtime, 'stage1': stage1,
-            'cue': load_numeric_npz(root / 'cue-decision.npz'),
-            'length_control': load_numeric_npz(root / 'length_control-decision.npz')}
+            'cue': load_numeric_npz(root / 'cue-decision.npz', request['donor_files']['cue-decision.npz']),
+            'length_control': load_numeric_npz(root / 'length_control-decision.npz', request['donor_files']['length_control-decision.npz'])}
 
 
 def runtime_identity(loading):
@@ -311,7 +306,9 @@ def run_addition(model, tokenizer, plan, outdir, spec, deltas, off_position):
         score, arrays = probe.run_forward(model, tokenizer, plan, outdir, spec['id'])
         score.update({'activation_addition': spec, 'position': position, 'actual_interventions': stats,
                       'capture_score_sha256': sha256(outdir / (spec['id'] + '-score.json'))})
-        publish_json(score, outdir / (spec['id'] + '-causal-score.json'))
+        causal_path = outdir / (spec['id'] + '-causal-score.json')
+        publish_json(score, causal_path)
+        score['causal_score_artifact'] = evidence.artifact(causal_path)
         return score, arrays
     except BaseException as error:
         publish_json({'error': type(error).__name__ + ': ' + str(error), 'activation_addition': spec,
@@ -381,7 +378,8 @@ def run_causal(request, lock, verified, donor_root, outdir, patient, source_requ
               'causal_code_sha256': sha256(Path(__file__)), 'arms': [], 'complete': False,
               'quality_evaluation': 'NOT_RUN', 'weights_edited': False, 'training': False,
               'weight_candidate_eligible': False, 'runtime_attestation_scope':
-              'Current runtime checked against controller-attested historical environment; fresh replay required'}
+              'Current runtime checked against controller-attested historical environment; fresh replay required',
+              **evidence.bindings(outdir)}
     error = None
     try:
         validate_parameter_map(before)
@@ -396,12 +394,14 @@ def run_causal(request, lock, verified, donor_root, outdir, patient, source_requ
             require(donors['stage1'].get('causal_code_sha256') == report['causal_code_sha256'],
                     'Causal implementation changed since Stage 1')
         publish_json(report, outdir / 'loaded-parent-proof.json')
+        report['loaded_parent_proof'] = evidence.artifact(outdir / 'loaded-parent-proof.json')
         plans = probe.prepare_plans(tokenizer, donors['request'], patient)
         require(plans == donors['plans'], 'Fresh tokenization differs from cached donor proof')
         off_position = off_target_position(tokenizer, plans['length_control'], patient)
         require(off_position == off_target_position(tokenizer, plans['cue'], patient),
                 'Semantic and neutral off-target positions differ')
         publish_json({'plans': plans, 'off_target_position': off_position}, outdir / 'tokenization-proof.json')
+        report['tokenization_proof'] = evidence.artifact(outdir / 'tokenization-proof.json')
         deltas = frozen_deltas(donors['cue'], donors['length_control'])
         timings, neutral_score, neutral_arrays = [], None, None
         specs = specifications(request['stage'], request['winner_group'])
@@ -436,6 +436,8 @@ def run_causal(request, lock, verified, donor_root, outdir, patient, source_requ
             report['loaded_parameter_sha256_after'] = after
             report['parameters_unchanged'] = after == before
             require(after == before, 'Parameters changed during activation experiment')
+            if verified.get('status') == 'baseline_verified':
+                assert_baseline_unchanged(verified)
             report['parameter_postcheck_complete'] = True
         except BaseException as caught:
             report['parameter_postcheck_complete'] = False
@@ -468,9 +470,10 @@ def main():
     signal.signal(signal.SIGALRM, expired); signal.alarm(1700)
     try:
         lock = load_lock(args.lock)
-        request, patient, source = (read_json(path) for path in (args.request, args.patient, args.source_request))
-        bindings = {'request_sha256': sha256(args.request), 'patient_sha256': sha256(args.patient),
-                    'source_request_sha256': sha256(args.source_request)}
+        captured = [read_bound_json(path) for path in (args.request, args.patient, args.source_request)]
+        request, patient, source = (item[0] for item in captured)
+        bindings = dict(zip(('request_sha256', 'patient_sha256', 'source_request_sha256'),
+                            (item[1] for item in captured)))
         validate_request(request, lock, patient_sha256=bindings['patient_sha256'],
                          source_request_sha256=bindings['source_request_sha256'])
         signal.alarm(max(1, int(request['budget']['max_wall_seconds'] - (time.monotonic() - started))))

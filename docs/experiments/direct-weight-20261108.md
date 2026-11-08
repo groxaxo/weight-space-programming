@@ -345,3 +345,17 @@ The [machine-readable findings](direct-weight-20261108.json) and
 [frozen records](direct-weight-20261108/README.md) preserve the positive evidence
 and failed gate together. The engineering boundary is implemented and tested;
 the model-repair objective remains unachieved.
+
+
+## Engineering follow-up: eight harness discrepancies
+
+The [subsequent repair report](../reviews/20261108-direct-harness-fixes.md)
+records fixes and regressions for authentication at consumption, frozen grader
+inputs, serialized host admission, interrupted-observer postchecks, all-arm
+completion, donor-gate recomputation, complete host evidence and EOS at the
+output cap. New host evidence has a separate version 2. Original protocols,
+raw results, source hashes and negative outcomes are preserved under their
+original identities; they are not rewritten to satisfy the newer verifier.
+The repairs required no new Qwen inference and do not alter this study's
+`STOP_controls_failed` result. Independent paired quality and a justified weight
+candidate remain `NOT_RUN`.

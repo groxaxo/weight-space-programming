@@ -50,7 +50,7 @@ def bundle(root):
     for context, values in arrays.items():
         with (root / (context + '-decision.npz')).open('xb') as handle:
             np.savez(handle, **values)
-    parameters = {f'parameter-{i}': 'd' * 64 for i in range(426)}
+    parameters = {name: 'd' * 64 for name in c.evidence.expected_parameter_names()}
     runtime = {'torch': 'test-torch', 'transformers': 'test-transformers', 'numpy': 'test-numpy',
                'cpu_reference_kernels': {'kind': 'test-pinned-reference'},
                'probe_sha256': c.sha256(Path(p.__file__)),

@@ -22,8 +22,9 @@ import numpy as np
 
 from direct_forward import load_text_model, parameter_sha256
 from direct_weights import (DEFAULT_LOCK, ValidationError, load_lock, parent_identity,
-                            publish_json, read_json, verify_baseline)
+                            publish_json, read_json, read_bound_json, verify_baseline, assert_baseline_unchanged)
 from pipeline import require, sha256, sync_directory
+import direct_evidence as evidence
 
 QUESTION = 'half_open_overlap-empty-interval-guard'
 FIRST_ASSERTION_QUESTION = 'half_open_overlap-first-semantic-assertion'
@@ -255,6 +256,44 @@ def reproduces_incorrect_operator(score):
         and score.get('correct_minus_incorrect_logprob', math.inf) < 0
 
 
+def validate_score(row):
+    """Check the raw joint-score arithmetic before using a cached verdict."""
+    require(type(row) is dict and row.get('status') == 'completed', 'Incomplete score row')
+    branches = row.get('branches')
+    keys(branches, set(LABELS), 'scored branches')
+    totals = {}
+    for label in LABELS:
+        branch = branches[label]
+        require(type(branch) is dict, 'Invalid score branch')
+        ids, values, total = (branch.get(k) for k in ('ids', 'token_logprobs', 'sequence_logprob'))
+        require(type(ids) is list and 0 < len(ids) <= 64
+                and all(type(token) is int and token >= 0 for token in ids), 'Invalid branch token IDs')
+        require(type(values) is list and len(values) == len(ids)
+                and all(type(value) in (int, float) and math.isfinite(value) and value <= 0 for value in values)
+                and type(total) in (int, float) and math.isfinite(total)
+                and math.isclose(sum(values), total, rel_tol=0, abs_tol=1e-9),
+                'Inconsistent joint token log probabilities')
+        totals[label] = total
+    require(branches['correct']['ids'] != branches['incorrect']['ids'], 'Identical scored branches')
+    value = row.get('correct_minus_incorrect_logprob')
+    require(type(value) in (int, float) and math.isfinite(value)
+            and math.isclose(value, totals['correct'] - totals['incorrect'], rel_tol=0, abs_tol=1e-9),
+            'Score margin does not match joint probabilities')
+    require(type(row.get('next_token_id')) is int and row['next_token_id'] >= 0,
+            'Missing greedy token identity')
+    if 'preferred_scored_branch' in row:
+        expected = 'correct' if value > 0 else 'incorrect' if value < 0 else 'tie'
+        require(row['preferred_scored_branch'] == expected, 'Preferred branch differs from score')
+
+
+def validate_context_scores(rows, contexts):
+    require(type(rows) is list and len(rows) == len(contexts)
+            and [row.get('id') for row in rows if type(row) is dict] == list(contexts),
+            'Missing, duplicate, reordered or unexpected donor context scores')
+    for row in rows:
+        validate_score(row)
+
+
 def first_assertion_gate(rows):
     """Fixed diagnostic stop rules; passing never authorizes a weight candidate."""
     by_name = {row['id']: row for row in rows if row.get('status') == 'completed'}
@@ -400,7 +439,9 @@ def run_forward(model, tokenizer, plan, outdir, name, *, arm=None, donors=None):
                       'input_tokens_per_sequence_max': length, 'decision_position': position,
                       'observation': observation.name, 'observation_sha256': publish_arrays(arrays, observation),
                       'activation_arm': arm, 'intervention': intervention})
-        publish_json(score, outdir / (name + '-score.json'))
+        score_path = outdir / (name + '-score.json')
+        publish_json(score, score_path)
+        score['score_artifact'] = evidence.artifact(score_path)
         return score, arrays
     except BaseException as error:
         if arrays:
@@ -440,12 +481,15 @@ def run_probe(request, lock, verified, outdir, patient, source_request, *, reque
               'weights_edited': False, 'training': False, 'arms': [],
               'controls_scope': 'Partial controls only: optional grouped self/cue replacements and strengths; '
                                 'no matched-random, irrelevant-position or reverse-transfer controls',
-              'scope': 'Conditional activation causality diagnostic; no weight candidate or quality gate'}
+              'scope': 'Conditional activation causality diagnostic; no weight candidate or quality gate',
+              **evidence.bindings(outdir)}
     error = None
     try:
         publish_json(report, outdir / 'loaded-parent-proof.json')
+        report['loaded_parent_proof'] = evidence.artifact(outdir / 'loaded-parent-proof.json')
         plans = prepare_plans(tokenizer, request, patient)
         publish_json(plans, outdir / 'tokenization-proof.json')
+        report['tokenization_proof'] = evidence.artifact(outdir / 'tokenization-proof.json')
         timings, donors = [], {}
         specifications = [(context, None) for context in required_contexts(request)] + [(arm['id'], arm) for arm in request['arms']]
         for index, (name, arm) in enumerate(specifications):
@@ -467,9 +511,10 @@ def run_probe(request, lock, verified, outdir, patient, source_request, *, reque
                 report['arms'].extend({'id': remaining, 'status': 'NOT_RUN_replay_mismatch'}
                                       for remaining, _ in specifications[index + 1:])
                 break
-        report['complete'] = all(any(row['id'] == name and row['status'] == 'completed'
+        report['contrast_complete'] = all(any(row['id'] == name and row['status'] == 'completed'
                                      for row in report['arms']) for name in required_contexts(request))
         report['all_requested_arms_completed'] = all(row['status'] == 'completed' for row in report['arms'])
+        report['complete'] = report['contrast_complete'] and report['all_requested_arms_completed']
         if request['schema_version'] == 2:
             report['diagnostic_gate'] = first_assertion_gate(report['arms'])
     except BaseException as caught:
@@ -482,6 +527,8 @@ def run_probe(request, lock, verified, outdir, patient, source_request, *, reque
             report['loaded_parameter_sha256_after'] = after
             report['parameters_unchanged'] = after == before
             require(after == before, 'Loaded parameter bytes changed during activation diagnosis')
+            if verified.get('status') == 'baseline_verified':
+                assert_baseline_unchanged(verified)
             report['parameter_postcheck_complete'] = True
         except BaseException as caught:
             report['parameter_postcheck_complete'] = False
@@ -514,9 +561,10 @@ def main():
     signal.alarm(ACTIVE_WALL_LIMIT)
     try:
         lock = load_lock(args.lock)
-        request, patient, source = (read_json(path) for path in (args.request, args.patient, args.source_request))
-        bindings = {'request_sha256': sha256(args.request), 'patient_sha256': sha256(args.patient),
-                    'source_request_sha256': sha256(args.source_request)}
+        captured = [read_bound_json(path) for path in (args.request, args.patient, args.source_request)]
+        request, patient, source = (item[0] for item in captured)
+        bindings = dict(zip(('request_sha256', 'patient_sha256', 'source_request_sha256'),
+                            (item[1] for item in captured)))
         validate_request(request, lock, patient, source, patient_sha256=bindings['patient_sha256'],
                          source_request_sha256=bindings['source_request_sha256'])
         signal.alarm(max(1, int(min(request['budget']['max_wall_seconds'], ACTIVE_WALL_LIMIT)

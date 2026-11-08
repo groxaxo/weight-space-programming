@@ -84,26 +84,16 @@ class CausalHostTests(unittest.TestCase):
                 patient=Path('/patient'), source_request=Path('/original'))
 
     def test_causal_result_must_bind_the_exact_stage_donors_and_unchanged_parent(self):
-        value = request()
-        report = {'request_sha256': 'f' * 64, 'protocol_sha256': value['protocol_sha256'],
-                'parent': {'model_id': MODEL_ID, 'revision': REVISION, 'lock_sha256': 'a' * 64},
-                'training': False, 'role': 'practice', 'status': 'practice_only',
-                'weights_edited': False, 'quality_evaluation': 'NOT_RUN',
-                'patient_sha256': value['patient_sha256'],
-                'source_request_sha256': value['source_request_sha256'],
-                'stage': 1, 'question': QUESTION, 'donor_files': value['donor_files'],
-                'parameters_unchanged': True, 'parameter_postcheck_complete': True, 'complete': True,
-                'loaded_parameter_sha256_before': {'weight': '0' * 64},
-                'loaded_parameter_sha256_after': {'weight': '0' * 64}}
+        from direct_evidence_fixtures import make_worker
         with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory); (output / 'causal').mkdir()
-            path = output / 'causal/result.json'; path.write_text(json.dumps(report))
-            self.assertTrue(host.worker_evidence(output, 'causal', value, 'f' * 64, 'a' * 64)['worker_complete'])
+            output = Path(directory)
+            value, report, path = make_worker(output, 'causal')
+            check = lambda: host.worker_evidence(output, 'causal', value, 'f' * 64, value['lock_sha256'])
+            self.assertTrue(check()['worker_complete'])
             for field, changed in [('stage', 2), ('donor_files', {}), ('weights_edited', True),
                                    ('loaded_parameter_sha256_after', {'weight': '1' * 64})]:
                 path.write_text(json.dumps({**report, field: changed}))
-                with self.subTest(field=field), self.assertRaises(ValidationError):
-                    host.worker_evidence(output, 'causal', value, 'f' * 64, 'a' * 64)
+                with self.subTest(field=field), self.assertRaises(ValidationError): check()
 
 
 if __name__ == '__main__':
