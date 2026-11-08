@@ -175,6 +175,38 @@ A durable same-user claim prevents accidentally starting a second correction.
 Another corrected harness fault ends the cycle without a further replay.
 This amendment supplies no coordinate choice, weight candidate or quality pass.
 
+## Cycle 2 semantic-specificity gate
+
+The corrected `f0b7bd3` two-episode batch reproduced the duplicate call with
+identical greedy tokens and all 426 protected parameters unchanged. This admits
+only the five exposed B/S/C/N/P semantic controls from the original plan.
+`scripts/direct_tool_specificity.py` independently revalidates all four old
+records against the pinned historical 13-source bank; current broker changes
+must not rewrite that bank or invalidate its provenance. Its own source and the
+separate host driver are additionally frozen. Never replace raw eligibility
+checks with the saved gate flag.
+
+Use `ops/direct_tool_specificity54.py` for preparation, the admitted tokenizer-only
+compiler and the five one-generation workers. Stage-1 mounts contain only the
+32 authenticated data files, read-only. C/N padding is a bounded tokenizer-only
+first lexicographic match; no score search or wording change. Capture three
+read-only positions at all 32 MLPs. Fresh B must reproduce both token sequences
+and all 64 original assistant-position vectors bit for bit.
+
+Freeze all five conditions before scores. An ordinary completed semantic failure
+irreversibly rejects localization, while the remaining controls still finish.
+Only infrastructure, censoring, source/integrity or budget failure aborts the
+remaining tranche. Preserve the shared lease, all-426 `finally` postchecks,
+one-core/10-GiB/1800-second maximum and the cumulative 13-generation/21600-second
+ceiling, including all failed and engineering work. The durable same-user Stage-2
+claim is evidence, not a disposable lock; never unlink it to retry.
+
+Only a complete pass admits the separately frozen geometry/causal stages; it
+does not admit a weight candidate. A failed gate admits no feature selection,
+weaker cue, alternate support, fitted delta, independent final run or promotion.
+The Sol max custodian receives only a later eligible immutable candidate under
+its public contract. No candidate means final paired quality stays `NOT_RUN`.
+
 ## Audited worker invariants
 
 The eight audited harness repairs are documented in
