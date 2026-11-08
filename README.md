@@ -52,6 +52,13 @@ records the authenticated historical evidence boundary, three-position capture,
 CPU sandbox, cumulative accounting and regression checks. The original BF16
 checkpoint remains the reference; no direct-edit model has been promoted.
 
+The [comparison with six related GitHub repositories](docs/reviews/20261108-related-direct-editing-repositories.md)
+checks these method boundaries against actual source. Forward intervention and
+matched evaluation are useful references; ROME/MEMIT target optimization and a
+popular one-neuron framework's fitted-probe/LoRA paths do not satisfy this
+project's no-gradient contract. The review also separates our local sparse-edit
+hypothesis from upstream requirements and labels the historical client examples.
+
 **Historical coding track:** the preserved LoRA/QLoRA work contains authenticated model snapshots, licensed corpora, assistant-only loss masks, adapter selection, serving, executable coding/tool checks, HumanEval and OpenCode/Hermes fixtures. Those artifacts and results remain useful records, but they are not implementations of the active no-training method. Legacy training, supervised-corpus preparation and trained-derivative CLI entry points are guarded by `scripts/method_policy.py`. See [the historical coding-assistant workflow](docs/coding-assistant.md).
 
 **Scope:** the original `0be1a86` wrapper reconstructs an existing 0.8B patch; it does not discover a repair. Its selected coordinates are never transferred to 4B. Model quality requires matched reports and independent evaluation, beyond successful reconstruction or a valid numeric patch. The exposed HE9/development/client fixtures are regressions, not a fresh untouched holdout. No result here establishes frontier-model equivalence.

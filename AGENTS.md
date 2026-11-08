@@ -254,6 +254,22 @@ training, a new hypothesis, a weight candidate, model promotion or cleanup.
 
 ## Preservation and claims
 
+The external-source comparison is in
+`docs/reviews/20261108-related-direct-editing-repositories.md`. Inspect the whole
+construction pipeline behind a training-free claim: optimizing a probe or target
+activation still violates this project's no-gradient/optimizer rule even if the
+base model stays frozen. ROME/MEMIT target optimizers and weight-patching's
+LBFGS-fitted gate/LoRA `all` workflow are not authorized alternatives. Fixed
+forward interventions may inform a separately reviewed protocol; no external
+framework, architecture mapping or coordinate selection is implicitly trusted.
+
+The one-layer/eight-column deletion and dominance/support limits are local
+Cycle 2 hypotheses, not upstream mandates or a general discovery algorithm.
+Their failed result stays closed. A future contract may be reviewed separately;
+this comparison admits no broader edit, training restart, new holdout exposure
+or model promotion. Historical client examples are labelled in
+`examples/README.md`; their example limits are not native acceptance evidence.
+
 Preserve all originals, intermediate artifacts, staging files, manifests,
 observations and failures. No cleanup is authorized. Do not delete a path because
 it is called cache/train/reports, rejected or apparently unused. Any separate
