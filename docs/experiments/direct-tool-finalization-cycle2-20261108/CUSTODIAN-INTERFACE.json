@@ -1,0 +1,385 @@
+{
+  "schema_version": 1,
+  "protocol_id": "direct-cycle2-independent-acceptance-20261108-v1",
+  "prepared_on": "2026-11-08",
+  "kind": "public_interface_and_preregistration_only",
+  "implementation_status": "SPECIFICATION_ONLY_NOT_IMPLEMENTED",
+  "companion_document": "docs/plans/direct-cycle2-independent-acceptance-20261108.md",
+  "status": {
+    "qualified_candidate_supplied": false,
+    "candidate_admission": "NOT_RUN",
+    "hidden_material_created": false,
+    "model_calls": 0,
+    "independent_paired_quality": "NOT_RUN",
+    "quantized_acceptance": "NOT_RUN",
+    "native_opencode_acceptance": "NOT_RUN",
+    "native_hermes_acceptance": "NOT_RUN",
+    "publication": "NOT_RUN"
+  },
+  "custodian_identity": {
+    "canonical_task": "/root/independent_custodian",
+    "reported_actual_spawn_args": {
+      "model": "gpt-6.1-sol",
+      "reasoning_effort": "max",
+      "fork_turns": "none",
+      "task_name": "independent_custodian"
+    },
+    "spawn_evidence": "orchestrator_report_of_actual_invocation",
+    "independent_provider_attestation": false,
+    "scientific_surgeon": false,
+    "boundary": "user_selected_separate_agent_context",
+    "same_os_user_and_tools": true,
+    "adversarial_os_or_acl_boundary_claimed": false,
+    "initial_project_reads_only": [
+      "AGENTS.md",
+      "docs/direct-paired-acceptance.md",
+      "configs/qwen35-4b-direct.lock.json"
+    ],
+    "additional_required_skill_reads": [
+      "/Users/op/.codex/skills/repo-investigator/SKILL.md",
+      "/Users/op/.codex/skills/git-safety/SKILL.md"
+    ],
+    "excluded_material": [
+      "development_prompts_answers_and_raw_outputs",
+      "evaluate_coder.py",
+      "existing_benchmark_HE9_and_client_fixtures",
+      "candidate_selection_scores",
+      "prior_training_data",
+      "other_agents_files"
+    ]
+  },
+  "source_authority": {
+    "local_source_snapshot_has_git_metadata": false,
+    "primary_owns_sync_commits_and_publication": true,
+    "policy_sha256": "e902d99700a2e56ac165e4ece5dd6555fd20dbc9eaa9fa717e499d0ff695a4d4",
+    "paired_acceptance_policy_sha256": "8058560b9896403e3711a08d47137c03a25e4289d944b86e44bfdb527d7c7a60",
+    "policy_hashes_attest_only_to_read_file_bytes": true
+  },
+  "parent": {
+    "model_id": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "lock_path": "configs/qwen35-4b-direct.lock.json",
+    "lock_sha256": "6058685c1842ee36e24fcb17131ae072332c8cf1e679189e7eaeff4765a2eb8b",
+    "dtype": "BF16",
+    "locked_files_to_fully_authenticate_before_model_execution": 12,
+    "language_parameter_names_to_authenticate": 426,
+    "evidence_schema_version": 2,
+    "shards_freshly_authenticated_at_this_handoff": false,
+    "exact_consumed_file_generation_and_before_after_stability_required": true,
+    "read_only_shared_blobs_and_baseline_descriptors": true
+  },
+  "freeze_contract": {
+    "manifest_name": "FREEZE.json",
+    "required_bound_inputs": [
+      "this_interface_exact_bytes",
+      "companion_preregistration_exact_bytes",
+      "parent_lock_exact_bytes",
+      "one_strict_numeric_sparse_BF16_candidate",
+      "candidate_before_after_words_tensor_hashes_counts_and_norms",
+      "immutable_producer_source_archive",
+      "new_hypothesis_failure_and_finite_control_review_receipt",
+      "non_fitting_derivation_and_no_training_provenance_review",
+      "complete_exposed_family_exclusion_ledger_and_case_fingerprints",
+      "frozen_exposed_regression_manifest_and_results",
+      "RUNTIME.lock.json",
+      "trusted_plumbing_source_and_container_identities"
+    ],
+    "every_input_requires": ["sha256", "byte_size", "captured_exact_bytes"],
+    "placeholder_hashes_allowed": false,
+    "candidate_count": 1,
+    "actual_changed_entries_must_be_positive": true,
+    "late_candidate_replacement_allowed": false,
+    "scientific_review_required_beyond_numeric_schema": true,
+    "prior_closed_control_study_can_be_reopened": false,
+    "candidate_data_may_be_executed_or_unpickled": false,
+    "independent_numeric_recomputation_required": true,
+    "permitted_support": {
+      "tensor_name_pattern": "model.language_model.layers.{0..31}.mlp.down_proj.weight",
+      "dtype": "BF16",
+      "shape": [2560, 9216],
+      "max_tensors": 4,
+      "max_selected_entries_per_tensor": 65536,
+      "max_selected_entries_total": 65536,
+      "max_selected_fraction": 0.01,
+      "max_absolute_delta": 0.125,
+      "max_relative_l2_delta": 0.05
+    },
+    "candidate_application": "one_private_verified_language_model_memory_copy",
+    "protected_parameter_hash_checks_in_finally": true
+  },
+  "data_custody": {
+    "creation_condition": "qualified_candidate_interface_runtime_and_exposure_identities_frozen_and_admitted",
+    "custodian_authors_new_tasks_references_graders_aggregation_and_checker_selftests": true,
+    "surgeon_test_reuse_as_independent_checking_allowed": false,
+    "all_hidden_material_frozen_before_either_arm": true,
+    "public_task_ids": "T001..T024",
+    "private_family_definition": [
+      "core_problem_and_invariant",
+      "solution_dependencies",
+      "generator_or_template_ancestry",
+      "equivalent_transformations"
+    ],
+    "surface_paraphrase_or_new_constants_create_new_family": false,
+    "disjoint_from_all_exposed_families_and_mutually_disjoint": true,
+    "uncertain_disjointness_action": "DO_NOT_SEAL",
+    "public_commitment": "sha256(canonical_private_manifest_with_private_fresh_32_byte_nonce)",
+    "publicly_permitted": [
+      "this_interface",
+      "opaque_task_ids",
+      "salted_manifest_and_code_commitments",
+      "one_final_permitted_aggregate"
+    ],
+    "not_disclosed_to_surgeon_or_primary": [
+      "hidden_prompts",
+      "reference_answers",
+      "semantic_family_names_or_mapping",
+      "grader_internals",
+      "raw_outputs",
+      "per_case_scores",
+      "intermediate_final_scores"
+    ],
+    "selection_exposure_breach_action": "REJECT_CUSTODY_CLAIM_AND_RETIRE_SET",
+    "future_audit": "private_evidence_retained_for_later_user_authorized_independent_audit"
+  },
+  "task_contract": {
+    "cases": 24,
+    "families": 8,
+    "cases_per_family": 3,
+    "domain": "small_deterministic_Python311_tasks_with_frozen_recorded_tool_result_context",
+    "live_external_tools": false,
+    "function_entrypoint": "solve(data)",
+    "response": {
+      "format": "strict_JSON_object",
+      "exact_keys": ["solution_py", "final"],
+      "solution_py_type": "string_containing_self_contained_Python_source",
+      "final_type": "nonempty_string",
+      "final_max_unicode_characters": 256,
+      "extra_keys_prose_fences_or_fallback_extraction": false
+    },
+    "protected_checks_per_case": 12,
+    "boundary_checks_per_case": 4,
+    "seeded_property_or_generated_checks_per_case": 8,
+    "reference_oracle_and_predeclared_incorrect_mutation_checks_before_model_run": true,
+    "output_influenced_test_selection_allowed": false
+  },
+  "paired_protocol": {
+    "arms": ["official_original_BF16", "one_frozen_candidate_BF16"],
+    "seeds_per_case": 1,
+    "seed_formula": "1009 + 37*(integer(task_id[1:])-1)",
+    "same_case_seed_for_both_arms": true,
+    "order_sort_key": "sha256(UTF8('cycle2-independent-order-v1:' + task_id))",
+    "zero_based_even_position_arm_order": ["original", "candidate"],
+    "zero_based_odd_position_arm_order": ["candidate", "original"],
+    "cases_per_arm_order": 12,
+    "model_generations": 48,
+    "attempts_per_case_arm": 1,
+    "fresh_process_and_empty_state_and_KV_per_case_arm": true,
+    "grader_blinded_to_arm": true,
+    "adaptive_retries_best_of_or_selective_completion": false,
+    "runtime_requires_frozen_exact_identities": [
+      "backend_and_libraries",
+      "container_digest",
+      "platform",
+      "source_archives",
+      "official_tokenizer_and_template",
+      "effective_template_arguments",
+      "tokenization_and_EOS_IDs",
+      "effective_sampler"
+    ],
+    "effective_generation": {
+      "dtype": "BF16",
+      "thinking": "off",
+      "do_sample": false,
+      "temperature": 0,
+      "top_p": 1,
+      "repetition_penalty": 1,
+      "max_rendered_input_tokens": 1024,
+      "max_new_tokens": 256,
+      "context_capacity_tokens": 1280,
+      "generation_wall_seconds": 480,
+      "unsupported_settings_action": "DO_NOT_RUN"
+    }
+  },
+  "resource_contract": {
+    "host": "100.85.200.54",
+    "model_worker_cpu_cores": 1,
+    "model_worker_memory_GiB_max": 10,
+    "GPU_admitted": false,
+    "concurrent_model_workers": 1,
+    "worker_seconds_max": 1800,
+    "progress_inspection_seconds_max": 300,
+    "required_maximum_progress_gap_seconds": 600,
+    "phase_seconds_max": {
+      "authentication": 300,
+      "loading_and_before_parameter_proof": 450,
+      "generation": 480,
+      "evidence_flush": 60,
+      "all_parameter_postcheck": 360,
+      "confirmed_shutdown": 150
+    },
+    "generation_may_consume_postcheck_or_shutdown_reserve": false,
+    "host_user_shared_lease_before_resource_sampling_through_confirmed_exit": true,
+    "per_worker_live_resource_admission": true,
+    "existing_ops_broker_currently_supports_final_candidate_role": false,
+    "required_entrypoint_after_implementation_and_audit": "ops/direct_edit54.py",
+    "direct_heavy_worker_bypass_allowed": false,
+    "grader_sandbox": {
+      "Python": "3.11_exact_patch_and_image_to_be_frozen",
+      "cpu_cores": 1,
+      "memory_MiB_max": 256,
+      "seconds_per_check_max": 2,
+      "seconds_per_trial_max": 60,
+      "network_secrets_checkpoint_or_host_write_mounts": false
+    },
+    "model_workers_per_batch_max": 48,
+    "model_worker_wall_seconds_sum_max": 86400,
+    "grading_wall_seconds_sum_max": 2880,
+    "end_to_end_batch_seconds_max": 90000,
+    "admission_granted_by_this_document": false,
+    "cannot_fit_action": "NOT_RUN",
+    "service_changes_job_interruptions_VM_reuse_or_cleanup_authorized": false
+  },
+  "scoring": {
+    "primary_metric": "paired_executable_pass_rate_gain",
+    "case_arm_pass_requires": [
+      "complete_attributed_generation_with_observed_allowed_EOS",
+      "strict_response_and_finalization_valid",
+      "Python_compiles",
+      "all_12_protected_executable_checks_pass"
+    ],
+    "valid_model_failures_scored_zero_in_full_denominator": [
+      "token_cap_without_EOS",
+      "generation_wall_timeout",
+      "unexplained_short_stop",
+      "invalid_response",
+      "compile_failure",
+      "protected_check_failure"
+    ],
+    "EOS_at_last_allowed_token_is_complete": true,
+    "preserve_actual_EOS_IDs_tokens_stop_reason_and_censor_flags": true,
+    "raw_EOS_evidence_overrides_contradictory_cap_flag": true,
+    "invalid_batch_conditions": [
+      "missing_or_duplicate_trial",
+      "identity_or_attribution_mismatch",
+      "parent_or_source_instability",
+      "oracle_fault",
+      "infrastructure_or_resource_failure",
+      "unsupported_effective_runtime",
+      "postcheck_failure",
+      "lost_raw_record"
+    ],
+    "invalid_batch_verdict": "NOT_RUN",
+    "partial_evidence_preserved": true,
+    "independent_denominator": 24,
+    "pair_count_names": {
+      "R": "original_fail_candidate_pass",
+      "L": "original_pass_candidate_fail",
+      "B": "both_pass",
+      "F": "both_fail"
+    },
+    "delta_formula": "(R-L)/24",
+    "full_pair_count_invariant": "R+L+B+F == 24",
+    "family_difference": "sum(candidate_pass-original_pass)/3",
+    "sign_test": {
+      "unit": "semantic_family",
+      "K": "number_of_positive_family_differences",
+      "M": "number_of_nonzero_family_differences",
+      "sidedness": "one_sided",
+      "p_formula": "sum(comb(M,j) for j in range(K,M+1))/2**M; 1 if M==0",
+      "alpha": 0.05,
+      "uncertainty": "exact_one_sided_95_percent_Clopper_Pearson_lower_bound_for_Pr_positive_given_nonzero_family_difference",
+      "lower_bound_when_K_zero": 0,
+      "assumption": "registered_distinct_family_sampling_and_exchangeability",
+      "population_pass_rate_magnitude_confidence_interval_claimed": false
+    },
+    "acceptance_all_required": {
+      "integrity_and_all_24_pairs_complete": true,
+      "minimum_delta": 0.125,
+      "maximum_task_regressions_L": 0,
+      "minimum_improved_families": 5,
+      "maximum_worsened_families": 0,
+      "maximum_exact_family_sign_p": 0.05,
+      "directional_95_percent_lower_bound_strictly_greater_than": 0.5,
+      "maximum_unexplained_base_solved_exposed_regression_losses": 0
+    },
+    "exposed_regressions": {
+      "previous_development_cases": 14,
+      "HE9_and_client_cases": "exact_selected_ids_counts_and_hashes_must_be_in_frozen_manifest",
+      "untouched_holdout": false,
+      "included_in_independent_denominator": false
+    },
+    "permitted_verdicts": ["PASS_BOUNDED_BF16_SCREEN", "REJECT", "NOT_RUN"],
+    "valid_failed_final_action": "REJECT_AND_RETIRE_SET_NEW_CYCLE_AND_NEW_CONFIRMATION_DATA_REQUIRED",
+    "invalid_attempt_set_action": "RETAIN_PARTIAL_EVIDENCE_AND_RETIRE_SET_FROM_CONFIRMATION",
+    "no_candidate_action": "NOT_RUN",
+    "no_op_or_simulated_final_comparison_allowed": false,
+    "limitations": [
+      "small_low_power_short_CPU_screen",
+      "ties_reduce_effective_family_sample_size",
+      "non_significance_is_not_equivalence",
+      "no_broad_population_quality_or_magnitude_claim",
+      "no_native_or_quantized_acceptance_claim"
+    ]
+  },
+  "audit": {
+    "exact_input_output_tokens_bytes_and_source_identities_captured_before_execution": true,
+    "private_append_only_artifacts_and_sha256_manifest": true,
+    "independent_record_recomputation_required": true,
+    "checker_engineering_selftests": [
+      "schema_rejection",
+      "arm_blinding",
+      "missing_duplicate_and_identity_mismatched_rows",
+      "token_cap_and_EOS_at_last_token",
+      "known_pass_and_fail_generated_programs",
+      "altered_inputs",
+      "exact_statistic_and_lower_bound"
+    ],
+    "public_aggregate_fields": [
+      "freeze_runtime_parent_candidate_and_code_identities",
+      "salted_private_manifest_commitment",
+      "arm_pass_counts_and_full_denominator",
+      "R_L_B_F_and_delta",
+      "positive_negative_tied_family_counts_K_M",
+      "exact_family_sign_p_directional_lower_bound_and_assumptions",
+      "censor_and_error_counts_by_arm",
+      "integrity_completeness_resources_and_partial_status",
+      "independent_screen_verdict",
+      "exposed_regression_verdict",
+      "limitations_and_separate_gate_status"
+    ],
+    "hashes_alone_attest_to_hidden_data_or_grader_soundness": false
+  },
+  "separate_gates": {
+    "quantized_pair_required_after_BF16": true,
+    "native_clients": ["OpenCode", "Hermes"],
+    "native_context_tokens": 262144,
+    "native_KV": "Q8",
+    "native_output_allowance_tokens": 28192,
+    "effective_native_sampler_template_backend_and_client_identities_required": true,
+    "fresh_VM_Opencode_requires_new_admitted_VM_and_preinstall_absence_evidence": true,
+    "short_CPU_BF16_certifies_native_profile": false,
+    "publication_promotion_owned_by_primary_and_requires_all_required_gates": true
+  },
+  "prospective_cli": {
+    "entrypoint": ["python3", "-m", "weight_space_independent_acceptance"],
+    "currently_implemented": false,
+    "commands": {
+      "verify-freeze": ["--interface", "--freeze", "--out"],
+      "seal-tests": ["--admission", "--private-root", "--out"],
+      "run-paired": ["--admission", "--sealed-set", "--resource-admission", "--private-root", "--out"],
+      "audit-aggregate": ["--public-result", "--private-root", "--out"]
+    },
+    "run_arm_selector_candidate_override_prompt_override_seed_override_or_output_regeneration_allowed": false,
+    "reconcile_existing_exact_bytes_without_regeneration_allowed": true,
+    "exit_zero_means": "engineering_operation_completed_not_scientific_acceptance"
+  },
+  "handoff": {
+    "write_scope_only": [
+      "docs/plans/direct-cycle2-independent-acceptance-20261108.md",
+      "docs/experiments/direct-tool-finalization-cycle2-20261108/CUSTODIAN-INTERFACE.json"
+    ],
+    "stop_after_initial_protocol_handoff": true,
+    "resume_only_on_explicit_frozen_candidate_invocation": true,
+    "model_jobs_hidden_case_creation_commits_or_pushes_at_initial_handoff": false
+  }
+}

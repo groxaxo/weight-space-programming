@@ -23,6 +23,15 @@ EOS handling. New worker acceptance requires source-bound evidence schema 2.
 These engineering repairs preserve the negative scientific result above; they
 introduce no weight candidate or independent quality claim.
 
+A [new tool-finalization hypothesis](docs/plans/direct-tool-finalization-cycle2-20261108.md)
+is separately preregistered: test whether the unchanged BF16 model repeats a
+completed failed-test call before investigating a sparse persistent-action write.
+The initial gate uses two fresh full episodes and at most four CPU generation
+invocations; it permits no weight edits. A separate user-selected
+[Sol max custodian](docs/plans/direct-cycle2-independent-acceptance-20261108.md)
+defines later independent paired acceptance. No candidate or new quality result
+is established at this protocol freeze.
+
 **Historical coding track:** the preserved LoRA/QLoRA work contains authenticated model snapshots, licensed corpora, assistant-only loss masks, adapter selection, serving, executable coding/tool checks, HumanEval and OpenCode/Hermes fixtures. Those artifacts and results remain useful records, but they are not implementations of the active no-training method. Legacy training, supervised-corpus preparation and trained-derivative CLI entry points are guarded by `scripts/method_policy.py`. See [the historical coding-assistant workflow](docs/coding-assistant.md).
 
 **Scope:** the original `0be1a86` wrapper reconstructs an existing 0.8B patch; it does not discover a repair. Its selected coordinates are never transferred to 4B. Model quality requires matched reports and independent evaluation, beyond successful reconstruction or a valid numeric patch. The exposed HE9/development/client fixtures are regressions, not a fresh untouched holdout. No result here establishes frontier-model equivalence.

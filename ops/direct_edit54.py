@@ -149,6 +149,9 @@ def validate_host_request(request, mode, lock_hash):
         require(type(request.get('budget', {}).get('max_wall_seconds')) is int
                 and request['budget']['max_wall_seconds'] <= 1700,
                 'Diagnostic must leave postcheck/stop time inside the 1800-second worker maximum')
+    if mode == 'tool-observe':
+        from direct_tools import validate_request
+        validate_request(request, {'_sha256': lock_hash})
     if mode == 'causal':
         from direct_causal import validate_request
         validate_request(request, {'_sha256': lock_hash},
@@ -189,9 +192,9 @@ def mounted_files(lock, baseline):
 
 
 def container_command(name, code, deps, model_files, output, request, memory_bytes, mode,
-                      patient=None, source_request=None, donors=None):
+                      patient=None, source_request=None, donors=None, episode=None):
     require(re.fullmatch(r'wsp-direct-[a-z0-9-]{1,80}', name) is not None, 'Unsafe container name')
-    require(mode in ('verify', 'observe', 'probe', 'causal'), 'Unsupported worker mode')
+    require(mode in ('verify', 'observe', 'probe', 'causal', 'tool-observe'), 'Unsupported worker mode')
     command = ['docker', 'run', '--name', name, '--pull', 'never', '--network', 'none',
                '--read-only', '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges',
                '--pids-limit', '64', '--memory', str(memory_bytes), '--memory-swap', str(memory_bytes),
@@ -213,12 +216,18 @@ def container_command(name, code, deps, model_files, output, request, memory_byt
     if mode == 'causal':
         require(donors is not None, 'Causal worker needs frozen donor artifacts')
         mounts.append((str(donors), '/donors'))
+    if mode == 'tool-observe' and episode is not None:
+        mounts.append((str(episode), '/episode'))
     for source, target in mounts:
         require(',' not in source, 'Comma in bind path is unsupported')
         command.extend(['--mount', f'type=bind,source={source},target={target},readonly'])
     require(',' not in str(output), 'Comma in output path is unsupported')
     command.extend(['--mount', f'type=bind,source={output},target=/out', IMAGE, 'python', '-u'])
-    if mode == 'causal':
+    if mode == 'tool-observe':
+        command.extend(['scripts/direct_tools.py', '--request', '/request.json', '--output', '/out/worker.json'])
+        if episode is not None:
+            command.extend(['--episode', '/episode'])
+    elif mode == 'causal':
         command.extend(['scripts/direct_causal.py', '--request', '/request.json', '--patient', '/patient.json',
                         '--source-request', '/source-request.json', '--donors', '/donors',
                         '--output', '/out/causal', '--base', '/model'])
@@ -289,7 +298,11 @@ def worker_evidence(output, mode, request, request_hash, lock_hash, *, source_ha
     require(lock['_sha256'] == lock_hash, 'Host result uses a different official parent lock')
     source_hashes = evidence_contract.SOURCE_AT_IMPORT if source_hashes is None else source_hashes
     evidence_contract.verify_common(path.parent, mode, report, lock=lock, source_hashes=source_hashes)
-    if mode == 'observe':
+    if mode == 'tool-observe':
+        from direct_tools import observer_request, verify_tool_evidence
+        evidence_contract.verify_observation(path.parent, report, observer_request(request))
+        verify_tool_evidence(path.parent, report, request, lock)
+    elif mode == 'observe':
         evidence_contract.verify_observation(path.parent, report, request)
     elif mode in ('probe', 'causal'):
         evidence_contract.verify_arms(path.parent, mode, report, request)
@@ -300,13 +313,14 @@ def worker_evidence(output, mode, request, request_hash, lock_hash, *, source_ha
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('status', 'verify', 'observe', 'probe', 'causal'))
+    parser.add_argument('mode', choices=('status', 'verify', 'observe', 'probe', 'causal', 'tool-observe'))
     parser.add_argument('--baseline', type=Path)
     parser.add_argument('--deps', type=Path, help='Existing Python 3.12 site-packages, mounted read-only')
     parser.add_argument('--request', type=Path, help='Frozen numerical/practice request, never executable Python')
     parser.add_argument('--patient', type=Path, help='Completed exposed generation, required for a decision probe')
     parser.add_argument('--source-request', type=Path, help='Original frozen practice request for the patient')
     parser.add_argument('--donors', type=Path, help='Bounded completed practice evidence for causal controls')
+    parser.add_argument('--episode', type=Path, help='Prior actual initial worker-output; frozen read-only for continuation')
     parser.add_argument('--lock', type=Path, default=ROOT / 'configs/qwen35-4b-direct.lock.json')
     parser.add_argument('--output', type=Path, required=True, help='New private run directory')
     args = parser.parse_args()
@@ -321,7 +335,7 @@ def main():
     require(args.baseline is not None and args.deps is not None and args.request is not None,
             'baseline, deps and request are required')
     request, frozen_request_hash, request_bytes = read_bound_json(args.request)
-    memory_bytes = (10 * GIB if args.mode in ('observe', 'probe', 'causal') else GIB)
+    memory_bytes = (10 * GIB if args.mode in ('observe', 'probe', 'causal', 'tool-observe') else GIB)
     try:
         with WorkerLease(args.output) as lease:
             state = resources(args.output)
@@ -357,17 +371,26 @@ def main():
                 require(args.donors is not None, 'Causal worker requires donor artifacts')
                 frozen_donors = args.output / 'donors'
                 freeze_donors(args.donors, frozen_donors, request)
+            frozen_episode = None
+            if args.mode == 'tool-observe' and request['phase'] == 'continuation':
+                from direct_tools import copy_capsule
+                require(args.episode is not None, 'Continuation requires the actual initial episode')
+                frozen_episode = args.output / 'episode'
+                copy_capsule(args.episode, frozen_episode, request)
+            elif args.mode == 'tool-observe':
+                require(args.episode is None, 'Initial generation cannot consume a substituted episode')
             worker_output = args.output / 'worker-output'
             worker_output.mkdir(mode=0o700)
             command = container_command(name, frozen_source.resolve(), args.deps.resolve(strict=True), model_files,
                                         worker_output.resolve(), frozen_request.resolve(), memory_bytes, args.mode,
                                         patient=frozen_patient, source_request=frozen_source_request,
-                                        donors=frozen_donors.resolve() if frozen_donors is not None else None)
+                                        donors=frozen_donors.resolve() if frozen_donors is not None else None,
+                                        episode=frozen_episode.resolve() if frozen_episode is not None else None)
             write_new(args.output / 'invocation.json', {'schema_version': 1, 'mode': args.mode,
                       'container': name, 'command': command, 'request_sha256': frozen_request_hash,
                       'source_sha256': source_hashes, 'model_file_mounts': model_files,
                       'training': False, 'gpu': False, 'service_control': False})
-            timeout = MAX_WORKER_SECONDS if args.mode in ('observe', 'probe', 'causal') else 900
+            timeout = MAX_WORKER_SECONDS if args.mode in ('observe', 'probe', 'causal', 'tool-observe') else 900
             with (args.output / 'console.log').open('x') as log:
                 lease.launching(name, memory_bytes)
                 child = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT)

@@ -219,7 +219,7 @@ def completion_status(generated, maximum, model, tokenizer):
             'censored': not ended, 'eos_token_ids': sorted(eos)}
 
 
-def observe(request, lock, verified, outdir):
+def observe(request, lock, verified, outdir, *, prompt_builder=None):
     import numpy as np
     import torch
     started = time.monotonic()
@@ -242,12 +242,19 @@ def observe(request, lock, verified, outdir):
         torch.manual_seed(request['generation']['seed'])
         report['loaded_parent_proof'] = evidence.artifact(outdir / 'loaded-parent-verification.json')
         for case in request['cases']:
-            ids = tokenizer.apply_chat_template(case['messages'], tokenize=True, add_generation_prompt=True,
-                                                enable_thinking=False, return_tensors='pt')
+            prompt_proof = None
+            if prompt_builder is None:
+                ids = tokenizer.apply_chat_template(case['messages'], tokenize=True, add_generation_prompt=True,
+                                                    enable_thinking=False, return_tensors='pt')
+            else:
+                ids, proof = prompt_builder(tokenizer, case)
+                prompt_path = outdir / (case['id'] + '-prompt.json')
+                write_new(prompt_path, proof)
+                prompt_proof = evidence.artifact(prompt_path)
             # New tokenizer APIs may return a BatchEncoding rather than the tensor.
             if not isinstance(ids, torch.Tensor):
                 ids = ids['input_ids']
-            require(ids.ndim == 2 and ids.shape[0] == 1 and ids.shape[1] <= 256,
+            require(ids.ndim == 2 and ids.shape[0] == 1 and ids.shape[1] <= request['generation']['max_input_tokens'],
                     'Practice input exceeds the frozen CPU diagnostic token limit')
             arrays, hooks = {}, []
             def capture(layer):
@@ -291,11 +298,14 @@ def observe(request, lock, verified, outdir):
             generated = output[0, ids.shape[1]:].tolist()
             results.append({'id': case['id'], 'input_ids': ids[0].tolist(),
                             'output_ids': generated, 'text': tokenizer.decode(generated, skip_special_tokens=True),
+                            'text_with_special_tokens': tokenizer.decode(generated, skip_special_tokens=False),
                             'input_tokens': ids.shape[1], 'generated_tokens': len(generated),
                             **completion_status(generated, request['generation']['max_new_tokens'], model, tokenizer),
                             'seconds': time.monotonic() - begin,
                             'observation_sha256': sha256(observation), 'observation': observation.name,
                             'observation_position': 'last prompt token, first prefill; all 32 down_proj inputs/outputs'})
+            if prompt_proof is not None:
+                results[-1]['prompt_proof'] = prompt_proof
             generation = outdir / (case['id'] + '-generation.json')
             write_new(generation, results[-1])
             results[-1]['generation_sha256'] = sha256(generation)

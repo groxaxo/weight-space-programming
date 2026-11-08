@@ -110,6 +110,42 @@ Short diagnostic contexts cannot establish the native client's 262,144 context,
 Q8 K/V or 28,192 output profile. Quantized conversion and deployment require their
 own pinned original-versus-edited paired experiment after BF16 evidence.
 
+## Authorized new cycle: tool finalization
+
+On 8 November the user authorized a new direct-weight hypothesis and independent
+paired testing. Follow `docs/plans/direct-tool-finalization-cycle2-20261108.md`
+and `configs/direct-tool-finalization-cycle2.protocol.json`; the previous
+interval hypothesis remains closed. The new claim concerns retiring a completed
+failed-test action. A native Q8 failure is not a BF16 defect until reproduced.
+
+The initial tranche permits only two fresh full BF16 episodes, at most four
+generation invocations, one per admitted CPU worker. The initial tool call must
+be generated spontaneously. Continuations must authenticate the complete actual
+initial episode capsule; do not supply a repaired or historical assistant call.
+Use `ops/direct_tool_cycle54.py` through the shared broker, after the frozen
+`ops/direct_tool_preflight54.py` template/parser check. Preserve exact system,
+tool schema, result bytes, lossless argument normalization, raw special tokens,
+actual parser-assigned call IDs and their tokenization invariance. Require
+agreement with the independent bounded parser check. Keep all 426 parameter
+postchecks and a 450-second postcheck/exit reserve inside each worker.
+
+Both valid episodes finish regardless of the first continuation's score. Either
+correct final JSON rejects the BF16 duplicate-action hypothesis; another failure
+phenotype, censoring or a harness fault also prevents localization. No new layer,
+feature, weight, strength or candidate selection follows a failed gate. Later
+stages are conditional on their separately frozen complete controls, measured
+admission and cumulative budget. The only conditional candidate is a causally
+proven existing sparse write deletion; fitting and clipping fallbacks are barred.
+
+The scientific surgeon remains `gpt-6.1-sol` with `xhigh` reasoning. The user
+separately selected a Codex `gpt-6.1-sol` **max** independent custodian. Its public
+contract is `docs/plans/direct-cycle2-independent-acceptance-20261108.md`. Keep
+its context, private cases, answers, grading and intermediate final scores out
+of candidate selection. This is separate-agent custody under the same OS user,
+not an adversarial OS boundary. No hidden set is created before one eligible
+candidate and all interfaces are frozen. No candidate means final paired quality
+is `NOT_RUN`; the current practice broker does not become a final evaluator.
+
 ## Audited worker invariants
 
 The eight audited harness repairs are documented in

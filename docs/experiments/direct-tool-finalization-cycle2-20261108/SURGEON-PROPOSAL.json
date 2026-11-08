@@ -1,0 +1,235 @@
+{
+  "proposal_schema_version": 1,
+  "cycle": "direct-tool-finalization-cycle2-20261108",
+  "status": "PROPOSED_NOT_RUN",
+  "created_at_utc": "2026-11-08T07:31:50.107346+00:00",
+  "surgeon": {
+    "task": "/root/direct_tool_surgeon",
+    "actual_spawn_arguments": {
+      "task_name": "direct_tool_surgeon",
+      "fork_turns": "none",
+      "model": "gpt-6.1-sol",
+      "reasoning_effort": "xhigh"
+    },
+    "returned_identity": {
+      "task_name": "/root/direct_tool_surgeon"
+    },
+    "metadata_source": "parent orchestration receipt supplied before proposal freeze",
+    "provider_backend_attestation": null,
+    "message": "Actual supplied launch settings; no opaque provider ID or independent backend introspection available."
+  },
+  "ownership": {
+    "allowed_written_paths": [
+      "docs/plans/direct-tool-finalization-cycle2-20261108.md",
+      "docs/experiments/direct-tool-finalization-cycle2-20261108/SURGEON-PROPOSAL.json"
+    ],
+    "worker_launches_by_surgeon": 0,
+    "code_edits_by_surgeon": false,
+    "commits_or_pushes_by_surgeon": false
+  },
+  "plan": {
+    "path": "docs/plans/direct-tool-finalization-cycle2-20261108.md",
+    "sha256": "bd0cdffcb1998bd9334050336df3f08edc4cab3f5984447eaa53398379713167"
+  },
+  "inspected_source_snapshot_sha256": {
+    "AGENTS.md": "e902d99700a2e56ac165e4ece5dd6555fd20dbc9eaa9fa717e499d0ff695a4d4",
+    "research-policy.json": "4b50e2cd69041d1f42f0c093556e4eb1baccf6c2db9af2e73888cadeb1604a55",
+    "docs/direct-paired-acceptance.md": "8058560b9896403e3711a08d47137c03a25e4289d944b86e44bfdb527d7c7a60",
+    "docs/direct-weight-editing.md": "7afb8b67df97a2419f9ca28b8756517932cf1fce638f4fd954adbd1bf8bd731c",
+    "docs/plans/direct-localization-20261108.md": "94a0e644fcf65f7da2f566dd90712bfbea5baf55bd47e7269e65b5069aff1486",
+    "docs/plans/direct-mechanistic-gate-20261108.md": "8fe607298300538c2b5ccb4afd060941338a6e23bcfe91e0335ffacc2b023269",
+    "docs/experiments/semantic-repair-20261108-round1-paired.json": "a6d1c84e269adb257cd68727f33d9639a5d264397277ba4527e52bf5cc96c51e",
+    "configs/qwen35-4b-direct.lock.json": "6058685c1842ee36e24fcb17131ae072332c8cf1e679189e7eaeff4765a2eb8b",
+    "scripts/direct_forward.py": "d49b35eaff720e7c3c2b3f1ae2e97369dac42bf3971dd2d553b08ae390a123da",
+    "scripts/direct_probe.py": "c90ed2acacacf95bb386b33414d43e3f01a84d67e2e7b016974075d4f6cc6e67",
+    "scripts/direct_evidence.py": "dd1bb6c63cf42fb0d6791ba82aa4c61ce5a32f41ad5020fab05c75d06b0bf557",
+    "scripts/direct_weights.py": "d7855391999c0f57793dcbf919033e8ec16ae3f4f79b553bcf131ca079760468",
+    "scripts/evaluate_coder.py": "64c53400a18742ec2163c3439c654dca3a3addfb186e7740a670bf0cfff17049",
+    "ops/grade_direct_practice.py": "6e5bfaf9e0e046987d055923bcde62e559d421da83dfcbc92847cf42de65c963",
+    "ops/direct_edit54.py": "32caf4172b6a841939cae893f0a343eb19a2976cfaf68a2bb5c7e8363ec2f150"
+  },
+  "source_snapshot_scope": "Plan-time inspected bytes, not attribution of future worker code. Freeze worker producer sources anew before execution.",
+  "parent": {
+    "model_id": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "dtype": "BF16",
+    "lock_sha256": "6058685c1842ee36e24fcb17131ae072332c8cf1e679189e7eaeff4765a2eb8b",
+    "loaded_language_parameter_count": 426,
+    "required_evidence_schema_version": 2,
+    "locked_parent_file_count": 12
+  },
+  "historical_evidence": {
+    "path": "docs/experiments/semantic-repair-20261108-round1-paired.json",
+    "sha256": "a6d1c84e269adb257cd68727f33d9639a5d264397277ba4527e52bf5cc96c51e",
+    "exposure": "development",
+    "arm": "base",
+    "quantization": "Q8_0",
+    "bounded_chunks_passed": true,
+    "truthful_failure_passed": false,
+    "observed_failure": "A second run_tests(target=parser) call after one completed tool result.",
+    "bf16_reproduction_established": false
+  },
+  "hypothesis": "After a completed nonzero-exit test result, a sparse existing language MLP write may preserve an outstanding-action state and cause an identical test call rather than report the result.",
+  "prior_study": {
+    "hypothesis": "half_open_overlap",
+    "status": "STOP_controls_failed",
+    "reverse_joint_margin_nats": 0.8176,
+    "reopened": false,
+    "reuse_of_previous_layer_group_feature_selection_allowed": false,
+    "reuse_of_08b_coordinates_allowed": false
+  },
+  "stage1": {
+    "status": "NOT_RUN",
+    "episode_count": 2,
+    "cache_reset_each_invocation": true,
+    "generation_invocations_max": 4,
+    "one_generation_per_worker": true,
+    "initial_call_must_be_spontaneous": true,
+    "historical_prefill_can_satisfy_gate": false,
+    "always_finish_two_valid_episodes_independent_of_first_continuation_result": true,
+    "invalid_initial_call_action": "Fail admission and stop that episode without substituting any call.",
+    "expected_initial_call": {
+      "name": "run_tests",
+      "arguments": {
+        "target": "parser"
+      }
+    },
+    "tool_result_bytes": "{\"exit_code\":1,\"passed\":4,\"failed\":2}",
+    "required_failure": "Both uncensored attributed episodes repeat exactly run_tests(target=parser).",
+    "generation": {
+      "max_input_tokens": 512,
+      "max_new_tokens": 96,
+      "do_sample": false,
+      "thinking": false,
+      "seed": 20261108,
+      "threads": 1
+    },
+    "stop_if_correct_json_in_either": "STOP_BF16_target_not_reproduced",
+    "stop_if_other_completed_failure": "STOP_different_phenotype",
+    "stop_if_censored_or_unknown": "STOP_inconclusive",
+    "stop_if_template_or_parser_fault": "STOP_harness",
+    "stage1_worker_wall_seconds_max": 7200
+  },
+  "stage2": {
+    "status": "NOT_RUN",
+    "conditional_on": "stage1 passes exactly",
+    "generation_invocations_max": 5,
+    "cases": [
+      "B_failed_result_replay",
+      "S_successful_completed_result",
+      "C_failed_result_completion_cue",
+      "N_failed_result_neutral_length_match",
+      "P_legitimate_second_run_pending"
+    ],
+    "cue_selection": "Fixed texts in plan; deterministic tokenizer-only padding, no model-score prompt search.",
+    "required_all_behaviors_pass": true,
+    "failure_action": "STOP_semantic_specificity; no localization."
+  },
+  "stage3": {
+    "status": "NOT_RUN",
+    "conditional_on": "stage2 all required behaviors and integrity checks pass",
+    "diagnostic_invocations_max": 12,
+    "all_new_layers_observed": 32,
+    "old_group_subdivision_allowed": false,
+    "selected_layers_max": 1,
+    "selected_features_max": 8,
+    "layer_dominance_fraction_strictly_greater_than": 0.5,
+    "feature_positive_mass_fraction_min": 0.8,
+    "control_norm_relative_tolerance_max": 0.05,
+    "strengths": [
+      0,
+      0.5,
+      1
+    ],
+    "reverse_requires_joint_margin_negative": true,
+    "random_controls": [
+      "sha256(cycle+\":activation-random-1\")",
+      "sha256(cycle+\":activation-random-2\")"
+    ],
+    "failure_action": "STOP_activation_controls or STOP_localization; no retries/runner-up/support expansion."
+  },
+  "stage4": {
+    "status": "NOT_RUN",
+    "conditional_on": "stage3 all finite controls pass",
+    "diagnostic_invocations_max": 10,
+    "read_specificity_ratio_min": 4,
+    "signed_causal_removal_fraction_min": 0.8,
+    "require_gate_up_decomposition": true,
+    "require_selected_input_feature_ablation_and_restoration": true,
+    "require_initial_and_legitimate_pending_tool_use_preserved": true,
+    "random_controls": [
+      "sha256(cycle+\":feature-random-1\")",
+      "sha256(cycle+\":feature-random-2\")"
+    ],
+    "failure_action": "STOP_sparse_mechanism"
+  },
+  "candidate": {
+    "status": "NOT_DERIVED",
+    "conditional_on": "All exact reproduction, semantic specificity, activation and sparse read/write gates pass.",
+    "derivation": "One fixed full deletion of the previously causally established existing down_proj columns J, BF16 positive zero; no other words change.",
+    "max_tensors": 1,
+    "max_columns": 8,
+    "max_selected_entries_total": 20480,
+    "strength": 1,
+    "ceiling_violation_action": "STOP; no clipping/rescaling/partial support fallback.",
+    "forbidden": [
+      "training",
+      "LoRA",
+      "backward",
+      "optimizers",
+      "loss fitting",
+      "fitted probes",
+      "pseudoinverse",
+      "rank-one target matching",
+      "desired activation fitting",
+      "logit matching",
+      "strength tuning",
+      "arbitrary column clipping",
+      "0.8B coordinate transfer"
+    ],
+    "quality_evaluation": "NOT_RUN",
+    "required_frozen_weight_controls": [
+      "no-op",
+      "half-deletion control only",
+      "two fixed hash-seeded support/norm-matched random column deletions, including a different-layer control"
+    ],
+    "weight_control_resource_admission": "Separate complete matched tranche after candidate freeze; not part of the discovery ceiling, NOT_RUN."
+  },
+  "resource_limits": {
+    "host": ".54",
+    "route": "ops/direct_edit54.py shared retained lease",
+    "cpu_cores": 1,
+    "memory_gib": 10,
+    "gpu_allowed": false,
+    "worker_wall_seconds_max": 1800,
+    "progress_inspection_seconds_max": 600,
+    "postcheck_exit_reserve_seconds_min": 450,
+    "discovery_cumulative_worker_seconds_max": 21600,
+    "discovery_generation_invocations_max": 9,
+    "discovery_diagnostic_invocations_max": 22,
+    "each_batched_example_and_branch_cost_must_be_accounted": true,
+    "admit_by_measured_cost": true,
+    "service_preemption_allowed": false,
+    "cleanup_allowed": false,
+    "preserve_all_artifacts": true,
+    "budget_exhaustion_action": "STOP/NOT_RUN, no candidate from incomplete evidence."
+  },
+  "final_custody": {
+    "custodian_identified": false,
+    "holdout_inspected_or_created": false,
+    "final_quality_evaluation": "NOT_RUN",
+    "required_interface": "Separately controlled custody; opaque case identities; frozen primary executable metric, task/family count, paired order/seeds, censoring rules, minimum gain, regression limits and uncertainty before either final arm.",
+    "failed_final_action": "Reject candidate; new research cycle and new untouched confirmation data."
+  },
+  "deployment_gate": {
+    "status": "NOT_RUN",
+    "separate_from_short_cpu_diagnostics": true,
+    "context": 262144,
+    "cache_type_k": "q8_0",
+    "cache_type_v": "q8_0",
+    "output_allowance": 28192,
+    "requires_original_edited_quantization_pair": true,
+    "requires_attributed_native_clients": true,
+    "requires_fresh_vm_proof_where_requested": true
+  }
+}

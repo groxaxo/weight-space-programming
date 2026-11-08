@@ -19,7 +19,8 @@ from pipeline import require, sha256
 VERSION = 2
 PRODUCER_FILES = tuple('scripts/' + name + '.py' for name in
                        ('pipeline', 'direct_weights', 'direct_forward', 'direct_probe',
-                        'direct_causal', 'direct_evidence')) + ('ops/direct_edit54.py',)
+                        'direct_causal', 'direct_evidence', 'direct_tools', 'coder_common',
+                        'coder_sampling', 'evaluate_coder')) + ('ops/direct_edit54.py', 'ops/direct_tool_cycle54.py', 'ops/direct_tool_preflight54.py')
 # Capture before model execution; later mutations cannot silently change attribution.
 SOURCE_AT_IMPORT = {name: sha256(ROOT / name) for name in PRODUCER_FILES}
 
