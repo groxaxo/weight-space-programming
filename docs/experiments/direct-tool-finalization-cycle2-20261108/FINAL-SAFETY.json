@@ -1,0 +1,16 @@
+{
+  "captured_at_utc": "2026-11-08T09:50:33.326309+00:00",
+  "deleted_files": 0,
+  "executable_members": false,
+  "heads": {
+    "corrected_cycle": "f0b7bd3674e3516611af786aca7ffc27fdbc7f57",
+    "original_cycle": "4c8cd17144b5f02e47a8a4b76dc80565873714a6",
+    "prior_direct": "f0f340213dd863d6d780bc52e35b20e4e17a2b08",
+    "runtime": "026a7da99073cd9c69f73bc299c8667cc0666a3f",
+    "specificity_cycle": "a0cec123359ceff613e6fc1f3a9088634fb73a07"
+  },
+  "preserve_originals": true,
+  "source_collection": "Read-only fixed task report roots; no cleanup or process/service control.",
+  "source_snapshots_as_text_only": true,
+  "training_unit": "Restart=no\nMainPID=0\nActiveState=failed\n"
+}

@@ -1,0 +1,22 @@
+{
+  "conditions_sha256": "324a91d0c81e5ee85b969bb9b95dffe559bcef9df2aa9d7668680ce2038af6a8",
+  "files": {
+    "AGENTS.md": "2851ab260ad255a138233b10e887030cab5178712db97c1e5961c3fb81795a68",
+    "configs/direct-tool-specificity-cycle2.protocol.json": "628b5674bbd951e42f4c182c8678b3ea1ccdcb126b73efc2e02598f669301364",
+    "docs/experiments/direct-tool-finalization-cycle2-20261108/SPECIFICITY-QUALIFICATION-LEDGER.json": "9a6b1085ce33a46f9c3ca88a75580ca78d66068c8184f05bf03e5cc6f1264e85",
+    "docs/plans/direct-tool-specificity-implementation-20261108.md": "a54f9386a1f80f0eba9aede58320957c7e46c0326cffb1f98e2779e1384050c6",
+    "docs/reviews/20261108-direct-tool-specificity-integration.md": "fae31e4da3a889e7031a7b815e339924450ca1228eeb09a8421ac6232e381648",
+    "ops/direct_tool_specificity54.py": "ae53f3ae2a731a61dcf526aa80921a9d7538ddd903e5c55f39b2e3c31469e3a0",
+    "scripts/direct_tool_specificity.py": "f226610750c4c44a1edd84895822f5a1300e77076977b341ad384f645dedeeb3",
+    "tests/test_direct_specificity_host.py": "bb9c807741f87557e164ac5f1b827961c6413578c7933e7294c9a29028c7b25d",
+    "tests/test_direct_specificity_runtime.py": "712810c499f3c4cc291b6b8a919c5cf0ce99220e1a5fc6b58fd79d2e061ae34f",
+    "tests/test_direct_tool_specificity.py": "ac40cae9c05a8763b831e157fa6724c79ab6011b9600f698c587773d41011a49"
+  },
+  "ledger_sha256": "9a6b1085ce33a46f9c3ca88a75580ca78d66068c8184f05bf03e5cc6f1264e85",
+  "producer_commit": "a0cec123359ceff613e6fc1f3a9088634fb73a07",
+  "protocol_sha256": "628b5674bbd951e42f4c182c8678b3ea1ccdcb126b73efc2e02598f669301364",
+  "pushed": false,
+  "training": false,
+  "weights_edited": false,
+  "worker_seconds_charged_before_controls": 3287.713629
+}

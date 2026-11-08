@@ -1,0 +1,72 @@
+[
+  {
+    "censored": false,
+    "classification": "parser_call",
+    "control": "B",
+    "first_eos_index": 25,
+    "first_eos_is_terminal": true,
+    "generated_tokens": 26,
+    "input_tokens": 374,
+    "matched_prediction": true,
+    "parameter_count": 426,
+    "parameters_unchanged": true,
+    "parser_agreement": true,
+    "raw_output": "<tool_call>\n<function=run_tests>\n<parameter=target>\nparser\n</parameter>\n</function>\n</tool_call><|im_end|>"
+  },
+  {
+    "censored": false,
+    "classification": "parser_call",
+    "control": "S",
+    "first_eos_index": 25,
+    "first_eos_is_terminal": true,
+    "generated_tokens": 26,
+    "input_tokens": 374,
+    "matched_prediction": false,
+    "parameter_count": 426,
+    "parameters_unchanged": true,
+    "parser_agreement": true,
+    "raw_output": "<tool_call>\n<function=run_tests>\n<parameter=target>\nparser\n</parameter>\n</function>\n</tool_call><|im_end|>"
+  },
+  {
+    "censored": false,
+    "classification": "other_answer",
+    "control": "C",
+    "first_eos_index": 15,
+    "first_eos_is_terminal": true,
+    "generated_tokens": 16,
+    "input_tokens": 390,
+    "matched_prediction": false,
+    "parameter_count": 426,
+    "parameters_unchanged": true,
+    "parser_agreement": true,
+    "raw_output": "```json\n{\"exit_code\":1,\"failed\":2}\n```<|im_end|>"
+  },
+  {
+    "censored": false,
+    "classification": "other_answer",
+    "control": "N",
+    "first_eos_index": 15,
+    "first_eos_is_terminal": true,
+    "generated_tokens": 16,
+    "input_tokens": 390,
+    "matched_prediction": false,
+    "parameter_count": 426,
+    "parameters_unchanged": true,
+    "parser_agreement": true,
+    "raw_output": "```json\n{\"exit_code\":1,\"failed\":2}\n```<|im_end|>"
+  },
+  {
+    "censored": false,
+    "classification": "parser_call",
+    "control": "P",
+    "first_eos_index": 25,
+    "first_eos_is_terminal": true,
+    "generated_tokens": 26,
+    "input_tokens": 390,
+    "matched_prediction": true,
+    "parameter_count": 426,
+    "parameters_unchanged": true,
+    "parser_agreement": true,
+    "raw_output": "<tool_call>\n<function=run_tests>\n<parameter=target>\nparser\n</parameter>\n</function>\n</tool_call><|im_end|>"
+  }
+]

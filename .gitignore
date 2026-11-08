@@ -19,3 +19,7 @@ __pycache__/
 .sol-plan-session-path
 data/
 runs/
+
+# Retained, inventoried atomic publication staging; never delete for cleanliness.
+configs/.direct-tool-specificity-cycle2.protocol.json.building-*
+docs/experiments/direct-tool-finalization-cycle2-20261108/.SPECIFICITY-QUALIFICATION-LEDGER.json.building-*

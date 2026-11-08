@@ -177,6 +177,15 @@ This amendment supplies no coordinate choice, weight candidate or quality pass.
 
 ## Cycle 2 semantic-specificity gate
 
+The terminal result is `STOP_semantic_specificity`, with all five workers
+complete. S repeats the call after a success result; C and N produce identical
+fenced JSON. Only B/P match their required behavior. Preserve this negative
+verdict. No layer geometry, feature selection, activation/weight intervention,
+candidate, independent-final run or promotion is admitted from this cycle.
+Do not strip fences, rename the neutral cue, widen the hypothesis after scores
+or treat the two prediction matches as model-quality improvement. Follow the
+terminal report in `docs/experiments/direct-tool-finalization-cycle2-20261108.md`.
+
 The corrected `f0b7bd3` two-episode batch reproduced the duplicate call with
 identical greedy tokens and all 426 protected parameters unchanged. This admits
 only the five exposed B/S/C/N/P semantic controls from the original plan.

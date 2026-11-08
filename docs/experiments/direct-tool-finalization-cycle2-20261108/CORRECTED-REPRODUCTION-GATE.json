@@ -1,0 +1,106 @@
+{
+  "activation_diagnosis_admitted": true,
+  "artifacts_retained": true,
+  "complete": true,
+  "cumulative_generation_invocations": 8,
+  "cumulative_worker_seconds": 3081.713629,
+  "cumulative_worker_seconds_cap": 21600,
+  "frozen_documents": {
+    "AGENTS.md": "967473ff0152aac87f3b2d4f463d101a2b7e2e931f62280147e2079eb2830c99",
+    "configs/direct-tool-finalization-cycle2-chatstop.protocol.json": "d44e668c125c3e3fb28ea756dcde83f0facbc7ec1d8a5e9fe589944152edec15",
+    "configs/direct-tool-finalization-cycle2.protocol.json": "6942b27d4d5884c06c5636beeebefb5c20897f5573dba12c9fb3edd3af4dab69",
+    "docs/experiments/direct-tool-finalization-cycle2-20261108/BUDGET-LEDGER-PRIOR.json": "c84f38314ec14f9d840ff37cdd23410d61854f5ccee7d2ef86443389eb51ae13",
+    "docs/experiments/direct-tool-finalization-cycle2-20261108/STOP-REPAIR-REVIEW.json": "98d1d9ad8a6645ff08a916bfb3888e802fd239c6646febdc5358d513529d686b",
+    "docs/experiments/direct-tool-finalization-cycle2-20261108/SURGEON-PROPOSAL.json": "dcf5cb99c9e47a9a3336ebd4129d757e893e96dc9c2be97011a53e7c5710c6ba",
+    "docs/plans/direct-tool-finalization-cycle2-20261108.md": "bd0cdffcb1998bd9334050336df3f08edc4cab3f5984447eaa53398379713167",
+    "docs/plans/direct-tool-finalization-cycle2-stop-repair-review-20261108.md": "fca0df338026f8c8f92247728d4d887d3b8b208a6598a4ea982b8897d1cf9a69",
+    "research-policy.json": "4b50e2cd69041d1f42f0c093556e4eb1baccf6c2db9af2e73888cadeb1604a55"
+  },
+  "generation_cap": 13,
+  "generation_invocations": 4,
+  "generation_invocations_max": 4,
+  "ledger": [
+    {
+      "charged_worker_seconds": 297,
+      "classification": "expected_initial_call",
+      "container": "wsp-direct-episode-1-initial-7759c0b6bf4e",
+      "cumulative_generation_invocations": 5,
+      "cumulative_worker_seconds": 2140.713629,
+      "evidence": {
+        "independent_evaluation": "NOT_RUN",
+        "path": "/home/op/work/weight-space-programming-direct-cycle2-chatstop-20261108/reports/direct-cycle2-chatstop-20261108/reproduction-02/episode-1-initial/worker-output/worker.json",
+        "quality_improvement_claimed": false,
+        "sha256": "cb360785ccb0d35199ede5621c00bf56364e5a98b68a3605f6b434861cbee6f9",
+        "worker_complete": true
+      },
+      "phase": "initial",
+      "replay": 1,
+      "request_sha256": "8e04b0fb14d482eb7607d893ec13112383137ef3ac803196c6695db48d99ec43",
+      "status": "completed"
+    },
+    {
+      "charged_worker_seconds": 322,
+      "classification": "repeat_same_call",
+      "container": "wsp-direct-episode-1-continuation-43dd1bfa37f5",
+      "cumulative_generation_invocations": 6,
+      "cumulative_worker_seconds": 2462.713629,
+      "evidence": {
+        "independent_evaluation": "NOT_RUN",
+        "path": "/home/op/work/weight-space-programming-direct-cycle2-chatstop-20261108/reports/direct-cycle2-chatstop-20261108/reproduction-02/episode-1-continuation/worker-output/worker.json",
+        "quality_improvement_claimed": false,
+        "sha256": "aeb4d38ba507d71279329abf6e051f13e8fee5cebef56e820716e414a3a6f1ee",
+        "worker_complete": true
+      },
+      "phase": "continuation",
+      "replay": 1,
+      "request_sha256": "d081b5e48232790bd43246d236a60d70d1bbe235a66b42468e37980a95e32abc",
+      "status": "completed"
+    },
+    {
+      "charged_worker_seconds": 297,
+      "classification": "expected_initial_call",
+      "container": "wsp-direct-episode-2-initial-5d4d5cde3c61",
+      "cumulative_generation_invocations": 7,
+      "cumulative_worker_seconds": 2759.713629,
+      "evidence": {
+        "independent_evaluation": "NOT_RUN",
+        "path": "/home/op/work/weight-space-programming-direct-cycle2-chatstop-20261108/reports/direct-cycle2-chatstop-20261108/reproduction-02/episode-2-initial/worker-output/worker.json",
+        "quality_improvement_claimed": false,
+        "sha256": "d74229e32b587e01136a60dd1306107378a6d1130735d3f7f6a0dcbeaca574b1",
+        "worker_complete": true
+      },
+      "phase": "initial",
+      "replay": 2,
+      "request_sha256": "238e9ad326779af210cb5f89acd3609c081ce1b36eb4a4c7a2b4aee3d3a2500b",
+      "status": "completed"
+    },
+    {
+      "charged_worker_seconds": 322,
+      "classification": "repeat_same_call",
+      "container": "wsp-direct-episode-2-continuation-f9426ad3193f",
+      "cumulative_generation_invocations": 8,
+      "cumulative_worker_seconds": 3081.713629,
+      "evidence": {
+        "independent_evaluation": "NOT_RUN",
+        "path": "/home/op/work/weight-space-programming-direct-cycle2-chatstop-20261108/reports/direct-cycle2-chatstop-20261108/reproduction-02/episode-2-continuation/worker-output/worker.json",
+        "quality_improvement_claimed": false,
+        "sha256": "64fa79a17b67d4c466237702e60091912eb0869aff4ef02fcd8a6b5e2196ebd9",
+        "worker_complete": true
+      },
+      "phase": "continuation",
+      "replay": 2,
+      "request_sha256": "0c630dc94c9e63d23fc385c514dee9e25fda615b113d8c5953eb3cb7f7b48e9d",
+      "status": "completed"
+    }
+  ],
+  "original_parent": "6058685c1842ee36e24fcb17131ae072332c8cf1e679189e7eaeff4765a2eb8b",
+  "prior_ledger_sha256": "c84f38314ec14f9d840ff37cdd23410d61854f5ccee7d2ef86443389eb51ae13",
+  "qualification_ledger_sha256": "c84c57a09f59bc0d25b7ea66f4f5d950dc5f567d2571001ea1db3eb8782d6893",
+  "quality_evaluation": "NOT_RUN",
+  "question": "truthful_failure-completed-tool-result-action-persistence-cycle2",
+  "reason": "Both fresh complete episodes reproduced the exact duplicate call; weights remain ineligible",
+  "status": "BF16_duplicate_call_reproduced",
+  "training": false,
+  "weight_candidate_eligible": false,
+  "weights_edited": false
+}

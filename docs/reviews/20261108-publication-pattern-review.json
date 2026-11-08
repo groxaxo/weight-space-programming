@@ -1,0 +1,228 @@
+{
+  "archive_members_checked": 509,
+  "assessment": "No real credential found by the documented bounded pattern/context review. This is not an exhaustive security certification.",
+  "bytes_scanned": 43549491,
+  "fetches": [
+    {
+      "command": [
+        "fetch",
+        "origin"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "fetch",
+        "origin",
+        "refs/pull/*/head:refs/remotes/publication-audit-20261108/pr/*"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "git_blobs": 381,
+  "limitations": "Pattern review is not exhaustive credential detection or a certification. Matched values are never printed; possible real credentials block visibility change pending review.",
+  "main_default_requested_for_landing_page": true,
+  "methods": [
+    "Known credential/private-key patterns",
+    "Literal credential assignment review",
+    "Existing immutable archive integrity/regular-data validation"
+  ],
+  "obvious_placeholder_occurrences": 0,
+  "repository_text_surfaces": [
+    {
+      "credential_pattern_hits": 0,
+      "endpoint": "issues?state=all",
+      "records": 3
+    },
+    {
+      "credential_pattern_hits": 0,
+      "endpoint": "issues/comments?sort=created",
+      "records": 4
+    },
+    {
+      "credential_pattern_hits": 0,
+      "endpoint": "pulls/comments?sort=created",
+      "records": 2
+    },
+    {
+      "credential_pattern_hits": 0,
+      "endpoint": "releases?",
+      "records": 0
+    },
+    {
+      "credential_pattern_hits": 0,
+      "endpoint": "pulls/1/reviews",
+      "records": 0
+    },
+    {
+      "credential_pattern_hits": 0,
+      "endpoint": "pulls/2/reviews",
+      "records": 1
+    },
+    {
+      "credential_pattern_hits": 0,
+      "endpoint": "pulls/3/reviews",
+      "records": 0
+    }
+  ],
+  "resolved_findings": [
+    {
+      "blob_or_file_sha256": "29a31deef53b7d71a905017f478074d1af7eef1e",
+      "classification": "Fixed loopback OpenAI-compatible client placeholder; not a provider credential.",
+      "kind": "literal-apiKey",
+      "line": 8,
+      "matched_value_printed": false,
+      "path": "history:examples/opencode.json",
+      "value_fingerprint": "5160ce6d4126c39adcd52b898c49c6259b4619ad66de90ea793a6ae8c59c185b",
+      "value_length": 10
+    },
+    {
+      "blob_or_file_sha256": "094f06db454ad6ead911b7d4946bfd0d95984cbb",
+      "classification": "Fixed loopback OpenAI-compatible client placeholder; not a provider credential.",
+      "kind": "literal-apiKey",
+      "line": 392,
+      "matched_value_printed": false,
+      "path": "history:ops/project_clients.py",
+      "value_fingerprint": "5160ce6d4126c39adcd52b898c49c6259b4619ad66de90ea793a6ae8c59c185b",
+      "value_length": 10
+    },
+    {
+      "blob_or_file_sha256": "3cf9eb448afecb995ec6b9ea711604dcfa93b794",
+      "classification": "Fixed loopback OpenAI-compatible client placeholder; not a provider credential.",
+      "kind": "literal-apiKey",
+      "line": 72,
+      "matched_value_printed": false,
+      "path": "history:ops/replay_he9.py",
+      "value_fingerprint": "5160ce6d4126c39adcd52b898c49c6259b4619ad66de90ea793a6ae8c59c185b",
+      "value_length": 10
+    },
+    {
+      "blob_or_file_sha256": "9fabb8843bc775350adc9f440c62076a7fa2b1db",
+      "classification": "Fixed loopback OpenAI-compatible client placeholder; not a provider credential.",
+      "kind": "literal-apiKey",
+      "line": 115,
+      "matched_value_printed": false,
+      "path": "history:ops/smoke_clients.py",
+      "value_fingerprint": "5160ce6d4126c39adcd52b898c49c6259b4619ad66de90ea793a6ae8c59c185b",
+      "value_length": 10
+    },
+    {
+      "blob_or_file_sha256": "1af95e30f772e8a71e1df699b92383d71adcbcaa",
+      "classification": "Header-only redaction-test marker; no private-key body.",
+      "kind": "private-key",
+      "line": 76,
+      "matched_value_printed": false,
+      "path": "history:tests/test_coder.py",
+      "value_fingerprint": "3021d90eb9437b2d8f30e8363695c4418b5e5f1870801b5c317e9398ee0f572d",
+      "value_length": 27
+    },
+    {
+      "blob_or_file_sha256": "274ca66586d67d8ba7ae61a4e0a7271136a688fb",
+      "classification": "Fixed loopback OpenAI-compatible client placeholder; not a provider credential.",
+      "kind": "literal-apiKey",
+      "line": 380,
+      "matched_value_printed": false,
+      "path": "history:ops/project_clients.py",
+      "value_fingerprint": "5160ce6d4126c39adcd52b898c49c6259b4619ad66de90ea793a6ae8c59c185b",
+      "value_length": 10
+    },
+    {
+      "blob_or_file_sha256": "d7262048d3ffd3d6aa2fb9ed612b4ee22fb82524",
+      "classification": "Fixed loopback OpenAI-compatible client placeholder; not a provider credential.",
+      "kind": "literal-apiKey",
+      "line": 115,
+      "matched_value_printed": false,
+      "path": "history:ops/smoke_clients.py",
+      "value_fingerprint": "5160ce6d4126c39adcd52b898c49c6259b4619ad66de90ea793a6ae8c59c185b",
+      "value_length": 10
+    },
+    {
+      "blob_or_file_sha256": "b37136b1f401aaf002c592ad3e7c011eb8fa0565",
+      "classification": "Fixed loopback OpenAI-compatible client placeholder; not a provider credential.",
+      "kind": "literal-apiKey",
+      "line": 378,
+      "matched_value_printed": false,
+      "path": "history:ops/project_clients.py",
+      "value_fingerprint": "5160ce6d4126c39adcd52b898c49c6259b4619ad66de90ea793a6ae8c59c185b",
+      "value_length": 10
+    },
+    {
+      "blob_or_file_sha256": "6c0b7a0ebecfadfa5a28fb32a155b4032f588ad0",
+      "classification": "Header-only redaction-test marker; no private-key body.",
+      "kind": "private-key",
+      "line": 70,
+      "matched_value_printed": false,
+      "path": "history:tests/test_coder.py",
+      "value_fingerprint": "3021d90eb9437b2d8f30e8363695c4418b5e5f1870801b5c317e9398ee0f572d",
+      "value_length": 27
+    },
+    {
+      "blob_or_file_sha256": "658b1acb5048ffd6f8d66bdf4dd49feb27f53c55",
+      "classification": "Fixed loopback OpenAI-compatible client placeholder; not a provider credential.",
+      "kind": "literal-apiKey",
+      "line": 377,
+      "matched_value_printed": false,
+      "path": "history:ops/project_clients.py",
+      "value_fingerprint": "5160ce6d4126c39adcd52b898c49c6259b4619ad66de90ea793a6ae8c59c185b",
+      "value_length": 10
+    },
+    {
+      "blob_or_file_sha256": "7d47a7e7632fa41c74d9ee58dda5be44e8138689",
+      "classification": "Fixed loopback OpenAI-compatible client placeholder; not a provider credential.",
+      "kind": "literal-apiKey",
+      "line": 114,
+      "matched_value_printed": false,
+      "path": "history:ops/smoke_clients.py",
+      "value_fingerprint": "5160ce6d4126c39adcd52b898c49c6259b4619ad66de90ea793a6ae8c59c185b",
+      "value_length": 10
+    },
+    {
+      "blob_or_file_sha256": "f824c504064b723850c7e18e572e026f7c4dec89",
+      "classification": "Header-only redaction-test marker; no private-key body.",
+      "kind": "private-key",
+      "line": 70,
+      "matched_value_printed": false,
+      "path": "history:tests/test_coder.py",
+      "value_fingerprint": "3021d90eb9437b2d8f30e8363695c4418b5e5f1870801b5c317e9398ee0f572d",
+      "value_length": 27
+    },
+    {
+      "blob_or_file_sha256": "81c0faf7ad46f02191cc595440937f91aaa727b8",
+      "classification": "Fixed loopback OpenAI-compatible client placeholder; not a provider credential.",
+      "kind": "literal-apiKey",
+      "line": 372,
+      "matched_value_printed": false,
+      "path": "history:ops/project_clients.py",
+      "value_fingerprint": "5160ce6d4126c39adcd52b898c49c6259b4619ad66de90ea793a6ae8c59c185b",
+      "value_length": 10
+    },
+    {
+      "blob_or_file_sha256": "cb26e5471353c0345689bc94fdabb515f2ba5935",
+      "classification": "Fixed loopback OpenAI-compatible client placeholder; not a provider credential.",
+      "kind": "literal-apiKey",
+      "line": 110,
+      "matched_value_printed": false,
+      "path": "history:ops/smoke_clients.py",
+      "value_fingerprint": "5160ce6d4126c39adcd52b898c49c6259b4619ad66de90ea793a6ae8c59c185b",
+      "value_length": 10
+    },
+    {
+      "blob_or_file_sha256": "e6e72f83574da529c3d9d7868c56a81f0727c74f",
+      "classification": "Header-only redaction-test marker; no private-key body.",
+      "kind": "private-key",
+      "line": 70,
+      "matched_value_printed": false,
+      "path": "history:tests/test_coder.py",
+      "value_fingerprint": "3021d90eb9437b2d8f30e8363695c4418b5e5f1870801b5c317e9398ee0f572d",
+      "value_length": 27
+    }
+  ],
+  "schema_version": 1,
+  "scope": "All reachable Git blobs after origin/PR fetch; every publication file; bounded archive text/JSON/log/source members.",
+  "seconds": 6.477342433994636,
+  "shallow": false,
+  "text_or_blob_records_scanned": 896,
+  "unresolved_findings": 0,
+  "visibility_change_authority": "Explicit user request: merge/push main, document and make public.",
+  "visibility_changed": false
+}

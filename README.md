@@ -40,6 +40,18 @@ fully charged technical replay uses fresh source and capsules, with every
 scientific criterion unchanged; no weight candidate or quality pass follows
 from repairing this harness.
 
+The corrected tool replay has now reproduced the duplicate call in both fresh
+BF16 episodes, with exact greedy token replay and all 426 parameters unchanged.
+The five fixed semantic controls in the
+[Cycle 2 report](docs/experiments/direct-tool-finalization-cycle2-20261108.md)
+reject the proposed nonzero-result-specific mechanism: the success-result
+control also repeats the tool call. No localization, weight candidate or
+independent model-quality result is admitted by this cycle.
+The [control integration review](docs/reviews/20261108-direct-tool-specificity-integration.md)
+records the authenticated historical evidence boundary, three-position capture,
+CPU sandbox, cumulative accounting and regression checks. The original BF16
+checkpoint remains the reference; no direct-edit model has been promoted.
+
 **Historical coding track:** the preserved LoRA/QLoRA work contains authenticated model snapshots, licensed corpora, assistant-only loss masks, adapter selection, serving, executable coding/tool checks, HumanEval and OpenCode/Hermes fixtures. Those artifacts and results remain useful records, but they are not implementations of the active no-training method. Legacy training, supervised-corpus preparation and trained-derivative CLI entry points are guarded by `scripts/method_policy.py`. See [the historical coding-assistant workflow](docs/coding-assistant.md).
 
 **Scope:** the original `0be1a86` wrapper reconstructs an existing 0.8B patch; it does not discover a repair. Its selected coordinates are never transferred to 4B. Model quality requires matched reports and independent evaluation, beyond successful reconstruction or a valid numeric patch. The exposed HE9/development/client fixtures are regressions, not a fresh untouched holdout. No result here establishes frontier-model equivalence.

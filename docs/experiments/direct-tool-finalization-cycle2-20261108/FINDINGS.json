@@ -1,0 +1,262 @@
+{
+  "all_13_model_containers_confirmed_exited": true,
+  "archive": {
+    "all_hashes_restored": true,
+    "archive": "CYCLE2-EVIDENCE.tar.gz",
+    "archive_bytes": 19292280,
+    "manifest_files": 460,
+    "members": 509,
+    "originals_preserved": true,
+    "sha256": "98fc1f7c20f28cad1351d87e7c884e19bf7c02f23d82f45434aa52a586771df6",
+    "source_text_files": 47
+  },
+  "comparison_is_model_quality_accuracy": false,
+  "controls": [
+    {
+      "censored": false,
+      "classification": "parser_call",
+      "control": "B",
+      "first_eos_index": 25,
+      "first_eos_is_terminal": true,
+      "generated_tokens": 26,
+      "input_tokens": 374,
+      "matched_prediction": true,
+      "parameter_count": 426,
+      "parameters_unchanged": true,
+      "parser_agreement": true,
+      "raw_output": "<tool_call>\n<function=run_tests>\n<parameter=target>\nparser\n</parameter>\n</function>\n</tool_call><|im_end|>"
+    },
+    {
+      "censored": false,
+      "classification": "parser_call",
+      "control": "S",
+      "first_eos_index": 25,
+      "first_eos_is_terminal": true,
+      "generated_tokens": 26,
+      "input_tokens": 374,
+      "matched_prediction": false,
+      "parameter_count": 426,
+      "parameters_unchanged": true,
+      "parser_agreement": true,
+      "raw_output": "<tool_call>\n<function=run_tests>\n<parameter=target>\nparser\n</parameter>\n</function>\n</tool_call><|im_end|>"
+    },
+    {
+      "censored": false,
+      "classification": "other_answer",
+      "control": "C",
+      "first_eos_index": 15,
+      "first_eos_is_terminal": true,
+      "generated_tokens": 16,
+      "input_tokens": 390,
+      "matched_prediction": false,
+      "parameter_count": 426,
+      "parameters_unchanged": true,
+      "parser_agreement": true,
+      "raw_output": "```json\n{\"exit_code\":1,\"failed\":2}\n```<|im_end|>"
+    },
+    {
+      "censored": false,
+      "classification": "other_answer",
+      "control": "N",
+      "first_eos_index": 15,
+      "first_eos_is_terminal": true,
+      "generated_tokens": 16,
+      "input_tokens": 390,
+      "matched_prediction": false,
+      "parameter_count": 426,
+      "parameters_unchanged": true,
+      "parser_agreement": true,
+      "raw_output": "```json\n{\"exit_code\":1,\"failed\":2}\n```<|im_end|>"
+    },
+    {
+      "censored": false,
+      "classification": "parser_call",
+      "control": "P",
+      "first_eos_index": 25,
+      "first_eos_is_terminal": true,
+      "generated_tokens": 26,
+      "input_tokens": 390,
+      "matched_prediction": true,
+      "parameter_count": 426,
+      "parameters_unchanged": true,
+      "parser_agreement": true,
+      "raw_output": "<tool_call>\n<function=run_tests>\n<parameter=target>\nparser\n</parameter>\n</function>\n</tool_call><|im_end|>"
+    }
+  ],
+  "discovery_budget": {
+    "additional_diagnostic_cap": 22,
+    "additional_diagnostic_invocations": 0,
+    "generation_cap": 13,
+    "generation_invocations": 13,
+    "semantic_worker_seconds": [
+      319,
+      324,
+      314,
+      314,
+      334
+    ],
+    "worker_seconds": 4892.713629,
+    "worker_seconds_cap": 21600
+  },
+  "engineering": {
+    "linux_passed": 421,
+    "linux_seconds": 61.376,
+    "linux_skipped": 19,
+    "linux_tests": 440,
+    "new_tests": 24,
+    "offline_raw_replay_passed": true,
+    "remaining_unrun_legacy_training_checks": 7,
+    "runtime_passed": 12,
+    "runtime_seconds": 7.574,
+    "tamper_rejected": true
+  },
+  "execution_complete": true,
+  "hugging_face_promotion": "NONE: no direct-edit candidate or verified quality gain.",
+  "hypothesis": "Nonzero completed-test outcome retains a sparse outstanding-action MLP write.",
+  "hypothesis_falsified": true,
+  "independent_custodian": {
+    "model": "gpt-6.1-sol",
+    "paired_final_generations": 0,
+    "private_cases_created": 0,
+    "provider_attestation": false,
+    "quality_evaluation": "NOT_RUN",
+    "reason": "No eligible immutable candidate; public interface only. Final runner/checker are unimplemented prerequisites.",
+    "reasoning_effort": "max",
+    "task": "/root/independent_custodian"
+  },
+  "interpretation": "S repeats after success; C/N give identical fenced JSON. This does not isolate a completion-specific mechanism or justify any weight support.",
+  "method": {
+    "candidate_count": 0,
+    "causal_interventions": "NOT_RUN",
+    "fitting": false,
+    "gradients": false,
+    "localization": "NOT_RUN",
+    "lora": false,
+    "optimizers": false,
+    "training": false,
+    "weights_edited": false
+  },
+  "model_container_states": [
+    {
+      "batch": "original",
+      "exit_code": 0,
+      "name": "/wsp-direct-episode-1-initial-393fb6fcea6a",
+      "state": "exited"
+    },
+    {
+      "batch": "original",
+      "exit_code": 0,
+      "name": "/wsp-direct-episode-2-initial-93a1fcce04b5",
+      "state": "exited"
+    },
+    {
+      "batch": "original",
+      "exit_code": 0,
+      "name": "/wsp-direct-episode-2-continuation-7ae981a5149b",
+      "state": "exited"
+    },
+    {
+      "batch": "original",
+      "exit_code": 0,
+      "name": "/wsp-direct-episode-1-continuation-c14f522dd8a0",
+      "state": "exited"
+    },
+    {
+      "batch": "corrected",
+      "exit_code": 0,
+      "name": "/wsp-direct-episode-1-initial-7759c0b6bf4e",
+      "state": "exited"
+    },
+    {
+      "batch": "corrected",
+      "exit_code": 0,
+      "name": "/wsp-direct-episode-2-initial-5d4d5cde3c61",
+      "state": "exited"
+    },
+    {
+      "batch": "corrected",
+      "exit_code": 0,
+      "name": "/wsp-direct-episode-2-continuation-f9426ad3193f",
+      "state": "exited"
+    },
+    {
+      "batch": "corrected",
+      "exit_code": 0,
+      "name": "/wsp-direct-episode-1-continuation-43dd1bfa37f5",
+      "state": "exited"
+    },
+    {
+      "batch": "specificity",
+      "exit_code": 0,
+      "name": "/wsp-direct-specificity-s-7333af5fe612",
+      "state": "exited"
+    },
+    {
+      "batch": "specificity",
+      "exit_code": 0,
+      "name": "/wsp-direct-specificity-n-8450451b6e9b",
+      "state": "exited"
+    },
+    {
+      "batch": "specificity",
+      "exit_code": 0,
+      "name": "/wsp-direct-specificity-b-cb4e4a10bb4e",
+      "state": "exited"
+    },
+    {
+      "batch": "specificity",
+      "exit_code": 0,
+      "name": "/wsp-direct-specificity-p-a121a7da819c",
+      "state": "exited"
+    },
+    {
+      "batch": "specificity",
+      "exit_code": 0,
+      "name": "/wsp-direct-specificity-c-15c7387550f6",
+      "state": "exited"
+    }
+  ],
+  "native_opencode_hermes": "NOT_RUN: no candidate; native profile remains separate from short CPU diagnostics.",
+  "parent": {
+    "lock_sha256": "6058685c1842ee36e24fcb17131ae072332c8cf1e679189e7eaeff4765a2eb8b",
+    "model": "Qwen/Qwen3.5-4B",
+    "original_fp32_auxiliaries": 48,
+    "protected_unique_language_parameters": 426,
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  },
+  "producers": {
+    "corrected": "f0b7bd3674e3516611af786aca7ffc27fdbc7f57",
+    "original": "4c8cd17144b5f02e47a8a4b76dc80565873714a6",
+    "semantic": "a0cec123359ceff613e6fc1f3a9088634fb73a07"
+  },
+  "publication": {
+    "baseline_promotion": false,
+    "force_push": false,
+    "target": "main",
+    "visibility_requested_by_user": "public"
+  },
+  "safety": {
+    "captured_at_utc": "2026-11-08T09:50:33.326309+00:00",
+    "deleted_files": 0,
+    "executable_members": false,
+    "heads": {
+      "corrected_cycle": "f0b7bd3674e3516611af786aca7ffc27fdbc7f57",
+      "original_cycle": "4c8cd17144b5f02e47a8a4b76dc80565873714a6",
+      "prior_direct": "f0f340213dd863d6d780bc52e35b20e4e17a2b08",
+      "runtime": "026a7da99073cd9c69f73bc299c8667cc0666a3f",
+      "specificity_cycle": "a0cec123359ceff613e6fc1f3a9088634fb73a07"
+    },
+    "preserve_originals": true,
+    "source_collection": "Read-only fixed task report roots; no cleanup or process/service control.",
+    "source_snapshots_as_text_only": true,
+    "training_unit": "Restart=no\nMainPID=0\nActiveState=failed\n"
+  },
+  "schema_version": 1,
+  "status": "STOP_semantic_specificity",
+  "surgeon": {
+    "model": "gpt-6.1-sol",
+    "provider_attestation": false,
+    "reasoning_effort": "xhigh",
+    "task": "/root/direct_tool_surgeon"
+  }
+}

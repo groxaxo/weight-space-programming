@@ -1,5 +1,16 @@
 # Qwen3.5-4B direct-weight editing
 
+The [Cycle 2 tool-action study](experiments/direct-tool-finalization-cycle2-20261108.md)
+reproduces a completed-result duplicate call in two fresh original-BF16 episodes.
+Its separately frozen success-result control also repeats the call, rejecting
+the nonzero-result-specific hypothesis before layer or feature localization.
+The new `ops/direct_tool_specificity54.py` route verifies
+the historical producer bank, compiles only fixed exposed conditions, admits the
+whole tranche and runs one CPU generation per sandbox. All five completed
+semantic controls remain in the denominator even after an ordinary failure;
+infrastructure/censoring stops retain explicit unstarted rows. This path does
+not apply weights or implement the independent final runner.
+
 The active method is forward-only diagnosis and bounded direct BF16 intervention,
 following the [pinned exp8 constraints](https://github.com/RikiyaT/lm_understand-logs/blob/4d09ba6d6a7e891dd8063974dfe81b3d78e3494f/exp8_math/README.md).
 There is currently **no demonstrated 4B direct repair**. The 0.8B reconstruction

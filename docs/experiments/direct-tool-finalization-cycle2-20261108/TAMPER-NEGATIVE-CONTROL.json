@@ -1,0 +1,10 @@
+{
+  "test": "Byte-modified private evidence copy must fail offline replay",
+  "passed": true,
+  "error": "Evidence artifact hash differs: truthful_failure-e1-continuation-generation.json",
+  "original_sha256_before_and_after": "2fa0ae67ab08c8e7dffcfc86edf0d84453f7fdc7fe167e081b59a204160a2673",
+  "modified_copy_sha256": "ce3b1a99361f7833ef8a06d6054328c2c1c8f295f0ccc7f2d7bdd64d35f8bc1a",
+  "original_evidence_unchanged": true,
+  "model_loaded": false,
+  "independent_quality": "NOT_RUN"
+}
