@@ -241,6 +241,8 @@ def tool_examples(variants=16):
 
 
 def main():
+    from method_policy import blocked_legacy_operation
+    blocked_legacy_operation("Legacy supervised-training corpus preparation")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--public-corpus', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)

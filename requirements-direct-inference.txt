@@ -1,0 +1,8 @@
+# Optional forward-only environment: versions used by the measured CPU study.
+# No PEFT, bitsandbytes, datasets, Trainer recipe or FLA package is required.
+# These are version constraints, not a hash-locked wheel/container distribution.
+-r requirements.txt
+torch==2.11.0
+transformers==5.22.1
+accelerate==1.15.0
+safetensors==0.8.0

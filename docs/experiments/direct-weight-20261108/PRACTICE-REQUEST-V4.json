@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "role": "practice",
+  "lock_sha256": "6058685c1842ee36e24fcb17131ae072332c8cf1e679189e7eaeff4765a2eb8b",
+  "protocol_sha256": "d84db6bcbd4d75e846b15ba9ed303405a0185b972eb4269ff8da8ab205ee9a02",
+  "cases": [
+    {
+      "id": "half_open_overlap-r1",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Implement wsp_intersection(a, b) for two half-open integer intervals (start,end). Return their intersection tuple, or None if it is empty. Raise ValueError for reversed input intervals. Return only Python code."
+        }
+      ]
+    },
+    {
+      "id": "half_open_overlap-r2",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Implement wsp_intersection(a, b) for two half-open integer intervals (start,end). Return their intersection tuple, or None if it is empty. Raise ValueError for reversed input intervals. Return only Python code."
+        }
+      ]
+    }
+  ],
+  "generation": {
+    "max_new_tokens": 384,
+    "max_input_tokens": 256,
+    "do_sample": false,
+    "thinking": false,
+    "seed": 20261108,
+    "threads": 1
+  }
+}

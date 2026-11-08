@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "active_method": "forward-only-direct-bf16-weight-editing",
+  "model": "Qwen/Qwen3.5-4B",
+  "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "surgeon": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "xhigh"
+  },
+  "training_allowed": false,
+  "lora_allowed": false,
+  "backward_allowed": false,
+  "optimizers_allowed": false,
+  "iterative_loss_fitting_allowed": false,
+  "reuse_08b_coordinates_allowed": false,
+  "service_preemption_allowed": false,
+  "cleanup_allowed": false,
+  "preserve_all_artifacts": true,
+  "baseline_dtype": "BF16",
+  "independent_paired_evaluation_required": true,
+  "legacy_entrypoints": "retained for historical inspection; active CLI paths refuse execution",
+  "upstream": "https://github.com/RikiyaT/lm_understand-logs/blob/4d09ba6d6a7e891dd8063974dfe81b3d78e3494f/exp8_math/README.md",
+  "worker_max_seconds": 1800,
+  "progress_inspection_max_seconds": 600
+}

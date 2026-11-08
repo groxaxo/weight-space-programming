@@ -163,6 +163,8 @@ def selected_identity(args,cfg):
 
 
 def main():
+    from method_policy import blocked_legacy_operation
+    blocked_legacy_operation('Legacy native GPU/service supervisor')
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--phase',choices=['evaluate','benchmark','serve'],default='evaluate')
     parser.add_argument('--conversion',type=Path,required=True)

@@ -1,5 +1,13 @@
 # Qwen3.5-4B coding-assistant workflow
 
+**Historical LoRA track, stopped.** The active objective is now
+[forward-only direct BF16 weight editing](direct-weight-editing.md), governed by
+root `AGENTS.md` and `research-policy.json`. The legacy training/export/serving
+CLI entry points refuse execution. The commands and measurements below are
+retained for provenance; they are not instructions to resume training, merge a
+trained adapter, or pause another service. Independent direct-edit qualification
+has not yet been completed.
+
 This track adapts the official Qwen3.5-4B checkpoint for coding and structured tool use. It produces a separate LoRA adapter and preserves the base files. A completed training run is a candidate; deployment and broad coding reliability are separate questions assessed through the paired evaluations and real clients.
 
 For the 7 November follow-up, the user selected the **nine historical Experimentos failures through OpenCode**, replacing the planned new all-164 run. Follow the separate [HE9 contract](he9-acceptance.md): fresh VM/client state, original frozen Base+Plus tests, 262,144 context, Q8 K/V and a strict matched gain before promotion. The all-164 utilities below retain their broader contract and historical evidence; HE9 qualification does not pass that gate.

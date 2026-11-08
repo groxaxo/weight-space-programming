@@ -91,6 +91,8 @@ class NativeBackend:
 
 
 def main():
+    from method_policy import blocked_legacy_operation
+    blocked_legacy_operation('Legacy GPU/adapter native serving')
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config',type=Path,required=True)
     parser.add_argument('--model-proof',type=Path,required=True)

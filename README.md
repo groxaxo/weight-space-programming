@@ -1,18 +1,30 @@
 # Weight-Space Programming Lab
 
-A verified reproduction of the published **Qwen3.5-0.8B p50c weight repair**, plus a pinned **Qwen3.5-4B coding-assistant adaptation and evaluation track**. Both keep the original base checkpoint unchanged.
+A verified reconstruction of the published **Qwen3.5-0.8B p50c weight repair**, plus an active **Qwen3.5-4B direct-weight-edit research track**. The original base checkpoints and retained historical artifacts are preserved. **A successful 4B direct repair has not yet been established.**
 
 **Reconstruction:** pinned downloads, full input authentication, sparse BF16 reconstruction, non-overwriting publication, output and provenance verification, and CPU regression tests. A real 1.75 GB checkpoint has been reconstructed and checked on the Ubuntu 12700. `verify-output` now also authenticates the reconstruction record against the actual files and trusted lock.
 
-**Coding track:** authenticated official model snapshots, licensed public corpus imports, complete task-disjoint conversations, assistant-only loss masks, BF16 LoRA / NF4 QLoRA, separate validation and checkpoint selection, bounded OpenAI-compatible serving, executable coding and multi-turn tool checks, all 164 HumanEval tasks, and isolated OpenCode/Hermes file-edit acceptance checks. Generated Python is graded in a digest-pinned Docker sandbox with no network and a read-only root filesystem. See [the coding-assistant workflow](docs/coding-assistant.md).
+**Active 4B method:** the [pinned upstream exp8 constraints](https://github.com/RikiyaT/lm_understand-logs/blob/4d09ba6d6a7e891dd8063974dfe81b3d78e3494f/exp8_math/README.md) require forward-only diagnosis and direct tensor interventions. Training, LoRA/QLoRA, PEFT, backward/autograd updates, optimizers, loss fitting and merging trained adapters are excluded. The new [CPU patch contract](docs/direct-weight-editing.md) pins the official BF16 4B parent, authenticates all runtime inputs and validates sparse uint16 BF16 replacements against exact before/after hashes, counts and limits. It writes no full checkpoint. Bounded practice observation and resource admission are separate first-stage tools; a causal repair, independent paired acceptance and native deployment remain unproven. See [active agent instructions](AGENTS.md) and [method policy](research-policy.json).
 
-**Scope:** this does not implement autonomous Sol/Astra orchestration, activation extraction, or a general sandbox for unrestricted agents. Model quality is established by the actual paired reports and client results, not by successful training or reconstruction alone. The compact development suite is not evidence of frontier-model equivalence.
+The [8 November direct-weight study](docs/experiments/direct-weight-20261108.md)
+records the provenance audit, exact-base reproduction, unchanged-parameter
+semantic diagnostics, finite activation controls, preservation and negative
+results. [Frozen practice records](docs/experiments/direct-weight-20261108/)
+are exposed research evidence, not untouched evaluation data.
+The finite 14-forward activation study found a reproducible effect in layers
+16–23 but failed its frozen reverse joint-margin check. No weight candidate was
+justified, independent paired model quality remains `NOT_RUN`, and the baseline
+remains the retained reference.
 
-The current coding experiment runs on **`100.85.200.54`**, an RTX 3060 with 12 GB VRAM. Its supervisor temporarily pauses the existing Bonsai service only when explicitly authorized and restores it at the end of each GPU phase, including failures. Moss and Bonsai models/runtimes are preserved.
+**Historical coding track:** the preserved LoRA/QLoRA work contains authenticated model snapshots, licensed corpora, assistant-only loss masks, adapter selection, serving, executable coding/tool checks, HumanEval and OpenCode/Hermes fixtures. Those artifacts and results remain useful records, but they are not implementations of the active no-training method. Legacy training, supervised-corpus preparation and trained-derivative CLI entry points are guarded by `scripts/method_policy.py`. See [the historical coding-assistant workflow](docs/coding-assistant.md).
 
-## Current measured findings
+**Scope:** the original `0be1a86` wrapper reconstructs an existing 0.8B patch; it does not discover a repair. Its selected coordinates are never transferred to 4B. Model quality requires matched reports and independent evaluation, beyond successful reconstruction or a valid numeric patch. The exposed HE9/development/client fixtures are regressions, not a fresh untouched holdout. No result here establishes frontier-model equivalence.
 
-**Semantic repair round (8 November 2026):** A new MLP continuation lowered held-out loss from 0.2627 to 0.1165 but scored **10/14 development cases and 2/4 actual clients**, against a fresh base **12/14 and 3/4**. It is rejected: `bounded_chunks` still fails, escaping/version comparison regress, OpenCode's project times out, and Hermes's project fails. All eight client trials have valid request attribution; all 177 client requests receive the 28,192 native allowance. See [the full negative result](docs/experiments/semantic-repair-20261108-round1.md), [raw paired evidence](docs/experiments/semantic-repair-20261108-round1-paired.json) and the [predeclared formatted-data follow-up](docs/experiments/formatted-repair-protocol-20261108.md). Released Hugging Face weights remain unchanged pending a measured replacement win.
+The research host is **`100.85.200.54`**, with an RTX 3060 and 12 GB VRAM. New work requires live CPU/RAM/disk/GPU admission. Do not pause, restart, reroute or reconfigure Spark Fable Runtime, Bonsai, Moss, other jobs or the separate evaluation. Queue unavailable resources and preserve all artifacts; no cleanup is authorized. Sparse candidates avoid a second 9.32 GB BF16 checkpoint copy.
+
+## Historical LoRA findings — preserved, not direct-edit results
+
+**Semantic repair round (8 November 2026):** A new MLP continuation lowered held-out loss from 0.2627 to 0.1165 but scored **10/14 development cases and 2/4 actual clients**, against a fresh base **12/14 and 3/4**. It is rejected: `bounded_chunks` still fails, escaping/version comparison regress, OpenCode's project times out, and Hermes's project fails. All eight client trials have valid request attribution; all 177 client requests receive the 28,192 native allowance. See [the full negative result](docs/experiments/semantic-repair-20261108-round1.md), [raw paired evidence](docs/experiments/semantic-repair-20261108-round1-paired.json) and the historical [formatted-data follow-up protocol](docs/experiments/formatted-repair-protocol-20261108.md). That training follow-up was stopped after logged step 22/172 without saving a new checkpoint; it is not the active plan. Released Hugging Face weights retain their historical trained identity.
 
 **28,192-token client follow-up:** The paired 28,192-token client rerun records base **3/4** and released MLP **3/4** passes. All actual clients have complete request attribution: **True**. The omitted-limit fallback is fixed, native output allowances are verified, and the original HE9 measurements retain their separate 8,192-token identity. No additional training or model promotion is performed. See [paired results and budget proof](docs/experiments/hermes-output28192-20261107.md).
 
@@ -58,16 +70,16 @@ checkpoint export, literal tool markup and attribution of actual client requests
 Serving identity schema 2 requires fresh paired evidence; the historical quality
 measurements above remain attached to their original source.
 
-The source regression suite contains 250 tests. Use the independent CPU setup
-below; optional training-library checks skip in that environment. Full sandbox
+The source regression suite includes CPU integrity and protocol controls. Use the independent CPU setup
+below; optional historical training-library checks skip in that environment. Full sandbox
 checks additionally require Docker and `WSP_TEST_DOCKER_IMAGE`, as configured
 in the included GitHub Actions workflow.
 
 **GPU comparison and accounting (7 November 2026):** a targeted, single-GPU-per-arm MATH-500 runner compares original-thinking, repaired-thinking, and original-nonthinking through the existing GPUQ queue. The three jobs were subsequently cancelled after entering generation, with zero saved samples and no accuracy result. The token-accounting audit and interruption evidence are retained. See [protocol, job IDs, and operations](docs/THREE_GPU_COMPARISON.md).
 
-**Research-agent components still not implemented:** autonomous Sol/Astra orchestration, frontier token or spending budgets, activation extraction, a general evaluation/serving service, and a sandbox for unrestricted research agents. The coding and HE9 tracks do provide isolated execution for their bounded fixtures. [Sol 6.1 Max produced the broader implementation plan](docs/plans/sol-6.1-max-20261107.md), with [invocation provenance](docs/plans/sol-plan-provenance-20261107.json).
+**Research-agent limits:** no autonomous Sol/Astra orchestration, frontier token/spending budget controller, general unrestricted editor sandbox or independently accepted direct-edit model exists. The direct contract and bounded forward-only practice worker are engineering foundations. The historical coding and HE9 tracks provide isolated execution for their bounded fixtures. [Sol 6.1 Max produced a broader historical implementation plan](docs/plans/sol-6.1-max-20261107.md), with [invocation provenance](docs/plans/sol-plan-provenance-20261107.json); that plan is not evidence of execution.
 
-## Quick start — Linux, Python 3.12
+## 0.8B reconstruction quick start — Linux, Python 3.12
 
 ```bash
 python3 -m venv .venv

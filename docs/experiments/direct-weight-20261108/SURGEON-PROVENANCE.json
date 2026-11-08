@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "captured_at_utc": "2026-11-07T22:15:54.589952+00:00",
+  "requested_model": "gpt-6.1-sol",
+  "requested_reasoning_effort": "xhigh",
+  "actual_invocation": {
+    "tool": "collaboration.spawn_agent",
+    "task": "/root/direct_weight_surgeon",
+    "fork_turns": "none",
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "xhigh"
+  },
+  "worker_completed": true,
+  "worker_scope": "CPU patch contract and regression tests, separate immutable4Block, AGENTS/README/directmethoddocumentation; read-only scientific localization review.",
+  "independent_quality_evaluator": false,
+  "training": false,
+  "holdout_access": false,
+  "model_edits_produced": false,
+  "file_sha256_at_capture": {
+    "scripts/direct_weights.py": "4f915127372cc9f00a8b94e3b5f500b0f1679cc6b10c3464489b3d1833a6ea1a",
+    "configs/qwen35-4b-direct.lock.json": "6058685c1842ee36e24fcb17131ae072332c8cf1e679189e7eaeff4765a2eb8b",
+    "tests/test_direct_weights.py": "5b0e39f8671b8daa0fb0c3a4f5e13bea2611d6b44ba6a6dd1475bb4ebed8a339",
+    "AGENTS.md": "0fc597a2d91085dcb58aeffef2e191bdea110f22d45e12a697dedcd26f35a011",
+    "README.md": "641827c10a378cc0a8f509bcdd4fa8f618e9b92bc6d829704ba0091e3d0d80d9",
+    "docs/direct-weight-editing.md": "29bdd8ea2ab9f07f8b1e4a76fc0b2c2e6a76c97ae2645a0bfacb0665e4b4f9b3"
+  },
+  "note": "Parent subsequently integrated runtime, policy, extra tests and documentation; final source hashes are recorded separately. Surgeon code provenance is distinct from model-quality evidence."
+}

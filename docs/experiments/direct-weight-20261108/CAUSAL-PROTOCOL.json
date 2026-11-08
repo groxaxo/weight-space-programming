@@ -1,0 +1,76 @@
+{
+  "budget_per_stage": {
+    "host_hard_max_seconds": 1800,
+    "max_forward_calls": [
+      6,
+      8
+    ],
+    "max_wall_seconds": 1700,
+    "postcheck_reserve_seconds": 120
+  },
+  "created_at_utc": "2026-11-08T00:20:26.887097+00:00",
+  "direction": "Per-layer MLP down-projection output at decision: semantic cue minus equal-length neutral, subtract FP32, add FP32 to recipient, round BF16; no parameter updates.",
+  "donor_files": {
+    "cue-decision.npz": "8bbc5a7fd6228a7d9c1d60977722fc5003c8df37682b9ca1992942d1627a7a22",
+    "length_control-decision.npz": "77e9622ebdbafe06c9a8a539d2ac382e46b419fb7c6f95fb70dafc9f1a7ba619",
+    "request-proof.json": "a5e8f4b1d481bd99127e4d514d14019f7d21b2a4ddd78a9fc2b7590f893ad054",
+    "result.json": "576390096a5f66fe03cdd3bcf5ade9e296bdbee848871cd6ec683c8e712817de",
+    "runtime-identity.json": "13e6875e2a6b5cf6c8f85085275a974a3588be7dc3fd9048887d523fd0f84cb7",
+    "tokenization-proof.json": "7e0abb8e2258432e099ec0d54dbd5c294340ed9bfc9031dc711af83c151a3f7b"
+  },
+  "parent_lock_sha256": "6058685c1842ee36e24fcb17131ae072332c8cf1e679189e7eaeff4765a2eb8b",
+  "patient_sha256": "45de371d0f630611d2268cb4298807b78756c9e70773c732b64be851ab94047e",
+  "preservation": "All completed/failed/intermediate runs and original inputs retained. No cleanup or control of Spark Fable Runtime, Bonsai, Moss, other jobs or separate evaluation; CPU only admitted under existing resource broker.",
+  "quality_evaluation": "NOT_RUN",
+  "replay_gate": "Exact parent all426parameters and fresh runtime/source/kernel identities; neutral/cue raw candidate token logprobs within1e-6 and ALL64 input/output decision arrays bit-identical. Zero-strength hook exact repeat. Off-target location verified actual tokenizer before any stage score.",
+  "schema_version": 1,
+  "source_request_sha256": "e8951e2d02b4a213918d9c6b79937ca2971043c4583f4b5fb5178035afe31845",
+  "source_sha256": {
+    "ops/direct_edit54.py": "dcb134875f7deb90e56a8a2661c506f8fc60c33c6e25c46d5e238bf2a574b169",
+    "scripts/direct_causal.py": "c55175a3c1a26c8c03221df28bbd2be683c05c0519e0ceb098eb4e59b49782cf",
+    "scripts/direct_forward.py": "ebaba42faf5e43aaf97c0c7c9060a1a5a28b0968675130735bb5f2030858fbcf",
+    "scripts/direct_probe.py": "051a9b69f8230ab56abb04c16d5abfb8de1a2d9d055270bf876c188f6a65c600",
+    "scripts/direct_weights.py": "4f915127372cc9f00a8b94e3b5f500b0f1679cc6b10c3464489b3d1833a6ea1a"
+  },
+  "stage": "Finite activation causality screen; practice only",
+  "stage1_gate": "Greedycorrect>, positive correct-minus-wrong joint logprob, increase>=2nat over neutral. Winner greatestincrease, tieswithin1e-6smallerindex. NoqualifierSTOP.",
+  "stage2_gate": [
+    "Full reproduces stage1 score within1e-6 and exact intervention stats; greedy> positive margin.",
+    "Half marginincrease strictlybetweenzeroandfull.",
+    "Two randomsign andofftarget actualpostBF16 perlayernorm+changedcount mustmatchfullwithin5%; no seed/position search. Both random andofftarget mustretain>= and absolute marginchange<25%of full effect.",
+    "Fresh semantic cue replay; reverse mustselect>= withnegative margin andnorm/supportmatchwithin5%.",
+    "All426before/afterparameterhashes equal."
+  ],
+  "stages": {
+    "1": [
+      "neutral-replay",
+      "no-op-group0-alpha0",
+      "group0-layers0:8-alpha1",
+      "group1-layers8:16-alpha1",
+      "group2-layers16:24-alpha1",
+      "group3-layers24:32-alpha1"
+    ],
+    "2": [
+      "neutral-replay",
+      "full-winner-alpha1",
+      "half-winner-alpha0.5",
+      "random-sign-seed20261108",
+      "random-sign-seed20261109",
+      "off-target-assistant-codefence-python-token",
+      "semantic-replay",
+      "reverse-semantic-minus-delta"
+    ]
+  },
+  "stop_rules": [
+    "Any replay/identity/matching/control failure or incomplete stage ends this hypothesis. No broadened groups, alternate strengths/seeds/positions/thresholds after scores.",
+    "An activation-control pass establishes only a candidate information carrier. It does NOT establish defectiveweights, eligiblecoordinates, permanentpatch or modelqualityimprovement.",
+    "Separate reviewed non-fitting read/write geometry and practice-family regression protocol required before any sparse BF16 candidate.",
+    "Independent untouched paired evaluation remainsNOT_RUN until a justified frozen candidate exists. Exposed HE9/development/client cases are regressions. No training fallback."
+  ],
+  "surgeon": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "xhigh"
+  },
+  "training": false,
+  "weights_edited": false
+}

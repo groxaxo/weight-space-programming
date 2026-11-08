@@ -1,0 +1,77 @@
+"""Separate arithmetic audit of recorded controls; never a model quality evaluator."""
+from pathlib import Path
+import hashlib,json,math,sys
+ROOT=Path(__file__).resolve().parents[1]
+OUT=Path(sys.argv[1]).resolve() if len(sys.argv)==2 else ROOT/'outputs/direct-weight-implementation-20261108'
+def read(p):return json.loads(p.read_text())
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def scores(j):
+ rows={}
+ for row in j['arms']:
+  assert row['id'] not in rows
+  if row['status']!='completed':continue
+  totals={}
+  for label in ('correct','incorrect'):
+   branch=row['branches'][label]
+   assert len(branch['ids'])==len(branch['token_logprobs'])==3
+   assert all(math.isfinite(v) and v<=0 for v in branch['token_logprobs'])
+   totals[label]=sum(branch['token_logprobs'])
+   assert abs(totals[label]-branch['sequence_logprob'])<=1e-9
+  margin=totals['correct']-totals['incorrect']
+  assert abs(margin-row['correct_minus_incorrect_logprob'])<=1e-9
+  rows[row['id']]={**row,'M':margin,'correct':row['next_token_id']==row['branches']['correct']['ids'][0],
+                  'wrong':row['next_token_id']==row['branches']['incorrect']['ids'][0]}
+ return rows
+
+def matches(actual,reference):
+ assert len(actual)==len(reference)==8
+ a={x['layer']:x for x in actual};b={x['layer']:x for x in reference}
+ assert len(a)==len(b)==8 and set(a)==set(b)
+ comparisons=[]
+ for layer in sorted(a):
+  assert type(a[layer]['changed_entries']) is int and 0<=a[layer]['changed_entries']<=2560
+  for key in ('delta_l2','changed_entries'):
+   assert math.isfinite(a[layer][key]) and a[layer][key]>=0
+   comparisons.append(abs(a[layer][key]-b[layer][key])<=0.05*b[layer][key])
+ return all(comparisons)
+
+j1=read(OUT/'causal-stage1.result.json');j2=read(OUT/'causal-stage2.result.json')
+identity=read(OUT/'first-semantic-probe-02.result.json')['loaded_parameter_sha256_before']
+assert len(identity)==426
+for stage,j in enumerate((j1,j2),1):
+ assert j['parent']['lock_sha256']=='6058685c1842ee36e24fcb17131ae072332c8cf1e679189e7eaeff4765a2eb8b'
+ assert j['loaded_parameter_sha256_before']==j['loaded_parameter_sha256_after']==identity
+ assert j['parameter_postcheck_complete'] and j['parameters_unchanged'] and j['training'] is False
+ assert j['weights_edited'] is False and j['quality_evaluation']=='NOT_RUN' and j['stage']==stage
+ assert j['request_sha256']==sha(OUT/f'CAUSAL-STAGE{stage}-REQUEST.json')
+ assert j['protocol_sha256']==sha(OUT/'CAUSAL-PROTOCOL.json')
+r1,r2=scores(j1),scores(j2)
+assert j1['complete'] and set(r1)=={'neutral-replay','no-op','group-0','group-1','group-2','group-3'}
+assert r1['neutral-replay']['branches']==r1['no-op']['branches']
+assert r1['no-op']['replay']['all_64_input_output_vectors_bit_identical']
+qualifying={g:r1[f'group-{g}']['M']-r1['neutral-replay']['M'] for g in range(4) if r1[f'group-{g}']['correct'] and r1[f'group-{g}']['M']>0 and r1[f'group-{g}']['M']-r1['neutral-replay']['M']>=2}
+assert qualifying
+best=max(qualifying.values());winner=min(g for g,v in qualifying.items() if v>=best-1e-6)
+assert winner==j1['diagnostic_gate']['winner_group']
+assert j2['stage1_result_sha256']==sha(OUT/'causal-stage1.result.json')
+expected={'neutral-replay','full','half','random-20261108','random-20261109','off-target','semantic-replay','reverse'}
+checks={}
+if j2['complete']:
+ assert set(r2)==expected
+ base,full=r2['neutral-replay'],r2['full'];effect=full['M']-base['M']
+ checks={'full_correct':full['correct'] and full['M']>0 and effect>=2,
+         'dose_monotone':0<r2['half']['M']-base['M']<effect,
+         'reverse_incorrect':r2['reverse']['wrong'] and r2['reverse']['M']<0,
+         'reverse_matched':matches(r2['reverse']['actual_interventions'],full['actual_interventions'])}
+ for name in ('random-20261108','random-20261109','off-target'):
+  row=r2[name]
+  checks[name+'_matched']=matches(row['actual_interventions'],full['actual_interventions'])
+  checks[name+'_specific']=row['wrong'] and abs(row['M']-base['M'])<0.25*effect
+ verdict='activation_controls_passed' if all(checks.values()) else 'STOP_controls_failed'
+ assert checks==j2['diagnostic_gate']['checks'] and verdict==j2['diagnostic_gate']['status']
+else:
+ verdict=j2['diagnostic_gate']['status']
+ assert verdict in ('NOT_RUN_incomplete','STOP_integrity_or_replay')
+result={'schema_version':1,'scope':'Separately recomputed recorded joint probabilities, fixed winner, ancestry, all426parameteridentity and Stage2control arithmetic. Not independent modelqualityevaluation.','source_sha256':sha(Path(__file__)),'stage1_result_sha256':sha(OUT/'causal-stage1.result.json'),'stage2_result_sha256':sha(OUT/'causal-stage2.result.json'),'winner_group':winner,'stage2_verdict':verdict,'stage2_checks':checks,'all_recorded_joint_probability_sums_consistent':True,'all426parameters_match_official_loaded_parent':True,'new_model_quality_evaluation':'NOT_RUN'}
+with (OUT/'CONTROL-ARITHMETIC-REVIEW.json').open('x') as f:json.dump(result,f,indent=2,sort_keys=True);f.write('\n')
+print(json.dumps(result,indent=2))

@@ -1,0 +1,8 @@
+{
+  "errors": 0,
+  "failures": 0,
+  "scope": "contract and tiny tensor model, no Qwen load",
+  "skips": 0,
+  "successful": true,
+  "tests_run": 21
+}

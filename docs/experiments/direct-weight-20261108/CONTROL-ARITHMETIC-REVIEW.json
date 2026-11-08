@@ -1,0 +1,24 @@
+{
+  "all426parameters_match_official_loaded_parent": true,
+  "all_recorded_joint_probability_sums_consistent": true,
+  "new_model_quality_evaluation": "NOT_RUN",
+  "schema_version": 1,
+  "scope": "Separately recomputed recorded joint probabilities, fixed winner, ancestry, all426parameteridentity and Stage2control arithmetic. Not independent modelqualityevaluation.",
+  "source_sha256": "53f3b0fcd3c687ee622a6af2b025fe0b506f8b8ffdca3494f24958c5993b03a8",
+  "stage1_result_sha256": "d76e7cc0309d01ebe348f6f1e78836718b6aea45558525f54b275db988cf31c8",
+  "stage2_checks": {
+    "dose_monotone": true,
+    "full_correct": true,
+    "off-target_matched": true,
+    "off-target_specific": true,
+    "random-20261108_matched": true,
+    "random-20261108_specific": true,
+    "random-20261109_matched": true,
+    "random-20261109_specific": true,
+    "reverse_incorrect": false,
+    "reverse_matched": true
+  },
+  "stage2_result_sha256": "3b4a8c7046d906a9cbe75bc57aa67cdaef51ac238996bffd0132333779fa4804",
+  "stage2_verdict": "STOP_controls_failed",
+  "winner_group": 2
+}

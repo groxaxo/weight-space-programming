@@ -33,6 +33,8 @@ def record_progress(output, plan, rows):
 
 
 def main():
+    from method_policy import blocked_legacy_operation
+    blocked_legacy_operation('Legacy VM/native GPU replay requires a new direct-edit protocol')
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--conversion', type=Path, required=True)
     parser.add_argument('--profile', required=True)

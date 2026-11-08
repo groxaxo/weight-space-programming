@@ -72,6 +72,8 @@ def prepare_control(output, cfg, proof_path):
 
 
 def main():
+    from method_policy import blocked_legacy_operation
+    blocked_legacy_operation('Legacy GPU smoke pipeline includes training and service preemption')
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--allow-pause-bonsai', action='store_true')

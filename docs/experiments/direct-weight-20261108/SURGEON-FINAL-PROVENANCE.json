@@ -1,0 +1,39 @@
+{
+  "actual_invocation": {
+    "fork_turns": "none",
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "xhigh",
+    "task": "/root/direct_weight_surgeon",
+    "tool": "collaboration.spawn_agent"
+  },
+  "boundaries": {
+    "agent_model_jobs_or_remote_execution": false,
+    "holdout_access": false,
+    "independent_quality_evaluator": false,
+    "model_weights_edited": false,
+    "training": false
+  },
+  "captured_at_utc": "2026-11-08T00:29:31.945722+00:00",
+  "followup_scope": [
+    "sparseBF16contract+4Block+methoddocs",
+    "read-onlylocalizationreview",
+    "decisionprobev1+v2",
+    "finiteactivationcausalworker+regressiontests"
+  ],
+  "note": "Same selected surgeon profile throughout followups; parent integrated runtime, host admission, policy, extra tests and final docs. Source identity and numerical integrity are distinct from model quality.",
+  "schema_version": 1,
+  "source_sha256": {
+    "configs/qwen35-4b-direct.lock.json": "6058685c1842ee36e24fcb17131ae072332c8cf1e679189e7eaeff4765a2eb8b",
+    "scripts/direct_causal.py": "c55175a3c1a26c8c03221df28bbd2be683c05c0519e0ceb098eb4e59b49782cf",
+    "scripts/direct_probe.py": "051a9b69f8230ab56abb04c16d5abfb8de1a2d9d055270bf876c188f6a65c600",
+    "scripts/direct_weights.py": "4f915127372cc9f00a8b94e3b5f500b0f1679cc6b10c3464489b3d1833a6ea1a",
+    "tests/test_direct_causal.py": "fdedf23f8a06f452a2abc448a1bd536c85b951abf3690548f0cd9a91e49111e6",
+    "tests/test_direct_probe.py": "cc904136f67761a73eeaabb93169a2e2e8ce29d486bb44b4a9b66c9d4028d2ac",
+    "tests/test_direct_weights.py": "5b0e39f8671b8daa0fb0c3a4f5e13bea2611d6b44ba6a6dd1475bb4ebed8a339"
+  },
+  "validation": {
+    "causal_host_tests_passed": 5,
+    "causal_pure_tests": 15,
+    "causal_tiny_forward_passed_in_parent_container": true
+  }
+}

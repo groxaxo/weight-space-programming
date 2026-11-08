@@ -201,6 +201,8 @@ def handler_for(backend):
 
 
 def main():
+    from method_policy import blocked_legacy_operation
+    blocked_legacy_operation('Legacy GPU/adapter serving')
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=Path(__file__).resolve().parents[1] / "configs/qwen35-4b.json")
     parser.add_argument("--adapter", type=Path)

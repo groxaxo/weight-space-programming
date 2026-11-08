@@ -205,6 +205,8 @@ def serve_and_evaluate(args, output, cfg, snapshot):
 
 
 def main():
+    from method_policy import blocked_legacy_operation
+    blocked_legacy_operation("Legacy training/GPU/service supervisor")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--phase", choices=("evaluate", "benchmark", "smoke", "train", "serve"), default="evaluate")
     parser.add_argument("--python", default=str(ROOT / ".venv-train/bin/python"))

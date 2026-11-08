@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "scope": "Preregistered diagnostic gate, not independent quality evaluation",
+  "protocol_sha256": "6618e1d0fb9a9d91c11d88534debb5c126aa22ee87954f1e16f60797a230cfa1",
+  "evaluator_sha256": "b93adce61fb8d6871af4654ad7fbfafbb47bf679da55618881ecd2adf11e3f04",
+  "checks": {
+    "baseline_greedy_incorrect": true,
+    "baseline_numeric_repeatable": true,
+    "neutral_greedy_incorrect": true,
+    "neutral_margin_stable": true,
+    "semantic_advantage": true,
+    "semantic_greedy_correct": true
+  },
+  "passed": true,
+  "max_baseline_token_logprob_difference": 0.0,
+  "repeated_baseline_margin": -5.582263739155529,
+  "neutral_margin": -5.564170599110319,
+  "semantic_margin": 0.37471243675086185,
+  "neutral_minus_baseline_nats": 0.018093140045209566,
+  "semantic_minus_neutral_nats": 5.938883035861181,
+  "next_step": "Probe earliest incorrect semantic docstring assertion under a new reviewed protocol before group screening",
+  "weight_candidate_eligible": false,
+  "weights_edited": false,
+  "independent_paired_quality": "NOT_RUN"
+}

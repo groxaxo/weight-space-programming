@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "created_at_utc": "2026-11-07T23:25:07.663610+00:00",
+  "stage": "Preregistered length/format control; no activation intervention or weight edit",
+  "surgeon": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "xhigh"
+  },
+  "patient_sha256": "45de371d0f630611d2268cb4298807b78756c9e70773c732b64be851ab94047e",
+  "previous_semantic_probe_result_sha256": "7a39a7d51921f7cd48abea4c58529b00ff3f7438925296f451f376a6c1c6ca0c",
+  "neutral_selection_sha256": "5b221db29990d3289d817bd41f3a74ea543e45c07d0703b8a1416b0a37691084",
+  "neutral_text": "For presentation, use a plain style. Prefer descriptive names, consistent indentation, and ordinary spacing throughout the body of the function.",
+  "selection": "First exact233-token/decision230match in second predeclared finite list, using token counts only. First list had no match and is preserved. No neutral model score inspected or used.",
+  "question": "Is the observedsemanticcueeffectspecificenough to investigate further, given the extra26tokens and alreadyincorrectforceddocstring?",
+  "profile": {
+    "max_input_tokens": 512,
+    "thinking": false,
+    "threads": 1,
+    "seed": 20261108
+  },
+  "budget": {
+    "max_forward_calls": 2,
+    "max_wall_seconds": 1700,
+    "postcheck_reserve_seconds": 120,
+    "controls_admitted": false
+  },
+  "worker_max_seconds": 1800,
+  "contexts": "Unchanged repeatedbaseline and one fixed length/format-control prompt in the sameparagraphformat; identicalgeneratedassistantprefixIDs, operatorcandidates and scoring. Outputlabelcue means neutralcontrol in this protocol.",
+  "diagnostic_gate": {
+    "baseline_greedy_incorrect_required": true,
+    "baseline_branch_token_logprob_max_abs_difference": 1e-06,
+    "neutral_greedy_incorrect_required": true,
+    "neutral_margin_difference_from_repeated_baseline_max_abs_nats": 1.0,
+    "semantic_margin_advantage_over_neutral_min_nats": 2.0,
+    "existing_semantic_greedy_correct_required": true
+  },
+  "gate_interpretation": "Practical diagnostic thresholds, not significance or quality qualification. Ifneutralfails: STOPgroupscreening,no neutralwordingretryaftermodelscore,no weightcandidate. Ifpass: probeearliestwrongdocstringassertionundernewidentitybeforelocalization.",
+  "parameters": "Original officialcheckpoint; all426hashesmustmatchbefore/after. No LoRA/training/gradients/optimizers/fitting/weightchanges.",
+  "independent_paired_quality": "NOT_RUN: no candidate; exposedpracticeonly.",
+  "source_sha256": {
+    "scripts/direct_probe.py": "e43028de2e5d3d52a71f0797a4e470491e25fa8e06493027b174933451e06622",
+    "scripts/direct_forward.py": "ebaba42faf5e43aaf97c0c7c9060a1a5a28b0968675130735bb5f2030858fbcf",
+    "scripts/direct_weights.py": "4f915127372cc9f00a8b94e3b5f500b0f1679cc6b10c3464489b3d1833a6ea1a",
+    "ops/direct_edit54.py": "d696e3e4948dc2fac5d382e0617f23ee6b0834974c73cb6d933eb4a899160751"
+  }
+}

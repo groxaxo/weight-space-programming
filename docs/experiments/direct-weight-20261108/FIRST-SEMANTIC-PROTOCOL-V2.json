@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "created_at_utc": "2026-11-07T23:44:27.570955+00:00",
+  "stage": "First incorrect semantic assertion; three-context practice-only diagnostic",
+  "surgeon": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "xhigh"
+  },
+  "prerequisite_gate_sha256": "9d698d4c9509d640ace19a11b92b6550aa1560fd302ee38213eb4bc9064edf0a",
+  "patient_sha256": "45de371d0f630611d2268cb4298807b78756c9e70773c732b64be851ab94047e",
+  "question": "half_open_overlap-first-semantic-assertion",
+  "target": "Earliest actual incorrect ValueError docstring definition start>=end, before the later executableguard. Originalpatientprompt+generatedprefixIDs mustreplayexactly.",
+  "contexts": [
+    "baseline",
+    "cue",
+    "length_control"
+  ],
+  "semantic_cue": "An interval with equal endpoints is valid and empty. Only start > end is reversed. Return None when the intersection is empty.",
+  "length_control": "For presentation, use a plain style. Prefer descriptive names, consistent indentation, and ordinary spacing throughout the body of the function.",
+  "operators": {
+    "correct": ">",
+    "incorrect": ">=",
+    "suffix": " end)."
+  },
+  "profile": {
+    "max_input_tokens": 512,
+    "thinking": false,
+    "threads": 1,
+    "seed": 20261108
+  },
+  "budget": {
+    "max_forward_calls": 3,
+    "max_wall_seconds": 1700,
+    "postcheck_reserve_seconds": 120,
+    "controls_admitted": false
+  },
+  "worker_hard_max_seconds": 1800,
+  "tokenization": "No truncation, exactpatientreplay. Cue/controlmusthaveidenticalinputlength,decisionposition,candidatesequences.",
+  "stop_rules": [
+    "If first-semantic baseline does not selectincorrect>= withnegativecorrect-minus-wrongjointmargin: STOP localization; mark remainingcontextsNOT_RUN_replay_mismatch. Investigate cachedgenerationversusteacherforcing arithmetic, do not editweights.",
+    "Aftercomplete3contexts: require neutral>=, neutralmarginwithin1natofbase, semantic>andpositivemarginwith>=2natadvantageoverneutral. If not: STOP localization.",
+    "Even a diagnostic pass does not authorize weight coordinates, an edit or promotion. No activation arms in schema2. Matchedrandom/position/reversecausalcontrols,practicefamilyreplication andweightgeometryremainrequired."
+  ],
+  "preservation": "Originalparentreadonly, everyloadedparamhashbefore/afterequal, allpartialoutputsretained; noLoRA/training/optimizer/fitting/weightupdate, no controls of otherjobs.",
+  "quality_evaluation": "NOT_RUN",
+  "source_sha256": {
+    "scripts/direct_probe.py": "051a9b69f8230ab56abb04c16d5abfb8de1a2d9d055270bf876c188f6a65c600",
+    "scripts/direct_forward.py": "ebaba42faf5e43aaf97c0c7c9060a1a5a28b0968675130735bb5f2030858fbcf",
+    "scripts/direct_weights.py": "4f915127372cc9f00a8b94e3b5f500b0f1679cc6b10c3464489b3d1833a6ea1a",
+    "ops/direct_edit54.py": "2d3ba66070cdd79657c3ce143c686b9cf8a4c4010a32310c3981e51f570dfd07"
+  },
+  "protocol_version": 2,
+  "controller_revision": "Host admission was still schema1-only and refusedschema2 BEFORE any model job. Hostnowexplicitlyacceptsreviewedschema2onlyforprobe; Boolean/unknown/final/patchinputsremainrefused. Newregressioncoversmode-specificschema. Firstattemptretained."
+}

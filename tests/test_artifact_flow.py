@@ -99,7 +99,9 @@ class ArtifactFlowTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); base, training, proof, cpp, files, cfg = self.setup_flow(root)
             output = root / 'selected'
-            with patch.object(sys, 'argv', ['select', '--training', str(training), '--step', '1', '--output', str(output)]): selection.main()
+            # Exercise retained export internals with the active CLI guard mocked.
+            with patch('method_policy.blocked_legacy_operation'), \
+                 patch.object(sys, 'argv', ['select', '--training', str(training), '--step', '1', '--output', str(output)]): selection.main()
             verify_recipe(output)
             result = compile_checkpoint(base, output / 'adapter', [TARGET], files, root / 'compiled')
             self.assertTrue(result['verification']['all_unedited_bytes_preserved'])
@@ -110,7 +112,9 @@ class ArtifactFlowTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); _, training, *_ = self.setup_flow(root)
             output = root / 'selected'
-            with patch.object(sys, 'argv', ['select', '--training', str(training), '--step', '1', '--output', str(output)]):
+            # Exercise retained export internals with the active CLI guard mocked.
+            with patch('method_policy.blocked_legacy_operation'), \
+                 patch.object(sys, 'argv', ['select', '--training', str(training), '--step', '1', '--output', str(output)]):
                 with patch.object(selection.shutil, 'copytree', side_effect=OSError('injected copy failure')):
                     with self.assertRaises(OSError): selection.main()
                 self.assertFalse(output.exists())

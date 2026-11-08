@@ -124,6 +124,8 @@ def conversations(rows, controls):
 
 
 def main():
+    from method_policy import blocked_legacy_operation
+    blocked_legacy_operation("Legacy supervised-training corpus preparation")
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('public-corpus','existing-corpus','output','config','model-proof'):
         parser.add_argument('--'+name,type=Path,required=True)

@@ -96,6 +96,8 @@ def convert(args):
 
 
 def main():
+    from method_policy import blocked_legacy_operation
+    blocked_legacy_operation('Legacy trained-checkpoint GGUF conversion')
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', type=Path, default=Path(__file__).resolve().parents[1] / 'configs/qwen35-4b-lr5e-6.json')
     parser.add_argument('--model-proof', type=Path, required=True)

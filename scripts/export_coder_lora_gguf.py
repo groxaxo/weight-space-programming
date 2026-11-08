@@ -57,6 +57,8 @@ def verify_permutations(targets, counts):
 
 
 def main():
+    from method_policy import blocked_legacy_operation
+    blocked_legacy_operation('Trained LoRA export')
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--llama-source',type=Path,required=True)
     parser.add_argument('--config',type=Path,required=True)

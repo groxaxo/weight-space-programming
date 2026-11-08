@@ -64,6 +64,8 @@ class AdapterAuthenticationTests(unittest.TestCase):
                 with self.assertRaises(CoderError): verify_initial_adapter(training, cfg, targets)
 
     def test_supervisor_forwards_the_parent_to_training_and_rejects_it_for_inference(self):
+        # Historical command construction only: both the policy and subprocess
+        # execution are mocked. Real CLI refusal is covered by test_method_policy.
         sys.path.insert(0, str(ROOT))
         from ops import run54_gpu_phase as phase
         with tempfile.TemporaryDirectory() as directory:
@@ -75,6 +77,7 @@ class AdapterAuthenticationTests(unittest.TestCase):
                  patch.object(phase, 'load_config', return_value=cfg), \
                  patch.object(phase, 'gpu_window', return_value=nullcontext()), \
                  patch.object(phase.signal, 'signal'), patch.dict(os.environ), \
+                 patch('method_policy.blocked_legacy_operation'), \
                  patch.object(phase, 'run_logged') as run:
                 phase.main()
             actual = run.call_args.args[0]
@@ -82,7 +85,8 @@ class AdapterAuthenticationTests(unittest.TestCase):
             self.assertEqual(json.loads((root / 'run/phase.json').read_text())['init_training'], str(root / 'parent'))
             command[command.index('train')] = 'evaluate'
             command[command.index(str(root / 'run'))] = str(root / 'inference')
-            with patch.object(sys, 'argv', command), self.assertRaisesRegex(CoderError, 'only valid for training'):
+            with patch.object(sys, 'argv', command), patch('method_policy.blocked_legacy_operation'), \
+                 self.assertRaisesRegex(CoderError, 'only valid for training'):
                 phase.main()
             self.assertFalse((root / 'inference').exists())
 

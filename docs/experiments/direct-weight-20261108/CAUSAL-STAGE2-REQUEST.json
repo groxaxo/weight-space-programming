@@ -1,0 +1,26 @@
+{
+  "budget": {
+    "max_forward_calls": 8,
+    "max_wall_seconds": 1700,
+    "postcheck_reserve_seconds": 120
+  },
+  "donor_files": {
+    "cue-decision.npz": "8bbc5a7fd6228a7d9c1d60977722fc5003c8df37682b9ca1992942d1627a7a22",
+    "length_control-decision.npz": "77e9622ebdbafe06c9a8a539d2ac382e46b419fb7c6f95fb70dafc9f1a7ba619",
+    "request-proof.json": "a5e8f4b1d481bd99127e4d514d14019f7d21b2a4ddd78a9fc2b7590f893ad054",
+    "result.json": "576390096a5f66fe03cdd3bcf5ade9e296bdbee848871cd6ec683c8e712817de",
+    "runtime-identity.json": "13e6875e2a6b5cf6c8f85085275a974a3588be7dc3fd9048887d523fd0f84cb7",
+    "stage1-result.json": "d76e7cc0309d01ebe348f6f1e78836718b6aea45558525f54b275db988cf31c8",
+    "tokenization-proof.json": "7e0abb8e2258432e099ec0d54dbd5c294340ed9bfc9031dc711af83c151a3f7b"
+  },
+  "lock_sha256": "6058685c1842ee36e24fcb17131ae072332c8cf1e679189e7eaeff4765a2eb8b",
+  "patient_sha256": "45de371d0f630611d2268cb4298807b78756c9e70773c732b64be851ab94047e",
+  "protocol_sha256": "3fbedac088e9e468c63430d6a318da9c85793268171f159b6c0e4229128878e4",
+  "question": "half_open_overlap-first-semantic-causality",
+  "role": "practice",
+  "schema_version": 1,
+  "source_request_sha256": "e8951e2d02b4a213918d9c6b79937ca2971043c4583f4b5fb5178035afe31845",
+  "stage": 2,
+  "stage1_result_sha256": "d76e7cc0309d01ebe348f6f1e78836718b6aea45558525f54b275db988cf31c8",
+  "winner_group": 2
+}

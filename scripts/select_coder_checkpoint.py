@@ -19,6 +19,8 @@ from pipeline import publish_directory, sync_directory
 
 
 def main():
+    from method_policy import blocked_legacy_operation
+    blocked_legacy_operation('Legacy trained-adapter checkpoint selection')
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--training", type=Path, required=True)
     parser.add_argument("--step", type=int, required=True)

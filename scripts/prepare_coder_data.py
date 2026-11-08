@@ -92,6 +92,8 @@ def read_dataset(directory):
 
 
 def main():
+    from method_policy import blocked_legacy_operation
+    blocked_legacy_operation("Legacy supervised-training corpus preparation")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, action="append", required=True)
     parser.add_argument("--source", type=Path, action="append", required=True, help="JSON source identity for each --input")

@@ -38,6 +38,9 @@ def main():
     selection.add_argument("--base", action="store_true", help="Serve the unchanged base model for comparison")
     parser.add_argument("--allow-pause-bonsai", action="store_true")
     args = parser.parse_args()
+    if args.action != "status":
+        from method_policy import blocked_legacy_operation
+        blocked_legacy_operation("Legacy service start/stop launcher")
     check(os.uname().nodename == "4790", "This launcher is for .54 only")
     if args.action == "start":
         check(args.base or (args.adapter and args.adapter.is_dir()), "Supply --base or an evaluated --adapter directory")

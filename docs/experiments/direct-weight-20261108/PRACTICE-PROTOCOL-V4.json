@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "created_at_utc": "2026-11-07T22:02:00.804452+00:00",
+  "stage": "practice baseline diagnosis; no candidate or final evaluation",
+  "objective": "Reproduce the exposed half_open_overlap failure in official BF16 Qwen3.5-4B using forward-only CPU inference. No training or LoRA.",
+  "surgeon": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "xhigh"
+  },
+  "parent_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "hypothesis": "Unestablished. A runtime-specific base failure must be observed before any neural intervention.",
+  "cases": "Two identical greedy replays of existing exposed development case half_open_overlap; no holdout access.",
+  "seeds": [
+    20261108,
+    20261108
+  ],
+  "diagnostic_profile": {
+    "max_input_tokens": 256,
+    "max_new_tokens": 384,
+    "thinking": false,
+    "do_sample": false,
+    "device": "CPU",
+    "weight_dtype": "BF16"
+  },
+  "scope_limit": "Short BF16 diagnostic only. Truncation is a budget outcome, not evidence of a localized neural failure. Not a replacement for selected HE9 or full-context OpenCode/Hermes tests.",
+  "native_profile_preserved": {
+    "max_model_len": 262144,
+    "kv_k": "q8_0",
+    "kv_v": "q8_0",
+    "max_output_tokens": 28192
+  },
+  "causal_controls_required": [
+    "no-op",
+    "norm/support-matched random control",
+    "ablation",
+    "dose response"
+  ],
+  "candidate_selection": "Only after reproducible failure, harness exclusion and causal localization. No index transfer from0.8B. No loss-fitting or training fallback.",
+  "independent_gate": "Freeze patch, parent, protocol and code before independent paired holdout. Untouched holdout not created/opened until evaluator custody exists. Old exposed cases remain regressions. No promotion from diagnostic results.",
+  "preservation": "Preserve all artifacts and failed containers. No deletion, cache cleanup, service preemption, or separate evaluation reuse.",
+  "protocol_version": 4,
+  "supersedes_for_new_runs": "PRACTICE-PROTOCOL-V3.json retained; run04 passed parameter checks then failed serialization of installed loader set metadata before generation",
+  "budget_rationale": "Sol xhigh scientific review found historical exposed base response length290tokens. Increase output budget before any new generation result to avoid known192-token censoring; changed budget has a new protocol identity. No semantic result has been observed in this BF16 CPU runtime.",
+  "runtime": "Official stored BF16 and FP32 parameters, exact bytes; installed Transformers pure-Torch CPU references for linear attention/convolution, eager full attention. Distinct from nativeQ8clientruntime.",
+  "runtime_source_sha256": {
+    "scripts/direct_forward.py": "ebcd7042cb626437a8b8caba0454282ec70a239ea190b5ad71cd3ba0294e4764",
+    "scripts/direct_weights.py": "4f915127372cc9f00a8b94e3b5f500b0f1679cc6b10c3464489b3d1833a6ea1a",
+    "ops/direct_edit54.py": "ff066f1a19c53ddd48e07932d2859ad576e5e419404ec8d7e6dda2841ea7d2d6",
+    "configs/qwen35-4b-direct.lock.json": "6058685c1842ee36e24fcb17131ae072332c8cf1e679189e7eaeff4765a2eb8b"
+  },
+  "runtime_controls": "Exact dtype restoration, chunk/recurrent CPU reference consistency and real tiny-model loader metadata tests passed. Evidence JSON serialization is validated before atomic no-replace publication. Token journals preserve partial output."
+}

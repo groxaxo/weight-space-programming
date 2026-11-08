@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "role": "practice",
+  "question": "half_open_overlap-empty-interval-guard",
+  "lock_sha256": "6058685c1842ee36e24fcb17131ae072332c8cf1e679189e7eaeff4765a2eb8b",
+  "protocol_sha256": "b5aef6240c14c389d4d5a7a603e3f41ef9dfcc849d15e915691f3b72387aa24b",
+  "patient_sha256": "45de371d0f630611d2268cb4298807b78756c9e70773c732b64be851ab94047e",
+  "source_request_sha256": "e8951e2d02b4a213918d9c6b79937ca2971043c4583f4b5fb5178035afe31845",
+  "original_prompt": "Implement wsp_intersection(a, b) for two half-open integer intervals (start,end). Return their intersection tuple, or None if it is empty. Raise ValueError for reversed input intervals. Return only Python code.",
+  "assistant_prefix": "```python\ndef wsp_intersection(a, b):\n    \"\"\"\n    Compute the intersection of two half-open integer intervals (start, end).\n    \n    Args:\n        a: Tuple (start_a, end_a)\n        b: Tuple (start_b, end_b)\n    \n    Returns:\n        Tuple (start, end) representing the intersection, or None if empty.\n    \n    Raises:\n        ValueError: If any input interval is reversed (start >= end).\n    \"\"\"\n    def validate_interval(interval):\n        if not isinstance(interval, tuple) or len(interval) != 2:\n            raise ValueError(\"Input must be a tuple of two integers.\")\n        start, end = interval\n        if start ",
+  "semantic_cue": "An interval with equal endpoints is valid and empty. Only start > end is reversed. Return None when the intersection is empty.",
+  "operators": {
+    "correct": ">",
+    "incorrect": ">=",
+    "suffix": " end:"
+  },
+  "profile": {
+    "max_input_tokens": 512,
+    "thinking": false,
+    "threads": 1,
+    "seed": 20261108
+  },
+  "arms": [],
+  "budget": {
+    "max_forward_calls": 2,
+    "max_wall_seconds": 2300,
+    "postcheck_reserve_seconds": 120,
+    "controls_admitted": false
+  }
+}
