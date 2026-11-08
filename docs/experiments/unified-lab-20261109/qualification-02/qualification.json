@@ -1,0 +1,46 @@
+{
+  "charges": [
+    {
+      "exit_code": 0,
+      "label": "full-linux",
+      "log_sha256": "59f05a9bcb29885e5a225aee450bd8f1562778a8857791afcfd3b600e20fe871",
+      "seconds": 62
+    },
+    {
+      "exit_code": 0,
+      "label": "runtime",
+      "log_sha256": "71439f4c3f67b408592bea1c9b77d69828031cb2313187890d66caa097e25a84",
+      "seconds": 13
+    }
+  ],
+  "complete": true,
+  "lab_source_sha256": {
+    "configs/wsp-lab-sources.json": "21e5f70ef9beb1fd4cf6f87c0138fb9624d82a1e958ae7db2561c5d4ab65dafd",
+    "ops/direct_edit54.py": "32caf4172b6a841939cae893f0a343eb19a2976cfaf68a2bb5c7e8363ec2f150",
+    "ops/direct_tool_cycle54.py": "4348a98c717ecfe2f9212ee7b88347f820898394651efe8df6e07680e87e8c2e",
+    "ops/direct_tool_preflight54.py": "9eff8e68de6200b72978ac43928d42f3214db1e0a99dfe9476311f8c6e06da19",
+    "ops/wsp_lab54.py": "5a0d220bae208b13237657372f10894bbe644fe426b8a7938794b33a196bbc56",
+    "research-policy.json": "4b50e2cd69041d1f42f0c093556e4eb1baccf6c2db9af2e73888cadeb1604a55",
+    "scripts/coder_common.py": "c15da51c8e6da280f46cb31517ce48aeffc0a116312cb86339755fdacff6dafe",
+    "scripts/coder_sampling.py": "99217f812e30c269ce0aef6f1dedc7acf2b7922be7f8b3cebf9797c4489147cc",
+    "scripts/direct_causal.py": "b9e33fe4227094c59f69156bb736575d96e195aae3b865206cb02c94ac13fecc",
+    "scripts/direct_evidence.py": "99507aad4e7a49290823230c448b528d92b098ed3196565faa4509d43816f01b",
+    "scripts/direct_forward.py": "654b0c16c1c2cc770e99109a70f7aa8dcabb1fab0883798871c2486a5501d088",
+    "scripts/direct_probe.py": "c90ed2acacacf95bb386b33414d43e3f01a84d67e2e7b016974075d4f6cc6e67",
+    "scripts/direct_tools.py": "80167802fe879870674570b3370e43bf40927b46e4fbdba0bbe7ed23cb3bae45",
+    "scripts/direct_weights.py": "d7855391999c0f57793dcbf919033e8ec16ae3f4f79b553bcf131ca079760468",
+    "scripts/evaluate_coder.py": "64c53400a18742ec2163c3439c654dca3a3addfb186e7740a670bf0cfff17049",
+    "scripts/method_policy.py": "fb7fd245ccfab381dff42a8ecc1c0249c2a8a0ad480009135629ca31efdb02eb",
+    "scripts/pipeline.py": "b6e452b76a807b14283c89394cb5349e5a1a956eb277e2617482a53af0207b79",
+    "scripts/wsp_interventions.py": "c1c0400eaeb2bf219bc8fe66c5df41d0354df349fee77b6b70a1ad7ab03406ef",
+    "scripts/wsp_lab.py": "7287db0a6be2b80a3ffc777b64dbf970bc333da929d6ce8e94e630867cc0de97",
+    "scripts/wsp_pairs.py": "b79922f297f823959a32f4e7e87a466ca00a4cb661b8eacd9bbf71f121a877ef",
+    "scripts/wsp_worker.py": "2ad9ca19af097b31db61c1a0261ac2af742c5c266d0d0110160c06bc81502487"
+  },
+  "official_4b_generations": 0,
+  "quality_evaluation": "NOT_RUN",
+  "seconds": 74,
+  "synthetic_runtime_only": true,
+  "training": false,
+  "weights_edited": false
+}

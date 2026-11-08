@@ -99,7 +99,8 @@ their provenance or causal interpretation. See `docs/direct-weight-editing.md`.
 Admit CPU/RAM/disk/GPU work before execution. The trusted forward worker and the
 editor need separate verified boundaries; neither CLI guards nor disabling an
 optimizer proves that arbitrary analysis code avoided handwritten training.
-Launch model workers through `ops/direct_edit54.py`, with at most 1,800 seconds
+Launch model workers through `ops/direct_edit54.py`, or the integrated
+`ops/wsp_lab54.py` route using that same shared lease and container profile, with at most 1,800 seconds
 per worker and progress inspections at least every 600 seconds. Probe requests
 must leave postcheck and shutdown reserve within that maximum. Do not bypass
 admission by invoking the heavy worker CLI directly on the host.
@@ -110,7 +111,36 @@ Short diagnostic contexts cannot establish the native client's 262,144 context,
 Q8 K/V or 28,192 output profile. Quantized conversion and deployment require their
 own pinned original-versus-edited paired experiment after BF16 evidence.
 
-## Authorized new cycle: tool finalization
+## Unified engineering integration — 9 November
+
+The user requested merging the compatible logic from the reviewed repositories.
+`scripts/wsp_lab.py` is the integrated entry point; follow `docs/unified-lab.md`.
+It combines fixed forward interventions, frozen literal diagnostic grading,
+declared paired development metrics, numeric patch inspection and historical
+replay. No external trainer/framework is imported or vendored. No new official
+model research or candidate is implied by this engineering integration.
+
+New model workers use only `ops/wsp_lab54.py` with the existing shared host lease,
+resource admission and read-only sandbox. Freeze case/design, positions, operation,
+all eight controls, optional assessment, source identities and cumulative budget
+before execution. Preserve durable study claims. A failed no-op stops before
+treatment; random mismatch/degeneracy cannot be repaired with a new seed.
+
+The integrated worker binds twenty-one source/policy/catalog files while retaining
+the original thirteen historical producer bytes unchanged. Frozen expected answers
+are exposed grading data and must never enter rendered model inputs. Supplied
+tool history is counterfactual data, not proof of a spontaneous tool episode.
+All 426 parameter checks and handled-error postchecks remain mandatory.
+
+`fixed_activation_records_complete` and literal grading do not satisfy semantic/
+reverse causal gates, sparse read/write derivation or final acceptance.
+`compare` is an attributed-data calculator, not an authenticator for arbitrary
+grader claims. Activation-treatment metrics must retain that label. Every route
+keeps candidate admission and independent quality false/NOT_RUN. The Sol max
+custodian, protected executable coding grading and native client acceptance remain
+separate requirements; do not fabricate them or relabel a failed study as new.
+
+## Historical authorized cycle: tool finalization
 
 On 8 November the user authorized a new direct-weight hypothesis and independent
 paired testing. Follow `docs/plans/direct-tool-finalization-cycle2-20261108.md`

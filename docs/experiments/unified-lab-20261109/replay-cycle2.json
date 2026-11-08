@@ -1,0 +1,49 @@
+{
+  "charged_worker_seconds": 4892.713629,
+  "complete": true,
+  "completion_and_neutral_output_ids_identical": true,
+  "generation_invocations": 5,
+  "independent_model_quality": "NOT_RUN",
+  "localization_admitted": false,
+  "official_generations_total": 13,
+  "parameter_count_per_worker": 426,
+  "quality_evaluation": "NOT_RUN",
+  "recomputed_from_raw_evidence": true,
+  "scope": "Offline execution-integrity/development replay; no model loaded or new inference.",
+  "stage1_manifest_sha256": "125c9ad220fd55e93b3b5bbe6e62ebb9b09d9ca812a3a33263bf995cd19172a0",
+  "status": "STOP_semantic_specificity",
+  "verified_semantic_controls": [
+    {
+      "classification": "parser_call",
+      "control": "B",
+      "generated_tokens": 26,
+      "passed": true
+    },
+    {
+      "classification": "parser_call",
+      "control": "S",
+      "generated_tokens": 26,
+      "passed": false
+    },
+    {
+      "classification": "other_answer",
+      "control": "C",
+      "generated_tokens": 16,
+      "passed": false
+    },
+    {
+      "classification": "other_answer",
+      "control": "N",
+      "generated_tokens": 16,
+      "passed": false
+    },
+    {
+      "classification": "parser_call",
+      "control": "P",
+      "generated_tokens": 26,
+      "passed": true
+    }
+  ],
+  "weight_candidate_eligible": false,
+  "weights_edited": false
+}

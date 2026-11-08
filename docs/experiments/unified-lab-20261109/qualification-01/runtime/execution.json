@@ -1,0 +1,15 @@
+{
+  "exit_code": 0,
+  "resources_after": {
+    "captured_at_utc": "2026-11-08T19:10:51.325469+00:00",
+    "cpu_load": [
+      1.658203125,
+      1.2509765625,
+      1.1923828125
+    ],
+    "disk_free_bytes": 5895147520,
+    "gpu_observation_only": "11887 MiB, 12288 MiB, 0 %",
+    "gpu_query_error": "",
+    "mem_available_bytes": 15781621760
+  }
+}

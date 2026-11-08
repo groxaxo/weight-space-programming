@@ -1,0 +1,327 @@
+{
+  "containers": [
+    {
+      "AppArmorProfile": "docker-default",
+      "Args": [
+        "-u",
+        "-m",
+        "unittest",
+        "-v",
+        "test_direct_dtype",
+        "test_direct_probe.TinyForwardControls",
+        "test_direct_causal.TinyAdditionTests",
+        "test_direct_tools.TinyToolObserver",
+        "test_direct_chat_stop.TinyChatStopRuntime",
+        "test_direct_specificity_runtime.SpecificityRuntime",
+        "test_wsp_runtime"
+      ],
+      "Config": {
+        "AttachStderr": true,
+        "AttachStdin": false,
+        "AttachStdout": true,
+        "Cmd": [
+          "python",
+          "-u",
+          "-m",
+          "unittest",
+          "-v",
+          "test_direct_dtype",
+          "test_direct_probe.TinyForwardControls",
+          "test_direct_causal.TinyAdditionTests",
+          "test_direct_tools.TinyToolObserver",
+          "test_direct_chat_stop.TinyChatStopRuntime",
+          "test_direct_specificity_runtime.SpecificityRuntime",
+          "test_wsp_runtime"
+        ],
+        "Domainname": "",
+        "Entrypoint": null,
+        "Env": [
+          "PYTHONPATH=/deps:/code/scripts:/code/tests",
+          "TRANSFORMERS_OFFLINE=1",
+          "HF_HOME=/tmp/hf",
+          "WSP_TEST_DIRECT_TOOL_TORCH=1",
+          "PYTHONDONTWRITEBYTECODE=1",
+          "TOKENIZERS_PARALLELISM=false",
+          "USER=wsp-direct",
+          "TORCHINDUCTOR_CACHE_DIR=/tmp/torchinductor",
+          "MKL_NUM_THREADS=1",
+          "OPENBLAS_NUM_THREADS=1",
+          "WSP_TEST_DIRECT_PROBE_TORCH=1",
+          "CUDA_VISIBLE_DEVICES=",
+          "HF_HUB_OFFLINE=1",
+          "WSP_TEST_DIRECT_CAUSAL_TORCH=1",
+          "WSP_TEST_WSP_TORCH=1",
+          "HOME=/tmp",
+          "LOGNAME=wsp-direct",
+          "TRITON_CACHE_DIR=/tmp/triton",
+          "OMP_NUM_THREADS=1",
+          "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "LANG=C.UTF-8",
+          "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+          "PYTHON_VERSION=3.12.16",
+          "PYTHON_SHA256=b5796915dc45ff745cfb4e990a7e7c93d6f546328a102ce31448d69ebc37575c"
+        ],
+        "Hostname": "6fd2abfe6264",
+        "Image": "python@sha256:4840d514c583a4d3d8cad3940e68dee6f0f6f3635c12fcd0a3d74c21a5b93a54",
+        "Labels": {},
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "Tty": false,
+        "User": "1000:1000",
+        "Volumes": null,
+        "WorkingDir": "/code"
+      },
+      "Created": "2026-11-08T19:16:41.676828457Z",
+      "Driver": "overlayfs",
+      "ExecIDs": null,
+      "HostConfig": {
+        "AutoRemove": false,
+        "Binds": null,
+        "BlkioDeviceReadBps": [],
+        "BlkioDeviceReadIOps": [],
+        "BlkioDeviceWriteBps": [],
+        "BlkioDeviceWriteIOps": [],
+        "BlkioWeight": 10,
+        "BlkioWeightDevice": [],
+        "CapAdd": null,
+        "CapDrop": [
+          "ALL"
+        ],
+        "Cgroup": "",
+        "CgroupParent": "",
+        "CgroupnsMode": "private",
+        "ConsoleSize": [
+          0,
+          0
+        ],
+        "ContainerIDFile": "",
+        "CpuCount": 0,
+        "CpuPercent": 0,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpuRealtimePeriod": 0,
+        "CpuRealtimeRuntime": 0,
+        "CpuShares": 2,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "DeviceCgroupRules": null,
+        "DeviceRequests": null,
+        "Devices": [],
+        "Dns": null,
+        "DnsOptions": [],
+        "DnsSearch": [],
+        "ExtraHosts": null,
+        "GroupAdd": null,
+        "IOMaximumBandwidth": 0,
+        "IOMaximumIOps": 0,
+        "IpcMode": "private",
+        "Isolation": "",
+        "Links": null,
+        "LogConfig": {
+          "Config": {},
+          "Type": "json-file"
+        },
+        "MaskedPaths": [
+          "/proc/acpi",
+          "/proc/asound",
+          "/proc/interrupts",
+          "/proc/kcore",
+          "/proc/keys",
+          "/proc/latency_stats",
+          "/proc/sched_debug",
+          "/proc/scsi",
+          "/proc/timer_list",
+          "/proc/timer_stats",
+          "/sys/devices/virtual/powercap",
+          "/sys/firmware",
+          "/sys/devices/system/cpu/cpu0/thermal_throttle",
+          "/sys/devices/system/cpu/cpu1/thermal_throttle",
+          "/sys/devices/system/cpu/cpu2/thermal_throttle",
+          "/sys/devices/system/cpu/cpu3/thermal_throttle",
+          "/sys/devices/system/cpu/cpu4/thermal_throttle",
+          "/sys/devices/system/cpu/cpu5/thermal_throttle",
+          "/sys/devices/system/cpu/cpu6/thermal_throttle",
+          "/sys/devices/system/cpu/cpu7/thermal_throttle"
+        ],
+        "Memory": 2147483648,
+        "MemoryReservation": 0,
+        "MemorySwap": 2147483648,
+        "MemorySwappiness": null,
+        "Mounts": [
+          {
+            "ReadOnly": true,
+            "Source": "/home/op/work/weight-space-programming-unified-20261109/reports/unified-20261109/qualification-02/runtime/source",
+            "Target": "/code",
+            "Type": "bind"
+          },
+          {
+            "ReadOnly": true,
+            "Source": "/home/op/work/weight-space-programming-20261106/.venv-train/lib/python3.12/site-packages",
+            "Target": "/deps",
+            "Type": "bind"
+          },
+          {
+            "ReadOnly": true,
+            "Source": "/home/op/work/weight-space-programming-unified-20261109/reports/unified-20261109/qualification-02/runtime/request.json",
+            "Target": "/request.json",
+            "Type": "bind"
+          },
+          {
+            "Source": "/home/op/work/weight-space-programming-unified-20261109/reports/unified-20261109/qualification-02/runtime/worker-output",
+            "Target": "/out",
+            "Type": "bind"
+          }
+        ],
+        "NanoCpus": 1000000000,
+        "NetworkMode": "none",
+        "OomKillDisable": null,
+        "OomScoreAdj": 0,
+        "PidMode": "",
+        "PidsLimit": 64,
+        "PortBindings": {},
+        "Privileged": false,
+        "PublishAllPorts": false,
+        "ReadonlyPaths": [
+          "/proc/bus",
+          "/proc/fs",
+          "/proc/irq",
+          "/proc/sys",
+          "/proc/sysrq-trigger"
+        ],
+        "ReadonlyRootfs": true,
+        "RestartPolicy": {
+          "MaximumRetryCount": 0,
+          "Name": "no"
+        },
+        "Runtime": "runc",
+        "SecurityOpt": [
+          "no-new-privileges"
+        ],
+        "ShmSize": 67108864,
+        "Tmpfs": {
+          "/tmp": "rw,noexec,nosuid,size=67108864"
+        },
+        "UTSMode": "",
+        "Ulimits": [
+          {
+            "Hard": 67108864,
+            "Name": "fsize",
+            "Soft": 67108864
+          }
+        ],
+        "UsernsMode": "",
+        "VolumeDriver": "",
+        "VolumesFrom": null
+      },
+      "HostnamePath": "/var/lib/docker/containers/6fd2abfe626400aaf014fe450cde6f6a209f61894fd0322f261d8d1756cb2ecb/hostname",
+      "HostsPath": "/var/lib/docker/containers/6fd2abfe626400aaf014fe450cde6f6a209f61894fd0322f261d8d1756cb2ecb/hosts",
+      "Id": "6fd2abfe626400aaf014fe450cde6f6a209f61894fd0322f261d8d1756cb2ecb",
+      "Image": "sha256:4840d514c583a4d3d8cad3940e68dee6f0f6f3635c12fcd0a3d74c21a5b93a54",
+      "ImageManifestDescriptor": {
+        "annotations": {
+          "com.docker.official-images.bashbrew.arch": "amd64",
+          "org.opencontainers.image.base.digest": "sha256:7378260c0a098d27ac206225db5e7d92b8c7c84ea7afccc86eeb513756bbd392",
+          "org.opencontainers.image.base.name": "debian:trixie-slim",
+          "org.opencontainers.image.created": "2026-11-05T07:52:11Z",
+          "org.opencontainers.image.revision": "3d7e95597e56a415d9e4abc0f15877e005d2cb2e",
+          "org.opencontainers.image.source": "https://github.com/docker-library/python.git#3d7e95597e56a415d9e4abc0f15877e005d2cb2e:3.12/slim-trixie",
+          "org.opencontainers.image.url": "https://hub.docker.com/_/python",
+          "org.opencontainers.image.version": "3.12.16-slim-trixie"
+        },
+        "digest": "sha256:05a994d2344eb364cc186910f4fc8786a38215f39f00d0acc25bff33a08f4177",
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        "size": 1746
+      },
+      "LogPath": "/var/lib/docker/containers/6fd2abfe626400aaf014fe450cde6f6a209f61894fd0322f261d8d1756cb2ecb/6fd2abfe626400aaf014fe450cde6f6a209f61894fd0322f261d8d1756cb2ecb-json.log",
+      "MountLabel": "",
+      "Mounts": [
+        {
+          "Destination": "/code",
+          "Mode": "",
+          "Propagation": "rprivate",
+          "RW": false,
+          "Source": "/home/op/work/weight-space-programming-unified-20261109/reports/unified-20261109/qualification-02/runtime/source",
+          "Type": "bind"
+        },
+        {
+          "Destination": "/deps",
+          "Mode": "",
+          "Propagation": "rprivate",
+          "RW": false,
+          "Source": "/home/op/work/weight-space-programming-20261106/.venv-train/lib/python3.12/site-packages",
+          "Type": "bind"
+        },
+        {
+          "Destination": "/request.json",
+          "Mode": "",
+          "Propagation": "rprivate",
+          "RW": false,
+          "Source": "/home/op/work/weight-space-programming-unified-20261109/reports/unified-20261109/qualification-02/runtime/request.json",
+          "Type": "bind"
+        },
+        {
+          "Destination": "/out",
+          "Mode": "",
+          "Propagation": "rprivate",
+          "RW": true,
+          "Source": "/home/op/work/weight-space-programming-unified-20261109/reports/unified-20261109/qualification-02/runtime/worker-output",
+          "Type": "bind"
+        }
+      ],
+      "Name": "/wsp-direct-unified-runtime-20261109-02",
+      "NetworkSettings": {
+        "Networks": {
+          "none": {
+            "Aliases": null,
+            "DNSNames": null,
+            "DriverOpts": null,
+            "EndpointID": "",
+            "Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "GwPriority": 0,
+            "IPAMConfig": null,
+            "IPAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "Links": null,
+            "MacAddress": "",
+            "NetworkID": "dddac1557a0ba3a39e782eee6b94995d47df0a0a7d3aff3ae545a51d76fe9eff"
+          }
+        },
+        "Ports": {},
+        "SandboxID": "",
+        "SandboxKey": ""
+      },
+      "Path": "python",
+      "Platform": "linux",
+      "ProcessLabel": "",
+      "ResolvConfPath": "/var/lib/docker/containers/6fd2abfe626400aaf014fe450cde6f6a209f61894fd0322f261d8d1756cb2ecb/resolv.conf",
+      "RestartCount": 0,
+      "State": {
+        "Dead": false,
+        "Error": "",
+        "ExitCode": 0,
+        "FinishedAt": "2026-11-08T19:16:53.032721445Z",
+        "OOMKilled": false,
+        "Paused": false,
+        "Pid": 0,
+        "Restarting": false,
+        "Running": false,
+        "StartedAt": "2026-11-08T19:16:41.761162892Z",
+        "Status": "exited"
+      },
+      "Storage": {
+        "RootFS": {
+          "Snapshot": {
+            "Name": "overlayfs"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "path": "/home/op/work/weight-space-programming-unified-20261109/reports/unified-20261109/source-preimages/20261108T190749966844Z/tests/test_wsp_lab.py",
+    "size": 10375,
+    "uid": 1000,
+    "gid": 1000,
+    "sha256": "b5f149d47094fe32a2bd6ffb6e98b9b61cecf1e1305ccc6e1833cd015f8fe152",
+    "usefulness": "Intermediate source version retained for audit",
+    "dependencies": "Qualification source snapshots",
+    "recoverability": "Original remains on .54; no cleanup performed"
+  },
+  {
+    "path": "/home/op/work/weight-space-programming-unified-20261109/reports/unified-20261109/source-preimages/20261108T191401924668Z/ops/wsp_lab54.py",
+    "size": 12226,
+    "uid": 1000,
+    "gid": 1000,
+    "sha256": "1694c5ad5a1f089138f9b4dc93729ae22a1307420dbef975ca6598d1d5266dd2",
+    "usefulness": "Intermediate source version retained for audit",
+    "dependencies": "Qualification source snapshots",
+    "recoverability": "Original remains on .54; no cleanup performed"
+  },
+  {
+    "path": "/home/op/work/weight-space-programming-unified-20261109/reports/unified-20261109/source-preimages/20261108T191401924668Z/scripts/wsp_lab.py",
+    "size": 12085,
+    "uid": 1000,
+    "gid": 1000,
+    "sha256": "39c77f539a0b0ae52c43168923b9711f2f177140dd2712769029d37a890db34e",
+    "usefulness": "Intermediate source version retained for audit",
+    "dependencies": "Qualification source snapshots",
+    "recoverability": "Original remains on .54; no cleanup performed"
+  },
+  {
+    "path": "/home/op/work/weight-space-programming-unified-20261109/reports/unified-20261109/source-preimages/20261108T191401924668Z/scripts/wsp_pairs.py",
+    "size": 5298,
+    "uid": 1000,
+    "gid": 1000,
+    "sha256": "2984995040e66bd0c764db257807b9356d2d4a04091a3e2ee3c92916582d693a",
+    "usefulness": "Intermediate source version retained for audit",
+    "dependencies": "Qualification source snapshots",
+    "recoverability": "Original remains on .54; no cleanup performed"
+  },
+  {
+    "path": "/home/op/work/weight-space-programming-unified-20261109/reports/unified-20261109/source-preimages/20261108T191401924668Z/tests/test_wsp_lab.py",
+    "size": 13492,
+    "uid": 1000,
+    "gid": 1000,
+    "sha256": "25f1a5ea376ec9e854aef88f637ce31e5cbea979b405534d15d7582881868fcf",
+    "usefulness": "Intermediate source version retained for audit",
+    "dependencies": "Qualification source snapshots",
+    "recoverability": "Original remains on .54; no cleanup performed"
+  },
+  {
+    "path": "/home/op/work/weight-space-programming-unified-20261109/reports/unified-20261109/source-preimages/20261108T191401924668Z/tests/test_wsp_runtime.py",
+    "size": 9092,
+    "uid": 1000,
+    "gid": 1000,
+    "sha256": "af0c708096be57872cd92775c85064d27b718b10855d892c5aeb1b20a7282522",
+    "usefulness": "Intermediate source version retained for audit",
+    "dependencies": "Qualification source snapshots",
+    "recoverability": "Original remains on .54; no cleanup performed"
+  },
+  {
+    "path": "/home/op/work/weight-space-programming-unified-20261109/reports/unified-20261109/source-preimages/20261108T191943778388Z/ops/wsp_lab54.py",
+    "size": 12503,
+    "uid": 1000,
+    "gid": 1000,
+    "sha256": "5a0d220bae208b13237657372f10894bbe644fe426b8a7938794b33a196bbc56",
+    "usefulness": "Intermediate source version retained for audit",
+    "dependencies": "Qualification source snapshots",
+    "recoverability": "Original remains on .54; no cleanup performed"
+  },
+  {
+    "path": "/home/op/work/weight-space-programming-unified-20261109/reports/unified-20261109/source-preimages/20261108T191943778388Z/tests/test_wsp_lab.py",
+    "size": 14583,
+    "uid": 1000,
+    "gid": 1000,
+    "sha256": "0476142b059363b3c0a08caed9afb0f0444024069aa6e4679bd66ac9571a634b",
+    "usefulness": "Intermediate source version retained for audit",
+    "dependencies": "Qualification source snapshots",
+    "recoverability": "Original remains on .54; no cleanup performed"
+  }
+]

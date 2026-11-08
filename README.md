@@ -1,5 +1,13 @@
 # Weight-Space Programming Lab
 
+The [unified forward-only lab](docs/unified-lab.md) combines the compatible logic
+from the six reviewed projects behind one CLI: `python scripts/wsp_lab.py`.
+It provides frozen protocols, fixed BF16 activation controls, the shared `.54`
+sandbox, literal diagnostic grading, paired development/locality metrics, sparse
+patch-format inspection and historical replay. Fitted probes, target optimizers
+and LoRA workflows are excluded. Integration qualification is engineering evidence;
+no new 4B repair or independent model-quality result is claimed.
+
 A verified reconstruction of the published **Qwen3.5-0.8B p50c weight repair**, plus an active **Qwen3.5-4B direct-weight-edit research track**. The original base checkpoints and retained historical artifacts are preserved. **A successful 4B direct repair has not yet been established.**
 
 **Reconstruction:** pinned downloads, full input authentication, sparse BF16 reconstruction, non-overwriting publication, output and provenance verification, and CPU regression tests. A real 1.75 GB checkpoint has been reconstructed and checked on the Ubuntu 12700. `verify-output` now also authenticates the reconstruction record against the actual files and trusted lock.

@@ -1,0 +1,152 @@
+{
+  "copied_third_party_code": false,
+  "imports_external_frameworks": false,
+  "integration": [
+    {
+      "excluded": "0.8B coordinate transfer; assuming a general repair discovery algorithm",
+      "repository": "RikiyaT/lm_understand-logs",
+      "used": "Frozen parent, bounded forward tool, practice/final separation, explicit sparse BF16 contract"
+    },
+    {
+      "excluded": "LBFGS-fitted probe, learned gate and LoRA/all training workflows",
+      "repository": "kevinpl07/weight-patching",
+      "used": "Base/no-op/strength/random/location controls, paired rescues/regressions, exact-output locality and optional full-vocabulary KL"
+    },
+    {
+      "excluded": "Treating activation rescue as a weight repair or importing an unqualified model adapter",
+      "repository": "ndif-team/nnsight",
+      "used": "One fixed module/position intervention, prefill/cache separation and explicit baseline"
+    },
+    {
+      "excluded": "Trainable/rotated intervention fitting",
+      "repository": "stanfordnlp/pyvene",
+      "used": "Serialized nontrainable zero/replace/add operations with removable hooks"
+    },
+    {
+      "excluded": "Adam/backprop target-vector optimization",
+      "repository": "kmeng01/rome",
+      "used": "Separate observation of MLP reads/writes and preserved original parameters"
+    },
+    {
+      "excluded": "Optimized target activation and inferred multi-layer weight update",
+      "repository": "kmeng01/memit",
+      "used": "Explicit parent/update identities and matched evaluation accounting"
+    }
+  ],
+  "name": "Unified forward-only weight-space lab",
+  "schema_version": 1,
+  "scientific_model_quality": "NOT_RUN",
+  "sources": [
+    {
+      "blob_sha": "9232f3da94a9fa6d6b9bc83eef7c8766e48120e5",
+      "key": "upstream-rules",
+      "line_range": [
+        1,
+        170
+      ],
+      "path": "exp8_math/README.md",
+      "ref": "4d09ba6d6a7e891dd8063974dfe81b3d78e3494f",
+      "repository": "RikiyaT/lm_understand-logs",
+      "url": "https://github.com/RikiyaT/lm_understand-logs/blob/4d09ba6d6a7e891dd8063974dfe81b3d78e3494f/exp8_math/README.md"
+    },
+    {
+      "blob_sha": "4a9e071f890978d5d933cb652449937bbacc6a32",
+      "key": "patch-readme-pinned",
+      "line_range": null,
+      "path": "README.md",
+      "ref": "d7df0d9bd15afb952b1e0cb64a067806563aa8e3",
+      "repository": "kevinpl07/weight-patching",
+      "url": "https://github.com/kevinpl07/weight-patching/blob/d7df0d9bd15afb952b1e0cb64a067806563aa8e3/README.md"
+    },
+    {
+      "blob_sha": "b918df982b3d47f0a48b051426b3ab1a4f3a2494",
+      "key": "patch-protocol",
+      "line_range": [
+        1,
+        180
+      ],
+      "path": "docs/PROTOCOL.md",
+      "ref": "d7df0d9bd15afb952b1e0cb64a067806563aa8e3",
+      "repository": "kevinpl07/weight-patching",
+      "url": "https://github.com/kevinpl07/weight-patching/blob/d7df0d9bd15afb952b1e0cb64a067806563aa8e3/docs/PROTOCOL.md"
+    },
+    {
+      "blob_sha": "6f7416b740cbbfcdc6db15fcc298094398e1dc32",
+      "key": "patch-methods",
+      "line_range": null,
+      "path": "patchkit/methods.py",
+      "ref": "d7df0d9bd15afb952b1e0cb64a067806563aa8e3",
+      "repository": "kevinpl07/weight-patching",
+      "url": "https://github.com/kevinpl07/weight-patching/blob/d7df0d9bd15afb952b1e0cb64a067806563aa8e3/patchkit/methods.py"
+    },
+    {
+      "blob_sha": "0420f693a328faf1609907031b0fbf174e1ffeb1",
+      "key": "patch-llm",
+      "line_range": null,
+      "path": "patchkit/llm.py",
+      "ref": "d7df0d9bd15afb952b1e0cb64a067806563aa8e3",
+      "repository": "kevinpl07/weight-patching",
+      "url": "https://github.com/kevinpl07/weight-patching/blob/d7df0d9bd15afb952b1e0cb64a067806563aa8e3/patchkit/llm.py"
+    },
+    {
+      "blob_sha": "ff0b4ec09620919eeae690f6aedc76d2d98db292",
+      "key": "patch-run",
+      "line_range": null,
+      "path": "patchkit/run.py",
+      "ref": "d7df0d9bd15afb952b1e0cb64a067806563aa8e3",
+      "repository": "kevinpl07/weight-patching",
+      "url": "https://github.com/kevinpl07/weight-patching/blob/d7df0d9bd15afb952b1e0cb64a067806563aa8e3/patchkit/run.py"
+    },
+    {
+      "blob_sha": "9066956e219c955b759ddbe8c373f8511da2f10d",
+      "key": "nnsight-patch",
+      "line_range": null,
+      "path": "docs/patterns/activation-patching.md",
+      "ref": "4c7ebffab55313ed26f3690f1d93d3e420629dc3",
+      "repository": "ndif-team/nnsight",
+      "url": "https://github.com/ndif-team/nnsight/blob/4c7ebffab55313ed26f3690f1d93d3e420629dc3/docs/patterns/activation-patching.md"
+    },
+    {
+      "blob_sha": "ddd46a9545b175cf464e24e2035cc6d3e5d3e59e",
+      "key": "pyvene-readme",
+      "line_range": null,
+      "path": "README.md",
+      "ref": "9e333904dcf9e597ca76170010d17f4d4580de8d",
+      "repository": "stanfordnlp/pyvene",
+      "url": "https://github.com/stanfordnlp/pyvene/blob/9e333904dcf9e597ca76170010d17f4d4580de8d/README.md"
+    },
+    {
+      "blob_sha": "7ecd86ae0fc9eb947ac657c0e53ddab4ff2224a6",
+      "key": "pyvene-interventions",
+      "line_range": null,
+      "path": "pyvene/models/interventions.py",
+      "ref": "9e333904dcf9e597ca76170010d17f4d4580de8d",
+      "repository": "stanfordnlp/pyvene",
+      "url": "https://github.com/stanfordnlp/pyvene/blob/9e333904dcf9e597ca76170010d17f4d4580de8d/pyvene/models/interventions.py"
+    },
+    {
+      "blob_sha": "7bd8e22c8c8c576822d2850963181884620b0c2f",
+      "key": "rome-target",
+      "line_range": [
+        1,
+        180
+      ],
+      "path": "rome/compute_v.py",
+      "ref": "0874014cd9837e4365f3e6f3c71400ef11509e04",
+      "repository": "kmeng01/rome",
+      "url": "https://github.com/kmeng01/rome/blob/0874014cd9837e4365f3e6f3c71400ef11509e04/rome/compute_v.py"
+    },
+    {
+      "blob_sha": "9aceb7c4a4b7fde9d66965c7d234fe262abb9fdd",
+      "key": "memit-target",
+      "line_range": [
+        1,
+        180
+      ],
+      "path": "memit/compute_z.py",
+      "ref": "80426fd9316cf9a50c5ba15e0912f2c2c5bfe84b",
+      "repository": "kmeng01/memit",
+      "url": "https://github.com/kmeng01/memit/blob/80426fd9316cf9a50c5ba15e0912f2c2c5bfe84b/memit/compute_z.py"
+    }
+  ]
+}
