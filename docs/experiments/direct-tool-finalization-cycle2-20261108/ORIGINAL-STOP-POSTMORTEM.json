@@ -1,0 +1,60 @@
+{
+  "source_commit": "4c8cd17144b5f02e47a8a4b76dc80565873714a6",
+  "original_gate": "STOP_harness",
+  "original_gate_sha256": "824a514f9a8c9b2944387df1f88da48c6e14ab412ac4b0afdeef72d49489a77f",
+  "diagnostic_scope": "Postmortem first-stop inspection; original records unchanged; no prefix/suffix admitted as completed trials.",
+  "records": [
+    {
+      "replay": 1,
+      "phase": "initial",
+      "classification": "expected_initial_call",
+      "input_tokens": 317,
+      "generated_tokens": 28,
+      "generation_seconds": 201.3981050401926,
+      "first_eos_index": 25,
+      "last_output_index": 27,
+      "finish_reason_as_originally_reported": "eos",
+      "original_generation_sha256": "587b032603a5fbdeaed55a0f89953bb96bad12c4ee9969e3f778059620d87ba1",
+      "all_426_unchanged": true
+    },
+    {
+      "replay": 1,
+      "phase": "continuation",
+      "classification": "STOP_harness",
+      "input_tokens": 374,
+      "generated_tokens": 83,
+      "generation_seconds": 336.9040618899744,
+      "first_eos_index": 25,
+      "last_output_index": 82,
+      "finish_reason_as_originally_reported": "eos",
+      "original_generation_sha256": "ceddd82341c6b7601329d8fe389c8b5e9a1cee88dd04716176a34a6157e2940f",
+      "all_426_unchanged": true
+    },
+    {
+      "replay": 2,
+      "phase": "initial",
+      "classification": "expected_initial_call",
+      "input_tokens": 317,
+      "generated_tokens": 28,
+      "generation_seconds": 199.02987121092156,
+      "first_eos_index": 25,
+      "last_output_index": 27,
+      "finish_reason_as_originally_reported": "eos",
+      "original_generation_sha256": "7addf33bf631ec83a03fc7b1c0840728d97411e1b6009a38f2538ba2788d4623",
+      "all_426_unchanged": true
+    },
+    {
+      "replay": 2,
+      "phase": "continuation",
+      "classification": "STOP_harness",
+      "input_tokens": 374,
+      "generated_tokens": 83,
+      "generation_seconds": 334.97926502488554,
+      "first_eos_index": 25,
+      "last_output_index": 82,
+      "finish_reason_as_originally_reported": "eos",
+      "original_generation_sha256": "c0d89d7528a138bccc6a8bc78760245bd1de58a65a9095fe2d198dba7a837e5f",
+      "all_426_unchanged": true
+    }
+  ]
+}

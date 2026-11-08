@@ -146,6 +146,35 @@ not an adversarial OS boundary. No hidden set is created before one eligible
 candidate and all interfaces are frozen. No candidate means final paired quality
 is `NOT_RUN`; the current practice broker does not become a final evaluator.
 
+## One reviewed chat-stop correction
+
+The first Cycle 2 four-generation batch is retained as `STOP_harness` under
+producer commit `4c8cd17144b5f02e47a8a4b76dc80565873714a6`. Its generator reported
+the model/tokenizer EOS union but failed to pass that union to `generate`, so
+it crossed the first assistant end marker and fabricated later chat turns.
+Do not trim those streams or relabel their duplicate-call prefixes as valid
+trials. Do not reuse their initial-call capsules.
+
+The new source uses
+`configs/direct-tool-finalization-cycle2-chatstop.protocol.json` and the separate
+stop-repair review. This is a disclosed post-fault, pre-corrected-score amendment,
+not an all-data-blind original protocol. Pass the authenticated model/tokenizer
+EOS union explicitly to generation. Independently require the first EOS to be
+the terminal output token; internal chat controls stop before semantic parsing.
+EOS at the last allowed position remains completed. Keep the original eight
+harness fixes and exact all-426 postchecks.
+
+The owner adopted Sol xhigh's single technical replay allowance: four original,
+exactly one corrected tranche of four, and the unchanged five semantic controls
+fit a maximum of thirteen generation invocations. Preserve the 21,600 cumulative
+worker-second and 22-diagnostic ceilings and every scientific threshold. Charge
+all original, failed, preflight, runtime, authentication, loading, generation,
+postcheck and exit costs; no reset or free retry. The prior ledger and newly
+qualified source's engineering costs must be frozen and charged before replay.
+A durable same-user claim prevents accidentally starting a second correction.
+Another corrected harness fault ends the cycle without a further replay.
+This amendment supplies no coordinate choice, weight candidate or quality pass.
+
 ## Audited worker invariants
 
 The eight audited harness repairs are documented in

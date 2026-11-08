@@ -32,6 +32,14 @@ invocations; it permits no weight edits. A separate user-selected
 defines later independent paired acceptance. No candidate or new quality result
 is established at this protocol freeze.
 
+The first tool tranche ended `STOP_harness`: the CPU observer continued beyond
+assistant-turn EOS. The [F09 repair](docs/reviews/20261108-direct-chat-stop-repair.md)
+passes the authenticated EOS union explicitly and verifies the first stop from
+raw tokens. Original evidence remains unchanged. One separately reviewed,
+fully charged technical replay uses fresh source and capsules, with every
+scientific criterion unchanged; no weight candidate or quality pass follows
+from repairing this harness.
+
 **Historical coding track:** the preserved LoRA/QLoRA work contains authenticated model snapshots, licensed corpora, assistant-only loss masks, adapter selection, serving, executable coding/tool checks, HumanEval and OpenCode/Hermes fixtures. Those artifacts and results remain useful records, but they are not implementations of the active no-training method. Legacy training, supervised-corpus preparation and trained-derivative CLI entry points are guarded by `scripts/method_policy.py`. See [the historical coding-assistant workflow](docs/coding-assistant.md).
 
 **Scope:** the original `0be1a86` wrapper reconstructs an existing 0.8B patch; it does not discover a repair. Its selected coordinates are never transferred to 4B. Model quality requires matched reports and independent evaluation, beyond successful reconstruction or a valid numeric patch. The exposed HE9/development/client fixtures are regressions, not a fresh untouched holdout. No result here establishes frontier-model equivalence.

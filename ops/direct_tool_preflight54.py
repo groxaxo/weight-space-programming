@@ -7,12 +7,13 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT), str(ROOT / 'scripts')]
 from ops import direct_edit54 as host
 import direct_tools as tools
-from direct_weights import load_lock, publish_json, verify_baseline
+from direct_weights import load_lock, publish_json, verify_baseline, read_authenticated_json
 from pipeline import require, sha256
 
 
@@ -23,6 +24,11 @@ def inside():
     verified = verify_baseline(lock, Path('/model'))
     publish_json(verified, Path('/out/baseline-verification.json'))
     tokenizer = AutoTokenizer.from_pretrained('/model', local_files_only=True, trust_remote_code=False)
+    config = read_authenticated_json(verified['files']['config.json'])
+    model_eos = config.get('text_config', config).get('eos_token_id')
+    effective_eos = tools.forward.chat_stop_ids(SimpleNamespace(generation_config=SimpleNamespace(eos_token_id=model_eos)), tokenizer)
+    protocol = host.read_json(tools.PROTOCOL_FILE)
+    require(effective_eos == protocol['stopping']['expected_eos_token_ids'], 'Authenticated EOS union differs from protocol')
     template_sha = tools.sha_bytes(tokenizer.chat_template.encode())
     require(template_sha == lock['model']['files']['chat_template.jinja']['sha256'], 'Tokenizer template differs from parent')
     values = {}
@@ -41,6 +47,8 @@ def inside():
     result = {'status': 'template_parser_preflight_passed', 'generation_invocations': 0,
               'model_loaded': False, 'training': False, 'weights_edited': False, 'quality_evaluation': 'NOT_RUN',
               'synthetic_call_only': True, 'template_sha256': template_sha,
+              'effective_eos_token_ids': effective_eos, 'model_config_eos': model_eos,
+              'tokenizer_eos': tokenizer.eos_token_id, 'first_eos_must_be_terminal': True,
               'protocol_sha256': sha256(tools.PROTOCOL_FILE), 'fixture_sha256': tools.FIXTURE_SHA256,
               'source_sha256': tools.evidence.SOURCE_AT_IMPORT, 'contexts': values}
     publish_json(result, Path('/out/preflight.json'))

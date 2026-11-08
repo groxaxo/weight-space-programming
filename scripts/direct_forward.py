@@ -201,8 +201,8 @@ def load_text_model(lock, verified):
     return model, tokenizer, info, checked
 
 
-def completion_status(generated, maximum, model, tokenizer):
-    """An EOS at the last allowed position completes the response."""
+def chat_stop_ids(model, tokenizer):
+    """Use the same model/tokenizer EOS union as the authenticated native route."""
     eos = set()
     for value in (getattr(getattr(model, 'generation_config', None), 'eos_token_id', None),
                   getattr(tokenizer, 'eos_token_id', None)):
@@ -211,12 +211,22 @@ def completion_status(generated, maximum, model, tokenizer):
             if token is not None:
                 require(type(token) is int and token >= 0, 'Invalid EOS identity')
                 eos.add(token)
-    require(bool(eos) and len(generated) <= maximum, 'Missing EOS identity or oversized generation')
-    ended = bool(generated) and generated[-1] in eos
+    require(bool(eos), 'Missing authenticated chat EOS identity')
+    return sorted(eos)
+
+
+def completion_status(generated, maximum, model, tokenizer):
+    """One assistant turn ends at the FIRST requested EOS, including at the cap."""
+    eos = chat_stop_ids(model, tokenizer)
+    require(len(generated) <= maximum, 'Oversized generation')
+    stops = [index for index, token in enumerate(generated) if token in eos]
+    require(not stops or stops == [len(generated) - 1], 'Generation contains tokens past the first chat EOS')
+    ended = bool(stops)
     capped = len(generated) == maximum
     return {'hit_token_limit': capped and not ended, 'reached_length_cap': capped,
             'finish_reason': 'eos' if ended else 'length' if capped else 'unknown',
-            'censored': not ended, 'eos_token_ids': sorted(eos)}
+            'censored': not ended, 'eos_token_ids': eos,
+            'first_eos_index': stops[0] if stops else None, 'first_eos_is_terminal': ended}
 
 
 def observe(request, lock, verified, outdir, *, prompt_builder=None):
@@ -274,6 +284,7 @@ def observe(request, lock, verified, outdir, *, prompt_builder=None):
                     output = model.generate(input_ids=ids, attention_mask=torch.ones_like(ids),
                                             do_sample=False, max_new_tokens=request['generation']['max_new_tokens'], use_cache=True,
                                             logits_to_keep=1, pad_token_id=tokenizer.eos_token_id,
+                                            eos_token_id=chat_stop_ids(model, tokenizer),
                                             streamer=TokenJournal(journal))
             except BaseException as error:
                 if arrays:

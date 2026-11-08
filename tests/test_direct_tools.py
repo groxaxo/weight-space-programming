@@ -49,10 +49,10 @@ def worker(output, value, raw=CALL, capsule_source=None):
              'rendered': 'synthetic fixture, not a model invocation',
              'template_sha256': lock['model']['files']['chat_template.jinja']['sha256'],
              'harness_call_id_tokenization_invariant': True, 'silent_truncation': False, 'thinking': False}
-    row = {'id': name, 'input_ids': [1, 2], 'input_tokens': 2, 'output_ids': [3, 2], 'generated_tokens': 2,
+    row = {'id': name, 'input_ids': [1, 2], 'input_tokens': 2, 'output_ids': [3, 248046], 'generated_tokens': 2,
            'text': raw, 'text_with_special_tokens': raw,
-           'eos_token_ids': [2], 'finish_reason': 'eos', 'reached_length_cap': False,
-           'hit_token_limit': False, 'censored': False,
+           'eos_token_ids': [248044, 248046], 'finish_reason': 'eos', 'reached_length_cap': False,
+           'hit_token_limit': False, 'censored': False, 'first_eos_index': 1, 'first_eos_is_terminal': True,
            'prompt_proof': write(output / (name + '-prompt.json'), proof),
            'observation': name + '-prefill.npz'}
     arrays(output / row['observation']); row['observation_sha256'] = sha256(output / row['observation'])

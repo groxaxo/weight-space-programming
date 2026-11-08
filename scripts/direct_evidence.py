@@ -159,7 +159,11 @@ def verify_observation(root, report, request):
         eos = row.get('eos_token_ids')
         require(type(eos) is list and bool(eos) and all(type(token) is int and token >= 0 for token in eos),
                 'Missing generation EOS identity')
-        ended = bool(ids) and ids[-1] in eos
+        stops = [index for index, token in enumerate(ids) if token in eos]
+        require(not stops or stops == [len(ids) - 1], 'Generation has tokens past the first internal chat stop')
+        ended = bool(stops)
+        require(row.get('first_eos_index') == (stops[0] if stops else None)
+                and row.get('first_eos_is_terminal') is ended, 'First-stop evidence disagrees with raw token IDs')
         capped = len(ids) == request['generation']['max_new_tokens']
         require(len(ids) <= request['generation']['max_new_tokens']
                 and row.get('hit_token_limit') is (capped and not ended)

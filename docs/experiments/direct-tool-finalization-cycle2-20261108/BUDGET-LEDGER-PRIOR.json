@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "cycle": "direct-tool-finalization-cycle2-20261108",
+  "source_commit": "4c8cd17144b5f02e47a8a4b76dc80565873714a6",
+  "protocol_sha256": "6942b27d4d5884c06c5636beeebefb5c20897f5573dba12c9fb3edd3af4dab69",
+  "prior_verdict": "STOP_harness",
+  "generation_invocations_used": 4,
+  "charges": [
+    {
+      "kind": "original_model_tranche",
+      "generation_invocations": 4,
+      "charged_seconds": 1515.253196,
+      "host_tranche_seconds": 1515.253196,
+      "worker_details": [
+        {
+          "phase": "initial",
+          "replay": 1,
+          "container": "wsp-direct-episode-1-initial-393fb6fcea6a",
+          "started_at": "2026-11-08T07:52:37.700331751Z",
+          "finished_at": "2026-11-08T07:58:18.590914849Z",
+          "container_seconds": 340.890583,
+          "exit_code": 0,
+          "inspection_sha256": "5edc76c7a277ee6e5170db7d1c613b91decbbe637d15eeeb6a28769f5ed5dec6",
+          "execution_sha256": "987dd1ee129fef8bb37b24b6cebee1a7e4a89415c903800ba99ffc680c8e41a4"
+        },
+        {
+          "phase": "continuation",
+          "replay": 1,
+          "container": "wsp-direct-episode-1-continuation-c14f522dd8a0",
+          "started_at": "2026-11-08T07:58:22.951943424Z",
+          "finished_at": "2026-11-08T08:05:40.532386079Z",
+          "container_seconds": 437.580443,
+          "exit_code": 0,
+          "inspection_sha256": "6aaf887928da99e105705ccdc17d5cde5011826ce1dcdb09d30dd370e3542baf",
+          "execution_sha256": "14a841782cc9ee6d64ef0bf292c528384884e06c0f5334b5abe3f6a65e9ba50e"
+        },
+        {
+          "phase": "initial",
+          "replay": 2,
+          "container": "wsp-direct-episode-2-initial-93a1fcce04b5",
+          "started_at": "2026-11-08T08:05:47.878033548Z",
+          "finished_at": "2026-11-08T08:10:38.095639159Z",
+          "container_seconds": 290.217606,
+          "exit_code": 0,
+          "inspection_sha256": "2c20bac6eba87a24983e4e6c67b1db5a9c8743dd8080965316ecdbb37c99be62",
+          "execution_sha256": "369fb8feae26c3b79e14d952845765440b0d520cafeb779a0b8050fd53ed493c"
+        },
+        {
+          "phase": "continuation",
+          "replay": 2,
+          "container": "wsp-direct-episode-2-continuation-7ae981a5149b",
+          "started_at": "2026-11-08T08:10:42.899224114Z",
+          "finished_at": "2026-11-08T08:17:45.760154322Z",
+          "container_seconds": 422.86093,
+          "exit_code": 0,
+          "inspection_sha256": "1381a7dc1db0d81e544b673682c2e6d0d5b4fd6cdc9e6697e1f7411dd34e8fcf",
+          "execution_sha256": "a9c1a99565d71d24161ee65a322e038ba0107850ab2c41e8ae8a23003c70addc"
+        }
+      ],
+      "gate_sha256": "824a514f9a8c9b2944387df1f88da48c6e14ab412ac4b0afdeef72d49489a77f"
+    },
+    {
+      "kind": "template-01",
+      "generation_invocations": 0,
+      "charged_seconds": 60.254105,
+      "exit_code": 1,
+      "execution_sha256": "e51dd80ef3116aa2b697e2244e11562cad07eab33ac1ec85c3a4a9769b132d81"
+    },
+    {
+      "kind": "template-02",
+      "generation_invocations": 0,
+      "charged_seconds": 53.334473,
+      "exit_code": 0,
+      "execution_sha256": "d11de371ffd27dcd87982ffec8357c3384d279735f33f3bc5356d18c7b5fe0f7"
+    },
+    {
+      "kind": "runtime-01",
+      "generation_invocations": 0,
+      "charged_seconds": 11.042382,
+      "exit_code": 0,
+      "execution_sha256": "0a22517acd17d2191bc0158890b3a492c0b923eaf71b43267673da119ac600f2"
+    },
+    {
+      "kind": "full-linux-01.log",
+      "generation_invocations": 0,
+      "charged_seconds": 57,
+      "tests": 401,
+      "log_sha256": "656257607dbb2391904b59fc4fcb0642d91b5183518bed8c7ae55599a0a2f6e4",
+      "charging": "Rounded entire CPU-suite wall time, conservatively in addition to any overlap."
+    },
+    {
+      "kind": "full-linux-02.log",
+      "generation_invocations": 0,
+      "charged_seconds": 55,
+      "tests": 404,
+      "log_sha256": "2b363c3f266f818ddf909eac4477b4e863ce9c2fe8a8df9c74b0684c0c08b317",
+      "charging": "Rounded entire CPU-suite wall time, conservatively in addition to any overlap."
+    }
+  ],
+  "total_worker_seconds": 1751.8841559999998,
+  "all_prior_costs_reconciled": true,
+  "reset": false,
+  "scope": "All prior .54 original/failed/template/runtime worker cost; model authentication/loading/generation/postcheck/exit within full host-tranche charge. CPU suite wall also charged conservatively. Local synthetic unit checks used no Qwen weights and are outside the .54 worker ledger."
+}

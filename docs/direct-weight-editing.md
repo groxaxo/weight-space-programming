@@ -417,3 +417,28 @@ Independent final acceptance belongs to the separate
 [Sol max custodian](plans/direct-cycle2-independent-acceptance-20261108.md), with
 no private prompts or answers exposed to selection. That interface is a later
 prerequisite, not an implemented or completed final run.
+
+
+## First-stop correction and preserved failed tranche
+
+The first tool-episode tranche is `STOP_harness`: it advertised the correct
+model/tokenizer EOS union but passed neither explicit stop list to generation.
+The native route already used both `<|endoftext|>` and `<|im_end|>`. The raw
+continuation crossed its first assistant end, generated a simulated user/tool
+result and a later assistant answer. Those bytes and their original verifier
+remain preserved. Neither the prefix nor the suffix is a valid completed trial.
+
+The [separate review](plans/direct-tool-finalization-cycle2-stop-repair-review-20261108.md)
+and corrected protocol freeze one technical replay with fresh capsules. The
+same authenticated EOS union now controls generation and completion metadata;
+the host independently rejects any tokens past the first stop. Internal chat
+control markers also stop tool classification before parsing. No output is
+trimmed to manufacture a pass. New regressions exercise requested versus
+reported EOS, ignored first stops, host verification and fabricated chat turns.
+
+The amended discovery cap is thirteen generation invocations (original four,
+corrected four, unchanged five semantic controls), while the 21,600 charged
+worker-second and 22-diagnostic ceilings remain. Original costs and corrected
+qualification costs are captured before model execution. One durable replay
+claim is retained; another corrected harness fault ends this cycle. All earlier
+scientific controls and the prior interval-study failure remain unchanged.
